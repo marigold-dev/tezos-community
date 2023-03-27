@@ -1,0 +1,15 @@
+{
+  "name": "tezos-community",
+  "version": "1.0.0",
+  "description": "Project to build a dapp for Tezos community that includes a DAO, organization rules, multisig, message broadcast, etc ...",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@taqueria/plugin-ligo": "^0.28.4-1852.e20decfd"
+  }
+}

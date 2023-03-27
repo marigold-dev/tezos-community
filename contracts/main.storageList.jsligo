@@ -1,0 +1,18 @@
+#include "main.jsligo"
+
+let tezosOrganization : organization = {
+   name : "TEZOS",
+   business : "Save the planet",
+   members : Set.empty as set<address>,
+   membersMax : 10 as nat,
+   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"  as address])) as set<address>,
+   status : ACTIVE(),
+   memberRequests : Set.empty as set<joinOrganizationRequest>,
+   memberRequestMax : 0 as nat
+}; 
+
+const default_storage = {
+    tezosOrganization : tezosOrganization,
+    organizations : list([]) as list<organization>,
+    maxOrganization : 10 as nat
+};

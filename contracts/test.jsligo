@@ -1,0 +1,52 @@
+#import "./main.jsligo" "CONTRACT"
+
+// reset state
+const _ = Test.reset_state ( 3 as nat, list([]) as list <tez> );
+const baker = Test.nth_bootstrap_account(0);
+const _ = Test.set_baker(baker);
+const tezosAdmin : address = Test.nth_bootstrap_account(1);
+const _ = Test.log("tezosAdmin has balance : ");
+const _ = Test.log(Test.get_balance(tezosAdmin));
+const _ = Test.log(tezosAdmin);
+const user : address = Test.nth_bootstrap_account(2);
+const _ = Test.log("user has balance : ");
+const _ = Test.log(Test.get_balance(user));
+const _ = Test.log(user);
+
+const tezosOrganization : CONTRACT.organization = {
+   name : "TEZOS",
+   members : Set.empty as set<address>,
+   membersMax : 10 as nat,
+   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
+   business : "Save the planet",
+   status : ACTIVE(),
+   memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>,
+   memberRequestMax : 0 as nat
+}; 
+
+const initial_storage : CONTRACT.storage = {
+    tezosOrganization : tezosOrganization,
+    organizations : list([]) as list<CONTRACT.organization>,
+    maxOrganization : 10 as nat
+};
+
+const [taddr, _, _] = Test.originate_module(contract_of(CONTRACT), initial_storage, 0 as tez);
+const contr = Test.to_contract(taddr);
+
+///////////
+
+const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest) : bool => {
+    Test.set_source(sender);
+    const gas_cons = Test.transfer_to_contract_exn(contr, AddOrganization(or), 0 as mutez);
+    const _ = Test.log(["gas consumption", gas_cons]);
+    return true;
+}
+
+///////////
+
+const newOrganization : CONTRACT.addOrganizationRequest = {
+   name : "Marigold",
+   business : "Save Ligo"
+};
+
+const test2 = _testAddOrganizationNotAdmin(user,newOrganization);
