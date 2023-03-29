@@ -15,19 +15,18 @@ const _ = Test.log(user);
 
 const tezosOrganization : CONTRACT.organization = {
    name : "TEZOS",
-   members : Set.empty as set<address>,
-   membersMax : 10 as nat,
-   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
    business : "Save the planet",
+   members : Big_map.empty as big_map<address,unit>,
+   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
    status : ACTIVE(),
    memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>,
-   memberRequestMax : 0 as nat
 }; 
 
 const initial_storage : CONTRACT.storage = {
     tezosOrganization : tezosOrganization,
     organizations : list([]) as list<CONTRACT.organization>,
-    maxOrganization : 10 as nat
+    organizationMax : 100 as nat,
+    adminsMax : 50 as nat
 };
 
 const [taddr, _, _] = Test.originate_module(contract_of(CONTRACT), initial_storage, 0 as tez);

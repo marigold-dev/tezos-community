@@ -4,7 +4,6 @@ export type ORGANIZATION_STATUS =
 | ["FROZEN"] 
 ;
 
-
 export type removeMemberRequest = {
     member : address, 
     orgName : string,
@@ -37,18 +36,17 @@ export type addOrganizationRequest = {
 export type organization = {
    name : string,
    business : string,
-   members : set<address>,
-   membersMax : nat,
+   members : big_map<address,unit>,
    admins : set<address>,
    status : ORGANIZATION_STATUS,
    memberRequests : set<joinOrganizationRequest>,
-   memberRequestMax : nat
 }; 
 
 export type storage = {
     tezosOrganization : organization,
     organizations : list<organization>,
-    maxOrganization : nat
+    organizationMax : nat,
+    adminsMax : nat
 };
 
 export type _return = [list<operation>,storage];
@@ -76,13 +74,11 @@ export const addOrganization = (org : addOrganizationRequest, store : storage) :
         business: org.business,
         status : PENDING_APPROVAL(),
         admins : Set.literal(list([Tezos.get_sender()])) as set<address>,
-        members : Set.empty as set<address>,
-        membersMax : 100 as nat,
+        members : Big_map.empty as big_map<address,unit>,
         memberRequests : Set.empty as set<joinOrganizationRequest>,
-        memberRequestMax : 100 as nat    
     };
     
-    if(List.size(store.organizations) >= store.maxOrganization) {
+    if(List.size(store.organizations) >= store.organizationMax) {
         return failwith("Too many organization, please contact Tezos administrators to increase the limit");
     }
     else {
@@ -153,12 +149,9 @@ export const requestToJoinOrganization = (jor : joinOrganizationRequest, store :
     const orgOpt = List.find_opt((orgItem : organization)=>(orgItem.name == jor.joinRequest.orgName),store.organizations);
     return match(orgOpt, {
         None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => {
-            if(Set.cardinal(org.members) >= org.membersMax) return failwith("This organization has reach join request limit");
-            else {
+        Some : (org) => {            
                 const newOrg = {...org ,memberRequests :  Set.add({ user : Tezos.get_sender(), joinRequest : jor.joinRequest },org.memberRequests)};
                 return [list([]),{...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),newOrg,store.organizations)}];
-            }
             }
     });    
 };
@@ -174,7 +167,7 @@ export const responseToJoinOrganization = (jor : joinOrganizationResponse, store
                 let newOrg = {...org};
                 for (const mr of newOrg.memberRequests) {
                     if(Set.mem(mr.user,jor.membersToApprove)) {
-                       newOrg = {...newOrg,members : Set.add(mr.user,newOrg.members),memberRequests : Set.remove(mr,newOrg.memberRequests)};
+                       newOrg = {...newOrg,members : Big_map.add(mr.user,unit,newOrg.members),memberRequests : Set.remove(mr,newOrg.memberRequests)};
                     } else if(Set.mem(mr.user,jor.membersToDecline)){
                        newOrg = {...newOrg,memberRequests : Set.remove(mr,newOrg.memberRequests)};
                     }
@@ -184,3 +177,21 @@ export const responseToJoinOrganization = (jor : joinOrganizationResponse, store
         }
     });
 };
+
+/*
+//@entry
+export const freezeOrganization = (name : string, store : storage) : _return => {
+
+};
+*/
+
+/*
+//@entry
+export const unfreezeOrganization = (name : string, store : storage) : _return => {
+
+};
+*/
+
+//TODO add events everywhere
+
+//TODO add NFT card membership
