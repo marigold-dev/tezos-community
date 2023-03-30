@@ -1,11 +1,5 @@
 #import "@ligo/fa/lib/fa2/asset/single_asset.jsligo" "SINGLEASSET"
 
-/*
-//@inline
-const update_with = <a> (f : (a : a) => bool , v : a , xs : list<a>) : list<a> => 
-    List.map( ( (a : a) => { if(f(a)) return v ; else return a; }) , xs);
-*/
-
 export type ORGANIZATION_STATUS = 
 | ["PENDING_APPROVAL"] 
 | ["ACTIVE"] 
@@ -210,7 +204,7 @@ export const responseToJoinOrganization = (jor : joinOrganizationResponse, store
                        newOrg = {...newOrg,memberRequests : Set.remove(mr,newOrg.memberRequests)};
                     }
                 };
-                return [list([Tezos.emit("%organizationMemberRequestsUpdated",org.name)]), {...store,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,store.organizations)}];
+                return [list([Tezos.emit("%orgMemberRequestsUpdated",org.name)]), {...store,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,store.organizations)}];
             }
         }
     });
