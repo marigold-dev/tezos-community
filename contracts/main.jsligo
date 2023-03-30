@@ -65,7 +65,7 @@ export type storage = {
 
 export type _return = [list<operation>,storage];
 
-/*
+
 //@entry
 export const activateOrganization = (orgName : string, store : storage) : _return => {
     const orgOpt = List.find_opt((org : organization)=>orgName==org.name,store.organizations);
@@ -74,14 +74,14 @@ export const activateOrganization = (orgName : string, store : storage) : _retur
         Some : (org) => {
             if(Set.mem(Tezos.get_sender(),store.tezosOrganization.admins)) return [list([Tezos.emit("%organizationActivated",org.name)]),
                 {...store, 
-                organizations: List.update_with((orgItem : organization)=>(org.name == orgItem.name),{...org,status : ACTIVE()},store.organizations)            
+                organizations: List.update_with((orgItem : organization)=>(orgName == orgItem.name),{...org,status : ACTIVE()},store.organizations)            
                 }
                 ];    
             else return failwith("You need to be part of Tezos organization to activate an organization");
             }
     });
 };
-*/
+
 
 
 //@entry
@@ -91,12 +91,9 @@ export const freezeOrganization = (name : string, store : storage) : _return => 
         None : () => failwith("Cannot find organization with name passed on parameter"),
         Some : (org) => {
             if(Set.mem(Tezos.get_sender(),store.tezosOrganization.admins)) { 
-                let name = org.name;
                 return [list([Tezos.emit("%organizationFrozen",org.name)]),
                         {...store,
-                        organizations : //list([org , ...store.organizations])
-                        
-                        List.update_with((orgItem : organization)=>orgItem.name == name,
+                        organizations : List.update_with((orgItem : organization)=>orgItem.name == name,
                                                          {...org,status : FROZEN()},
                                                          store.organizations)
                         }];
@@ -147,7 +144,7 @@ export const removeOrganization = (name : string, store : storage) : _return => 
     });
 };
 
-/*
+
 const leaveOrganizationAsAdmin = (orgName : string, lastAdmin : option<address>, store : storage) : storage => {
     const orgOpt : option<organization> = List.find_opt((org:organization)=>(org.name == orgName),store.organizations);
     return match(orgOpt,{
@@ -157,7 +154,7 @@ const leaveOrganizationAsAdmin = (orgName : string, lastAdmin : option<address>,
                         else {
                             let newAdmins = Set.remove(Tezos.get_sender(),org.admins);
                             if(Set.cardinal(org.admins) == (1 as nat) && Option.is_some(lastAdmin)) newAdmins = Set.add(Option.unopt(lastAdmin),newAdmins);
-                            return {...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),{...org,admins:newAdmins},store.organizations)};
+                            return {...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == orgName),{...org,admins:newAdmins},store.organizations)};
                         }
                         }
         });
@@ -182,7 +179,7 @@ export const removeMember = (rmr : removeMemberRequest, store : storage) : _retu
         }
     });
 };
-*/
+
 
 //@entry
 export const requestToJoinOrganization = (jor : joinOrganizationRequest, store : storage) : _return => {
@@ -196,7 +193,7 @@ export const requestToJoinOrganization = (jor : joinOrganizationRequest, store :
     });    
 };
 
-/*
+
 //@entry
 export const responseToJoinOrganization = (jor : joinOrganizationResponse, store : storage) : _return => {
     const orgOpt : option<organization> = List.find_opt((org:organization)=>(org.name == jor.orgName),store.organizations);
@@ -213,12 +210,12 @@ export const responseToJoinOrganization = (jor : joinOrganizationResponse, store
                        newOrg = {...newOrg,memberRequests : Set.remove(mr,newOrg.memberRequests)};
                     }
                 };
-                return [list([Tezos.emit("%organizationMemberRequestsUpdated",org.name)]), {...store,organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),newOrg,store.organizations)}];
+                return [list([Tezos.emit("%organizationMemberRequestsUpdated",org.name)]), {...store,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,store.organizations)}];
             }
         }
     });
 };
-*/
+
 
 // NFT card membership
 
