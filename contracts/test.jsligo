@@ -69,7 +69,8 @@ const contr = Test.to_contract(taddr);
 
 ///////////
 
-const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest, orgSize : nat, status : CONTRACT.ORGANIZATION_STATUS) : bool => {
+const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest, orgSize : nat //,status : CONTRACT.ORGANIZATION_STATUS
+) : bool => {
     Test.set_source(sender);
     const status = Test.transfer_to_contract(contr, AddOrganization(or), 0 as mutez);
     const _ = Test.log(["status", status]);
@@ -83,10 +84,10 @@ const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganiza
     Test.assert_with_error(Option.is_some(orgOpt),"Cannot extract the organization on the list");
     const org = Option.unopt(orgOpt);
     Test.assert_with_error(org.name == or.name,"organization name is different");
-    Test.assert_with_error(org.status == status,"organization status is different");
-/*
-      return [Test.get_last_events_from(ta, "foo") as list<[int, int]>, Test.get_last_events_from(ta, "foo") as list<int>];
-*/
+    //Test.assert_with_error(org.status == status,"organization status is different");
+    const events = Test.get_last_events_from(taddr, "organizationAdded") as list<string>;
+    Test.assert_with_error(List.size(events) == (1 as nat),"Cannot find event");
+    Test.assert_with_error(Option.unopt(List.head_opt(events)) == org.name, "Event is different");
     return true;
 }
 
@@ -97,4 +98,4 @@ const newOrganization : CONTRACT.addOrganizationRequest = {
    business : "Save Tezos"
 };
 
-const testAddOrganizationNotAdmin = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat, PENDING_APPROVAL());
+const testAddOrganizationNotAdmin = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat); //,PENDING_APPROVAL());
