@@ -1,18 +1,49 @@
-#include "main.jsligo"
+#import "./main.jsligo" "CONTRACT"
 
-let tezosOrganization : organization = {
+const token_info: map<string, bytes> =
+     Map.literal(list([
+      ["name", (bytes`"Tezos Community"`)],
+      ["description",(bytes`"Membership card for Tezos community member"`)],
+      ["interfaces", (bytes `["TZIP-12"]`)],
+      ["thumbnailUri", (bytes`"ipfs://QmfPwhXDYyR8HCXyCpxYm4xfi2HcDozc84mQdnoG5sbPM4"`)],
+      ["symbol",(bytes`"NFTTZ"`)],
+      ["decimals", (bytes `0`)]
+     ])) as map<string, bytes>;
+
+
+    const metadata : bytes = bytes
+  `{
+      "name":"Tezos Community NFT",
+      "description":"Membership card for Tezos community member",
+      "version":"0.0.1",
+      "license":{"name":"MIT"},
+      "authors":["Marigold<contact@marigold.dev>"],
+      "homepage":"https://marigold.dev",
+      "source":{
+        "tools":["Ligo"],
+        "location":"https://github.com/ligolang/contract-catalogue/tree/main/lib/fa2"},
+      "interfaces":["TZIP-012"],
+      "errors": [],
+      "views": []
+      }` ;
+
+const tezosOrganization : CONTRACT.organization = {
    name : "TEZOS",
    business : "Save the planet",
-   members : Set.empty as set<address>,
-   membersMax : 10 as nat,
-   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"  as address])) as set<address>,
+   members : Big_map.empty as big_map<address,unit>,
+   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
    status : ACTIVE(),
-   memberRequests : Set.empty as set<joinOrganizationRequest>,
-   memberRequestMax : 0 as nat
+   memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>
 }; 
 
 const default_storage = {
     tezosOrganization : tezosOrganization,
-    organizations : list([]) as list<organization>,
-    maxOrganization : 10 as nat
+    organizations : list([]) as list<CONTRACT.organization>,
+    maxOrganization : 10 as nat,
+
+    ledger: Big_map.literal(list([[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),1 as nat]])) as CONTRACT.SINGLEASSET.Ledger.t,
+    metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", metadata]])),
+    token_metadata: Big_map.add(0 as nat, {token_id: 0 as nat,token_info:token_info},Big_map.empty as CONTRACT.SINGLEASSET.TokenMetadata.t),
+    operators: Big_map.empty as CONTRACT.SINGLEASSET.Operators.t,
+    owners: Set.add("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address,Set.empty as set<address>)
 };

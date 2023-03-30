@@ -1,4 +1,6 @@
 #import "./main.jsligo" "CONTRACT"
+#import "@ligo/fa/lib/fa2/asset/single_asset.jsligo" "SINGLEASSET"
+
 
 // reset state
 const _ = Test.reset_state ( 3 as nat, list([]) as list <tez> );
@@ -19,14 +21,47 @@ const tezosOrganization : CONTRACT.organization = {
    members : Big_map.empty as big_map<address,unit>,
    admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
    status : ACTIVE(),
-   memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>,
+   memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>
 }; 
+
+const token_info: map<string, bytes> =
+     Map.literal(list([
+      ["name", (bytes`"Tezos Community"`)],
+      ["description",(bytes`"Membership card for Tezos community member"`)],
+      ["interfaces", (bytes `["TZIP-12"]`)],
+      ["thumbnailUri", (bytes`"ipfs://QmfPwhXDYyR8HCXyCpxYm4xfi2HcDozc84mQdnoG5sbPM4"`)],
+      ["symbol",(bytes`"NFTTZ"`)],
+      ["decimals", (bytes `0`)]
+     ])) as map<string, bytes>;
+
+
+    const metadata : bytes = bytes
+  `{
+      "name":"Tezos Community NFT",
+      "description":"Membership card for Tezos community member",
+      "version":"0.0.1",
+      "license":{"name":"MIT"},
+      "authors":["Marigold<contact@marigold.dev>"],
+      "homepage":"https://marigold.dev",
+      "source":{
+        "tools":["Ligo"],
+        "location":"https://github.com/ligolang/contract-catalogue/tree/main/lib/fa2"},
+      "interfaces":["TZIP-012"],
+      "errors": [],
+      "views": []
+      }` ;
 
 const initial_storage : CONTRACT.storage = {
     tezosOrganization : tezosOrganization,
     organizations : list([]) as list<CONTRACT.organization>,
     organizationMax : 100 as nat,
-    adminsMax : 50 as nat
+    adminsMax : 50 as nat,
+
+    ledger: Big_map.literal(list([[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),1 as nat]])) as SINGLEASSET.Ledger.t,
+    metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", metadata]])),
+    token_metadata: Big_map.add(0 as nat, {token_id: 0 as nat,token_info:token_info},Big_map.empty as SINGLEASSET.TokenMetadata.t),
+    operators: Big_map.empty as SINGLEASSET.Operators.t,
+    owners: Set.add("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address,Set.empty as set<address>)
 };
 
 const [taddr, _, _] = Test.originate_module(contract_of(CONTRACT), initial_storage, 0 as tez);
@@ -34,10 +69,23 @@ const contr = Test.to_contract(taddr);
 
 ///////////
 
-const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest) : bool => {
+const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest, orgSize : nat) : bool => {
     Test.set_source(sender);
-    const gas_cons = Test.transfer_to_contract_exn(contr, AddOrganization(or), 0 as mutez);
-    const _ = Test.log(["gas consumption", gas_cons]);
+    const status = Test.transfer_to_contract(contr, AddOrganization(or), 0 as mutez);
+    const _ = Test.log(["status", status]);
+    //const _ = Test.bake_until_n_cycle_end(10 as nat);
+    let store : CONTRACT.storage = Test.get_storage(taddr);
+    Test.log(store);
+    /*Test.assert_with_error(List.size(store.organizations) == orgSize, "Wrong size on organization list");
+    const orgSet : list<CONTRACT.organization> = List.filter_map((orgItem : CONTRACT.organization) => orgItem.name == or.name ? Some(orgItem) : None(),store.organizations);
+    Test.assert_with_error(List.size(orgSet) == (1 as nat),"Cannot find the organization on the list");
+    const orgOpt = List.head_opt(orgSet);
+    Test.assert_with_error(Option.is_some(orgOpt),"Cannot extract the organization on the list");
+    const org = Option.unopt(orgOpt);
+    Test.assert_with_error(org.name == or.name,"Cannot find the organization");
+
+      return [Test.get_last_events_from(ta, "foo") as list<[int, int]>, Test.get_last_events_from(ta, "foo") as list<int>];
+*/
     return true;
 }
 
@@ -45,7 +93,7 @@ const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganiza
 
 const newOrganization : CONTRACT.addOrganizationRequest = {
    name : "Marigold",
-   business : "Save Ligo"
+   business : "Save Tezos"
 };
 
-const test2 = _testAddOrganizationNotAdmin(user,newOrganization);
+const test2 = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat);

@@ -4,6 +4,13 @@ Project to build a dapp for Tezos community that includes a DAO, organization ru
 
 [slides](https://docs.google.com/presentation/d/1Tao9c4QZm_YGRz9PxwZlPks2EbUCN8K_XKldVN4V0zQ/edit#slide=id.g2133bbaece6_0_0)
 
+Add @ligo/fa lib
+
+```
+echo "{}" > esy.json
+taq ligo --command "install @ligo/fa"
+```
+
 Compile with last version
 
 ```bash
