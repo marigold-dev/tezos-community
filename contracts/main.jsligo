@@ -1,10 +1,10 @@
 #import "@ligo/fa/lib/fa2/asset/single_asset.jsligo" "SINGLEASSET"
 
-
+/*
 //@inline
 const update_with = <a> (f : (a : a) => bool , v : a , xs : list<a>) : list<a> => 
     List.map( ( (a : a) => { if(f(a)) return v ; else return a; }) , xs);
-
+*/
 
 export type ORGANIZATION_STATUS = 
 | ["PENDING_APPROVAL"] 
@@ -117,12 +117,7 @@ export const addOrganization = (org : addOrganizationRequest, store : storage) :
             Some : (_org) => failwith("Organization name already exists and should be unique"),
             None : () => [list([Tezos.emit("%organizationAdded",org.name)]),
                         {...store,
-                        organizations: 
-                        /*list([newOrg,...store.organizations]) */
-                        List.update_with( 
-                            (orgItem : organization)=>(org.name == orgItem.name),
-                            Set.mem(Tezos.get_sender(),store.tezosOrganization.admins) ? {...newOrg,status:ACTIVE()} as organization : {...newOrg} as organization,
-                            store.organizations)
+                        organizations: Set.mem(Tezos.get_sender(),store.tezosOrganization.admins) ? list([{...newOrg,status:ACTIVE()} as organization,...store.organizations]) : list([{...newOrg} as organization,...store.organizations]),                        
                         }
             ]
         }); 

@@ -69,21 +69,22 @@ const contr = Test.to_contract(taddr);
 
 ///////////
 
-const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest, orgSize : nat) : bool => {
+const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest, orgSize : nat, status : CONTRACT.ORGANIZATION_STATUS) : bool => {
     Test.set_source(sender);
     const status = Test.transfer_to_contract(contr, AddOrganization(or), 0 as mutez);
     const _ = Test.log(["status", status]);
     //const _ = Test.bake_until_n_cycle_end(10 as nat);
     let store : CONTRACT.storage = Test.get_storage(taddr);
     Test.log(store);
-    /*Test.assert_with_error(List.size(store.organizations) == orgSize, "Wrong size on organization list");
-    const orgSet : list<CONTRACT.organization> = List.filter_map((orgItem : CONTRACT.organization) => orgItem.name == or.name ? Some(orgItem) : None(),store.organizations);
-    Test.assert_with_error(List.size(orgSet) == (1 as nat),"Cannot find the organization on the list");
-    const orgOpt = List.head_opt(orgSet);
+    Test.assert_with_error(List.size(store.organizations) == orgSize, "Wrong size on organization list");
+    const orgList : list<CONTRACT.organization> = List.filter_map((orgItem : CONTRACT.organization) => orgItem.name == or.name ? Some(orgItem) : None(),store.organizations);
+    Test.assert_with_error(List.size(orgList) == (1 as nat),"Cannot find the organization on the list");
+    const orgOpt = List.head_opt(orgList);
     Test.assert_with_error(Option.is_some(orgOpt),"Cannot extract the organization on the list");
     const org = Option.unopt(orgOpt);
-    Test.assert_with_error(org.name == or.name,"Cannot find the organization");
-
+    Test.assert_with_error(org.name == or.name,"organization name is different");
+    Test.assert_with_error(org.status == status,"organization status is different");
+/*
       return [Test.get_last_events_from(ta, "foo") as list<[int, int]>, Test.get_last_events_from(ta, "foo") as list<int>];
 */
     return true;
@@ -96,4 +97,4 @@ const newOrganization : CONTRACT.addOrganizationRequest = {
    business : "Save Tezos"
 };
 
-const test2 = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat);
+const testAddOrganizationNotAdmin = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat, PENDING_APPROVAL());
