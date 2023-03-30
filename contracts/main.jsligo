@@ -83,20 +83,31 @@ export const activateOrganization = (orgName : string, store : storage) : _retur
 };
 */
 
-/*
+
 //@entry
 export const freezeOrganization = (name : string, store : storage) : _return => {
     const orgOpt : option<organization> = List.find_opt((org:organization)=>(org.name == name),store.organizations);
     return match(orgOpt,{
         None : () => failwith("Cannot find organization with name passed on parameter"),
         Some : (org) => {
-            if(Set.mem(Tezos.get_sender(),store.tezosOrganization.admins)) return [list([Tezos.emit("%organizationFrozen",org.name)]), 
-            {...store,organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),{...org,status : FROZEN()},store.organizations)}];
-            else return failwith("You need to be part of Tezos organization to remove an organization");
+            if(Set.mem(Tezos.get_sender(),store.tezosOrganization.admins)) { 
+                let name = org.name;
+                return [list([Tezos.emit("%organizationFrozen",org.name)]),
+                        {...store,
+                        organizations : //list([org , ...store.organizations])
+                        
+                        List.update_with((orgItem : organization)=>orgItem.name == name,
+                                                         {...org,status : FROZEN()},
+                                                         store.organizations)
+                        }];
+            }
+            else {
+                return failwith("You need to be part of Tezos organization to remove an organization");
+                }
         }
     });
 };
-*/
+
 
 //@entry
 export const addOrganization = (org : addOrganizationRequest, store : storage) : _return => {
