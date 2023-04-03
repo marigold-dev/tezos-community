@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@taqueria/plugin-ligo": "^0.28.4-1852.e20decfd"
+    "@taqueria/plugin-contract-types": "^0.28.4",
+    "@taqueria/plugin-ligo": "^0.28.4-1852.e20decfd",
+    "@taqueria/plugin-taquito": "^0.28.4"
   }
 }

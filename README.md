@@ -22,3 +22,34 @@ Run test
 ```bash
 TAQ_LIGO_IMAGE=ligolang/ligo:next taq test test.jsligo
 ```
+
+deploy
+
+```
+taq install @taqueria/plugin-taquito
+taq deploy main.tz -e "testing"
+```
+
+> Note, change file name on storage
+
+Override with alice account on .taq/config.local.testing.json
+
+```json
+{
+  "networkName": "ghostnet",
+  "accounts": {
+    "taqOperatorAccount": {
+      "publicKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+      "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+      "privateKey": "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+    }
+  }
+}
+```
+
+Mobile app
+
+```
+npm run postinstall
+npm run start
+```

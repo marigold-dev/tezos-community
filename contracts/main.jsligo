@@ -60,6 +60,36 @@ export type storage = {
 export type _return = [list<operation>,storage];
 
 
+
+////////////////////// NFT card membership
+
+const createNFTCardForMember = (member : address,s : storage) : storage => {
+    return {...s,
+            ledger: Big_map.add(member,(1 as nat),s.ledger),
+            owners: Set.add(member,s.owners)};
+};
+
+/*Soulbound tokens are not transferable*/
+//@entry
+const transfer = (_p: SINGLEASSET.transfer, s : storage) : _return => {
+    if(1 == 1) return failwith("Soulbound tokens are not transferable");
+    return [list([]),s]; 
+};
+
+//@entry
+const balance_of = (p: SINGLEASSET.balance_of, s : storage) : _return => {
+    const ret2 = SINGLEASSET.balance_of([p,{ledger:s.ledger,metadata:s.metadata,token_metadata:s.token_metadata,operators:s.operators,owners:s.owners}]);
+    return [ret2[0],{...s,ledger:ret2[1].ledger,metadata:ret2[1].metadata,token_metadata:ret2[1].token_metadata,operators:ret2[1].operators,owners:ret2[1].owners}];
+};
+
+//@entry
+const update_operators = (p: SINGLEASSET.update_operators, s : storage) : _return => {
+    const ret2 = SINGLEASSET.update_ops([p,{ledger:s.ledger,metadata:s.metadata,token_metadata:s.token_metadata,operators:s.operators,owners:s.owners}]);
+    return [ret2[0],{...s,ledger:ret2[1].ledger,metadata:ret2[1].metadata,token_metadata:ret2[1].token_metadata,operators:ret2[1].operators,owners:ret2[1].owners}];
+};
+
+////////////////////////// DAO
+
 //@entry
 export const activateOrganization = (orgName : string, store : storage) : _return => {
     const orgOpt = List.find_opt((org : organization)=>orgName==org.name,store.organizations);
@@ -174,15 +204,17 @@ export const removeMember = (rmr : removeMemberRequest, store : storage) : _retu
     });
 };
 
-
 //@entry
-export const requestToJoinOrganization = (jor : joinOrganizationRequest, store : storage) : _return => {
-    const orgOpt = List.find_opt((orgItem : organization)=>(orgItem.name == jor.joinRequest.orgName),store.organizations);
+export const requestToJoinOrganization = (jr : joinRequest, store : storage) : _return => {
+    const orgOpt = List.find_opt((orgItem : organization)=>(orgItem.name == jr.orgName),store.organizations);
     return match(orgOpt, {
         None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => {            
-                const newOrg = {...org ,memberRequests :  Set.add({ user : Tezos.get_sender(), joinRequest : jor.joinRequest },org.memberRequests)};
+        Some : (org) => {
+            if(org.status != ACTIVE()) return failwith("You cannot receive requests until your organization is activated");
+            else {            
+                const newOrg = {...org ,memberRequests :  Set.add({ user : Tezos.get_sender(), joinRequest : jr },org.memberRequests)};
                 return [list([Tezos.emit("%joinOrganizationRequest",Tezos.get_sender())]),{...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),newOrg,store.organizations)}];
+                }
             }
     });    
 };
@@ -197,37 +229,17 @@ export const responseToJoinOrganization = (jor : joinOrganizationResponse, store
             if(!Set.mem(Tezos.get_sender(),org.admins)) return failwith("You don't have the rights to approve/decline users from this organization"); 
             else {
                 let newOrg = {...org};
+                let newStore = {...store};
                 for (const mr of newOrg.memberRequests) {
                     if(Set.mem(mr.user,jor.membersToApprove)) {
                        newOrg = {...newOrg,members : Big_map.add(mr.user,unit,newOrg.members),memberRequests : Set.remove(mr,newOrg.memberRequests)};
+                       newStore = createNFTCardForMember(mr.user,store);
                     } else if(Set.mem(mr.user,jor.membersToDecline)){
                        newOrg = {...newOrg,memberRequests : Set.remove(mr,newOrg.memberRequests)};
                     }
                 };
-                return [list([Tezos.emit("%orgMemberRequestsUpdated",org.name)]), {...store,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,store.organizations)}];
+                return [list([Tezos.emit("%orgMemberRequestsUpdated",org.name)]), {...newStore,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,newStore.organizations)}];
             }
         }
     });
-};
-
-
-// NFT card membership
-
-/*Soulbound tokens are not transferable*/
-//@entry
-const transfer = (_p: SINGLEASSET.transfer, s : storage) : _return => {
-    if(1 == 1) return failwith("Soulbound tokens are not transferable");
-    return [list([]),s]; 
-};
-
-//@entry
-const balance_of = (p: SINGLEASSET.balance_of, s : storage) : _return => {
-    const ret2 = SINGLEASSET.balance_of([p,{ledger:s.ledger,metadata:s.metadata,token_metadata:s.token_metadata,operators:s.operators,owners:s.owners}]);
-    return [ret2[0],{...s,ledger:ret2[1].ledger,metadata:ret2[1].metadata,token_metadata:ret2[1].token_metadata,operators:ret2[1].operators,owners:ret2[1].owners}];
-};
-
-//@entry
-const update_operators = (p: SINGLEASSET.update_operators, s : storage) : _return => {
-    const ret2 = SINGLEASSET.update_ops([p,{ledger:s.ledger,metadata:s.metadata,token_metadata:s.token_metadata,operators:s.operators,owners:s.owners}]);
-    return [ret2[0],{...s,ledger:ret2[1].ledger,metadata:ret2[1].metadata,token_metadata:ret2[1].token_metadata,operators:ret2[1].operators,owners:ret2[1].owners}];
 };

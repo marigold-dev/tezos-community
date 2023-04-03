@@ -1,0 +1,132 @@
+:root {
+  --startFixedChars: 15;
+  --endFixedChars: 10;
+  --startWidth: 1em * 1 * var(--startFixedChars);
+  --endWidth: 1em * 1 * (var(--endFixedChars));
+}
+
+.container {
+  display: flex;
+  background-color: #1c1d22;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  font-family: Roboto;
+}
+
+.image {
+  display: flex;
+  resize: cover;
+  justify-content: center;
+  width: 100%;
+}
+
+.logo {
+  height: 70px;
+  width: 50px;
+  object-fit: contain;
+  margin: 10px;
+}
+
+.logo-XXL.mobile {
+  max-height: 60vh;
+  max-width: 60vw;
+  object-fit: contain;
+  margin: 20vh 20vw;
+}
+
+.logo-XXL {
+  max-height: 70vh;
+  max-width: 30vw;
+  object-fit: contain;
+  margin: 20vh 40vw;
+}
+
+.centeredView {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.modalView {
+  margin: 20px;
+  background-color: #2b2a2e;
+  border-radius: 20px;
+  padding: 35px;
+  align-items: center;
+}
+
+.loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  opacity: 0.5;
+  background-color: transparent;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  color: var(--ion-color-primary);
+  height: 100vh;
+}
+
+.nopm {
+  padding: 0;
+  margin: 0;
+}
+
+.tiny {
+  font-size: 0.8em;
+}
+.title {
+  font-size: 35px;
+  font-weight: bold;
+}
+.input {
+  height: 40px;
+  margin: 12px;
+  border-width: 1px;
+  padding: 10px;
+  background-color: white;
+}
+
+.buttons {
+  padding: 20px;
+}
+
+#beacon-toast-wrapper {
+  color: black;
+}
+
+.split-pane-visible > ion-menu {
+  --side-min-width: 50px !important;
+}
+
+.address {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.address1,
+.address2 {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 0.9em;
+}
+
+.address1 {
+  max-width: calc(100% - var(--startWidth));
+  min-width: 3em;
+}
+.address2 {
+  text-overflow: ellipsis;
+  min-width: 5em;
+  max-width: calc(100% - var(--endWidth));
+  direction: rtl;
+}
