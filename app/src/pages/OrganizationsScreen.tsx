@@ -1,9 +1,7 @@
-import { BigNumber } from "bignumber.js";
-
 import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
 import {
   IonContent,
-  IonHeader,
+  IonIcon,
   IonItem,
   IonLabel,
   IonList,
@@ -11,20 +9,20 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonSegment,
-  IonSegmentButton,
   IonSpinner,
   IonSplitPane,
-  IonTitle,
-  IonToolbar,
+  IonThumbnail,
   useIonAlert,
 } from "@ionic/react";
+import { BigNumber } from "bignumber.js";
+import { ellipse } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Organization, UserContext, UserContextType } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { address } from "../type-aliases";
+import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -45,6 +43,10 @@ export const OrganizationsScreen: React.FC = () => {
   } = React.useContext(UserContext) as UserContextType;
 
   const [myOrganizations, setMyOrganizations] = useState<Organization[]>();
+
+  const [selectedOrganization, setSelectedOrganization] = useState<
+    Organization | undefined
+  >();
 
   const bigMapsService = new BigMapsService({
     baseUrl: "https://api.ghostnet.tzkt.io",
@@ -86,11 +88,22 @@ export const OrganizationsScreen: React.FC = () => {
         );
 
         setMyOrganizations(myOrganizations);
+
+        if (myOrganizations.length > 0)
+          setSelectedOrganization(myOrganizations[0]);
       } else {
         console.log("storage is not ready yet");
       }
     })();
   }, [storage]);
+
+  const getStatusColor = (org: Organization): string => {
+    return "aCTIVE" in org.status
+      ? "success"
+      : "fROZEN" in org.status
+      ? "danger"
+      : "warning";
+  };
 
   return (
     <IonPage className="container">
@@ -114,53 +127,71 @@ export const OrganizationsScreen: React.FC = () => {
         ) : (
           <IonSplitPane when="xs" contentId="main">
             <IonMenu contentId="main">
-              <IonHeader>
-                <IonToolbar color="tertiary">
-                  <IonTitle>Menu</IonTitle>
-                </IonToolbar>
-              </IonHeader>
               <IonContent className="ion-padding">
                 {storage &&
                 storage.tezosOrganization.admins.indexOf(
                   userAddress as address
                 ) >= 0 ? (
-                  <IonItem key={storage.tezosOrganization.name}>
+                  <IonItem
+                    fill={
+                      selectedOrganization?.name ==
+                      storage.tezosOrganization.name
+                        ? "outline"
+                        : undefined
+                    }
+                    onClick={() =>
+                      setSelectedOrganization(storage.tezosOrganization)
+                    }
+                    lines="none"
+                    key={storage.tezosOrganization.name}
+                  >
+                    <IonThumbnail slot="start">
+                      <img
+                        alt="Tezos"
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png"
+                      />
+                    </IonThumbnail>
                     {storage.tezosOrganization.name}
+                    <IonIcon
+                      size="small"
+                      slot="end"
+                      icon={ellipse}
+                      color={getStatusColor(storage.tezosOrganization)}
+                    />
                   </IonItem>
                 ) : (
                   <></>
                 )}
 
                 {myOrganizations?.map((organization) => (
-                  <IonItem key={organization.name}>{organization.name}</IonItem>
+                  <IonItem
+                    fill={
+                      selectedOrganization?.name == organization.name
+                        ? "outline"
+                        : undefined
+                    }
+                    onClick={() => setSelectedOrganization(organization)}
+                    lines="none"
+                    key={organization.name}
+                  >
+                    {organization.name}
+                    <IonThumbnail slot="start">
+                      <img
+                        alt="Tezos"
+                        src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
+                      />
+                    </IonThumbnail>
+                    <IonIcon
+                      size="small"
+                      slot="end"
+                      icon={ellipse}
+                      color={getStatusColor(organization)}
+                    />
+                  </IonItem>
                 ))}
               </IonContent>
             </IonMenu>
-
-            <div className="ion-page" id="main">
-              <IonHeader>
-                <IonToolbar>
-                  <IonTitle>Main View</IonTitle>
-                </IonToolbar>
-              </IonHeader>
-              <IonContent className="ion-padding">
-                <IonToolbar>
-                  <IonSegment value="all">
-                    <IonSegmentButton disabled>
-                      <IonLabel>site</IonLabel>
-                    </IonSegmentButton>
-                    <IonSegmentButton value="all">
-                      <IonLabel>Messages</IonLabel>
-                    </IonSegmentButton>
-                    <IonSegmentButton value="favorites">
-                      <IonLabel>Administration</IonLabel>
-                    </IonSegmentButton>
-                  </IonSegment>
-                </IonToolbar>
-
-                <IonContent>blabla</IonContent>
-              </IonContent>
-            </div>
+            <OrganizationScreen organization={selectedOrganization} />
           </IonSplitPane>
         )}
       </IonContent>

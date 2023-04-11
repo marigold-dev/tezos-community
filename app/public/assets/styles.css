@@ -7,7 +7,6 @@
 
 .container {
   display: flex;
-  background-color: #1c1d22;
   align-items: center;
   text-align: center;
   justify-content: center;
@@ -102,8 +101,23 @@
   color: black;
 }
 
+.split-pane-visible {
+  --border: 0;
+}
+
+.split-pane-visible > #main {
+  top: 56px;
+  bottom: 56px;
+}
+
 .split-pane-visible > ion-menu {
+  top: 56px;
+  bottom: 56px;
   --side-min-width: 50px !important;
+}
+
+.split-pane-visible > ion-menu > ion-content {
+  background-color: red;
 }
 
 .address {
@@ -129,4 +143,12 @@
   min-width: 5em;
   max-width: calc(100% - var(--endWidth));
   direction: rtl;
+}
+
+ion-thumbnail {
+  --size: 2em;
+}
+
+.in-toolbar {
+  background-color: var(--ion-color-secondary);
 }

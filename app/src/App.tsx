@@ -34,7 +34,7 @@ import { MainWalletType, Storage } from "./main.types";
 import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
-import { address, BigMap, unit } from "./type-aliases";
+import { BigMap, address, unit } from "./type-aliases";
 
 setupIonicReact();
 
@@ -120,31 +120,6 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
-  /*
-  useEffect(() => {
-    Tezos.setWalletProvider(wallet);
-    Tezos.setStreamProvider(
-      Tezos.getFactory(PollingSubscribeProvider)({
-        shouldObservableSubscriptionRetry: true,
-        pollingIntervalMilliseconds: 1500,
-      })
-    );
-    try {
-      const sub = Tezos.stream.subscribeEvent({
-        tag: "gameStatus",
-        address: process.env.REACT_APP_CONTRACT_ADDRESS!,
-      });
-
-      sub.on("data", (e) => {
-        console.log("on gameStatus event :", e);
-        refreshStorage();
-      });
-    } catch (e) {
-      console.log("Error with Smart contract event pooling", e);
-    }
-    (async () => await refreshStorage())();
-  }, [wallet]);
-*/
   return (
     <IonApp>
       <UserContext.Provider

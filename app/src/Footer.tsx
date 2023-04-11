@@ -95,22 +95,26 @@ export const Footer: React.FC = () => {
       <IonToolbar>
         {userAddress ? (
           <>
-            <IonButton color="primary" routerLink={PAGES.ORGANIZATIONS}>
+            <IonButton color="transparent" routerLink={PAGES.ORGANIZATIONS}>
               {PAGES.ORGANIZATIONS}
             </IonButton>
 
-            <IonButton>Join</IonButton>
+            <IonButton color="transparent">Join</IonButton>
 
-            <IonButton>Add</IonButton>
+            <IonButton color="transparent">Add</IonButton>
 
-            <IonButton color="primary" routerLink={PAGES.FUNDING}>
+            <IonButton color="transparent" routerLink={PAGES.FUNDING}>
               {PAGES.FUNDING}
             </IonButton>
 
-            <IonButton onClick={disconnectWallet}>logOut</IonButton>
+            <IonButton color="transparent" onClick={disconnectWallet}>
+              logOut
+            </IonButton>
           </>
         ) : (
-          <IonButton onClick={connectWallet}>Connect your wallet</IonButton>
+          <IonButton color="transparent" onClick={connectWallet}>
+            Connect your wallet
+          </IonButton>
         )}
       </IonToolbar>
     </IonFooter>
