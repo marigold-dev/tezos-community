@@ -1,27 +1,26 @@
-#import "./main.jsligo" "CONTRACT"
+#include "./main.jsligo" 
 
-const tezosOrganization : CONTRACT.organization = {
-   name : "TEZOS",
-   business : "Save the planet",
-   members : Big_map.empty as big_map<address,unit>,
-   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
-   status : ACTIVE(),
-   memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>
-}; 
+const default_storage = {
+    memberProfileVerified : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
+    tezosOrganization : 
+    {
+      name : "TEZOS",
+      business : "Save the planet",
+      siteUrl : "https://tezos.com",
+      logoUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
+      ipfsNftUrl : "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
+      members : Big_map.empty as big_map<address,unit>,
+      admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
+      status : ACTIVE(),
+      memberRequests : Set.empty as set<joinOrganizationRequest>,
+      verified : true
+    },
+    organizations : list([]) as list<organization>,
+    organizationMax : 100 as nat,
+    adminsMax : 50 as nat,
 
-const token_info: map<string, bytes> =
-     Map.literal(list([
-      ["name", (bytes `Tezos Community`)],
-      ["description",(bytes `Membership card for Tezos community member`)],
-      ["interfaces", (bytes `["TZIP-12"]`)],
-      ["thumbnailUri", (bytes`ipfs://QmfPwhXDYyR8HCXyCpxYm4xfi2HcDozc84mQdnoG5sbPM4`)],
-      ["symbol",(bytes`NFTTZ`)],
-      ["decimals", (bytes `0`)]
-     ])) as map<string, bytes>;
-
-
-    const metadata : bytes = bytes
-  `{
+    ledger: Big_map.literal(list([[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),1 as nat]])) as SINGLEASSET.Ledger.t,
+    metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", bytes  `{
       "name":"Tezos Community NFT",
       "description":"Membership card for Tezos community member",
       "version":"0.0.1",
@@ -34,21 +33,21 @@ const token_info: map<string, bytes> =
       "interfaces":["TZIP-012"],
       "errors": [],
       "views": []
-      }` ;
-
-const main = ([_op,store]: [unit,CONTRACT.storage]) : CONTRACT._return => {
-  return [list([]),store];
-};
-
-const default_storage = {
-    tezosOrganization : tezosOrganization,
-    organizations : list([]) as list<CONTRACT.organization>,
-    organizationMax : 100 as nat,
-    adminsMax : 50 as nat,
-
-    ledger: Big_map.literal(list([[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),1 as nat]])) as CONTRACT.SINGLEASSET.Ledger.t,
-    metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", metadata]])),
-    token_metadata: Big_map.add(0 as nat, {token_id: 0 as nat,token_info:token_info},Big_map.empty as CONTRACT.SINGLEASSET.TokenMetadata.t),
-    operators: Big_map.empty as CONTRACT.SINGLEASSET.Operators.t,
+      }`
+    ]])),
+    token_metadata: Big_map.add(0 as nat, {token_id: 0 as nat,token_info:  Map.literal(list([
+      ["name", (bytes `Tezos Community`)],
+      ["description",(bytes `Membership card for Tezos community member`)],
+      ["interfaces", (bytes `["TZIP-12"]`)],
+      ["thumbnailUri", (bytes`ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej`)],
+      ["symbol",(bytes`NFTTZ`)],
+      ["decimals", (bytes `0`)]
+     ])) as map<string, bytes>
+    
+    
+    },Big_map.empty as SINGLEASSET.TokenMetadata.t),
+    operators: Big_map.empty as SINGLEASSET.Operators.t,
     owners: Set.add("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address,Set.empty as set<address>)
 };
+
+

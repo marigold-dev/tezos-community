@@ -1,9 +1,9 @@
 import {
-  address,
   BigMap,
+  MMap,
+  address,
   bytes,
   contract,
-  MMap,
   nat,
   unit,
 } from "./type-aliases";
@@ -15,12 +15,15 @@ import {
 export type Storage = {
   adminsMax: nat;
   ledger: BigMap<address, nat>;
+  memberProfileVerified: Array<address>;
   metadata: BigMap<string, bytes>;
   operators: BigMap<address, Array<address>>;
   organizationMax: nat;
   organizations: Array<{
     admins: Array<address>;
     business: string;
+    ipfsNftUrl: string;
+    logoUrl: string;
     memberRequests: Array<{
       joinRequest: {
         contactId: string;
@@ -32,12 +35,16 @@ export type Storage = {
     }>;
     members: BigMap<address, unit>;
     name: string;
+    siteUrl: string;
     status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+    verified: boolean;
   }>;
   owners: Array<address>;
   tezosOrganization: {
     admins: Array<address>;
     business: string;
+    ipfsNftUrl: string;
+    logoUrl: string;
     memberRequests: Array<{
       joinRequest: {
         contactId: string;
@@ -49,7 +56,9 @@ export type Storage = {
     }>;
     members: BigMap<address, unit>;
     name: string;
+    siteUrl: string;
     status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+    verified: boolean;
   };
   token_metadata: BigMap<
     nat,
@@ -62,7 +71,13 @@ export type Storage = {
 
 type Methods = {
   activateOrganization: (param: string) => Promise<void>;
-  addOrganization: (business: string, name: string) => Promise<void>;
+  addOrganization: (
+    business: string,
+    ipfsNftUrl: string,
+    logoUrl: string,
+    name: string,
+    siteUrl: string
+  ) => Promise<void>;
   balance_of: (
     requests: Array<{
       owner: address;
@@ -114,7 +129,10 @@ type MethodsObject = {
   activateOrganization: (param: string) => Promise<void>;
   addOrganization: (params: {
     business: string;
+    ipfsNftUrl: string;
+    logoUrl: string;
     name: string;
+    siteUrl: string;
   }) => Promise<void>;
   balance_of: (params: {
     requests: Array<{

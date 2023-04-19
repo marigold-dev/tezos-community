@@ -152,3 +152,7 @@ ion-thumbnail {
 .in-toolbar {
   background-color: var(--ion-color-secondary);
 }
+
+.item-fill-outline {
+  --border-width: 1px !important;
+}

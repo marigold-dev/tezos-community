@@ -16,12 +16,16 @@ const _ = Test.log(Test.get_balance(user));
 const _ = Test.log(user);
 
 const tezosOrganization : CONTRACT.organization = {
-   name : "TEZOS",
-   business : "Save the planet",
-   members : Big_map.empty as big_map<address,unit>,
-   admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
-   status : ACTIVE(),
-   memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>
+      name : "TEZOS",
+      business : "Save the planet",
+      siteUrl : "https://tezos.com",
+      logoUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
+      ipfsNftUrl : "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
+      members : Big_map.empty as big_map<address,unit>,
+      admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
+      status : ACTIVE(),
+      memberRequests : Set.empty as set<CONTRACT.joinOrganizationRequest>,
+      verified : true
 }; 
 
 const token_info: map<string, bytes> =
@@ -52,6 +56,7 @@ const token_info: map<string, bytes> =
       }` ;
 
 const initial_storage : CONTRACT.storage = {
+    memberProfileVerified : Set.empty as set<address>,
     tezosOrganization : tezosOrganization,
     organizations : list([]) as list<CONTRACT.organization>,
     organizationMax : 100 as nat,
@@ -95,7 +100,10 @@ const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganiza
 
 const newOrganization : CONTRACT.addOrganizationRequest = {
    name : "Marigold",
-   business : "Save Tezos"
+   business : "Save Tezos",
+   siteUrl : "https://",
+   logoUrl : "https://",
+   ipfsNftUrl : "https://"
 };
 
 const testAddOrganizationNotAdmin = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat); //,PENDING_APPROVAL());

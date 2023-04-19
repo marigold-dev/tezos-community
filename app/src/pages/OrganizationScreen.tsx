@@ -3,7 +3,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
   IonContent,
   IonItem,
@@ -11,12 +10,13 @@ import {
   IonList,
   IonSegment,
   IonSegmentButton,
+  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
-import { useEffect, useState } from "react";
-import { Organization } from "../App";
+import React, { useEffect, useState } from "react";
+import { Organization, UserContext, UserContextType } from "../App";
 import { address } from "../type-aliases";
 import { OrganizationAdministration } from "./OrganizationAdministration";
 import { OrganizationMessages } from "./OrganizationMessages";
@@ -34,6 +34,21 @@ enum TABS {
 export const OrganizationScreen = ({
   organization,
 }: OrganizationProps): JSX.Element => {
+  const {
+    Tezos,
+    wallet,
+    userAddress,
+    userBalance,
+    storage,
+    mainWalletType,
+    setStorage,
+    setUserAddress,
+    setUserBalance,
+    setLoading,
+    loading,
+    refreshStorage,
+  } = React.useContext(UserContext) as UserContextType;
+
   const [selectedTab, setSelectedTab] = useState<TABS>(TABS.DESCRIPTION);
   const [members, setMembers] = useState<address[]>([]);
 
@@ -58,7 +73,7 @@ export const OrganizationScreen = ({
         setMembers(Array.from(keys.map((key) => key.key as address)));
       }
     })();
-  }, [organization]);
+  }, [organization, userAddress]);
 
   return (
     <div className="ion-page" id="main">
@@ -77,9 +92,14 @@ export const OrganizationScreen = ({
               <IonSegmentButton value={TABS.MESSAGES}>
                 <IonLabel>Messages</IonLabel>
               </IonSegmentButton>
-              <IonSegmentButton value={TABS.ADMINISTRATION}>
-                <IonLabel>Administration</IonLabel>
-              </IonSegmentButton>
+
+              {organization.admins.indexOf(userAddress as address) >= 0 ? (
+                <IonSegmentButton value={TABS.ADMINISTRATION}>
+                  <IonLabel>Administration</IonLabel>
+                </IonSegmentButton>
+              ) : (
+                ""
+              )}
             </IonSegment>
           </IonToolbar>
 
@@ -90,11 +110,18 @@ export const OrganizationScreen = ({
                   {organization.name}
                   {" (" + (members ? members.length : 0) + " members)"}
                 </IonCardTitle>
-                <IonCardSubtitle>http://....</IonCardSubtitle>
               </IonCardHeader>
 
               <IonCardContent>
                 <IonList>
+                  <IonItem>
+                    <IonTitle>Website</IonTitle>
+                    https://...........
+                  </IonItem>
+                  <IonItem>
+                    <IonTitle>Logo</IonTitle>
+                    https://...........
+                  </IonItem>
                   <IonItem>
                     <IonTitle>Objective</IonTitle>
                     {organization.business}
@@ -115,11 +142,17 @@ export const OrganizationScreen = ({
           ) : selectedTab == TABS.MESSAGES ? (
             <OrganizationMessages organization={organization} />
           ) : (
-            <OrganizationAdministration organization={organization} />
+            <OrganizationAdministration
+              organization={organization}
+              members={members}
+            />
           )}
         </IonContent>
       ) : (
-        "no organization selected ..."
+        <IonText>
+          <h1>Not part of an organization yet</h1>
+          <h3>join or create one</h3>
+        </IonText>
       )}
     </div>
   );

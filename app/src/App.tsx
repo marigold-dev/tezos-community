@@ -29,7 +29,7 @@ import "./theme/variables.css";
 import { NetworkType } from "@airgap/beacon-types";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MainWalletType, Storage } from "./main.types";
 import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
@@ -37,6 +37,25 @@ import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
 
 setupIonicReact();
+
+export enum SOCIAL_ACCOUNT_TYPE {
+  // GOOGLE = "GOOGLE",
+  TWITTER = "TWITTER",
+  /* WHATSAPP = "WHATSAPP",
+  FACEBOOK = "FACEBOOK",
+  DISCORD = "DISCORD",
+  TELEGRAM = "TELEGRAM",
+  SLACK = "SLACK",*/
+}
+
+export type UserProfile = {
+  displayName: string;
+  socialAccountType: SOCIAL_ACCOUNT_TYPE;
+  socialAccountAlias: string;
+  proof: string;
+  proofDate: Date;
+  verified: boolean;
+};
 
 export type Organization = {
   admins: Array<address>;
@@ -60,6 +79,8 @@ export type UserContextType = {
   setStorage: Dispatch<SetStateAction<Storage | null>>;
   userAddress: string;
   setUserAddress: Dispatch<SetStateAction<string>>;
+  userProfile: UserProfile;
+  setUserProfile: Dispatch<SetStateAction<UserProfile>>;
   userBalance: number;
   setUserBalance: Dispatch<SetStateAction<number>>;
   Tezos: TezosToolkit;
@@ -83,11 +104,24 @@ const App: React.FC = () => {
   );
   const [userAddress, setUserAddress] = useState<string>("");
   const [userBalance, setUserBalance] = useState<number>(0);
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    displayName: "",
+    proof: "",
+    proofDate: new Date(),
+    socialAccountAlias: "",
+    socialAccountType: SOCIAL_ACCOUNT_TYPE.TWITTER,
+    verified: false,
+  });
   const [storage, setStorage] = useState<Storage | null>(null);
   const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    Tezos.setWalletProvider(wallet);
+    (async () => await refreshStorage())();
+  }, [wallet]);
 
   const refreshStorage = async (
     event?: CustomEvent<RefresherEventDetail>
@@ -100,12 +134,23 @@ const App: React.FC = () => {
         setUserAddress(userAddress);
         const balance = await Tezos.tz.getBalance(userAddress);
         setUserBalance(balance.toNumber());
+
+        try {
+          const newUserProfile = await getUserProfile(userAddress);
+          newUserProfile.proofDate = new Date(newUserProfile.proofDate); //convert dates
+          setUserProfile(newUserProfile);
+          console.log("userProfile refreshed for " + userAddress);
+        } catch (error) {
+          console.log("No user profile found..");
+        }
       }
 
       console.log(
         "REACT_APP_CONTRACT_ADDRESS:",
         process.env.REACT_APP_CONTRACT_ADDRESS!
       );
+      console.log("REACT_APP_BACKEND_URL:", process.env.REACT_APP_BACKEND_URL!);
+
       const mainWalletType: MainWalletType =
         await Tezos.wallet.at<MainWalletType>(
           process.env.REACT_APP_CONTRACT_ADDRESS!
@@ -120,12 +165,29 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
+  const getUserProfile = async (userAddress: string): Promise<UserProfile> => {
+    const response = await fetch(
+      process.env.REACT_APP_BACKEND_URL + "/user/" + userAddress
+    );
+    const json = await response.json();
+    if (response.ok) {
+      console.log("data is : ", json);
+      return new Promise((resolve, reject) => resolve(json));
+    } else {
+      return new Promise((resolve, reject) =>
+        reject("ERROR : " + response.status)
+      );
+    }
+  };
+
   return (
     <IonApp>
       <UserContext.Provider
         value={{
           userAddress,
           userBalance,
+          userProfile,
+          setUserProfile,
           Tezos,
           wallet,
           storage,

@@ -2,9 +2,9 @@ import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
 import {
   IonContent,
   IonIcon,
+  IonImg,
   IonItem,
   IonLabel,
-  IonList,
   IonMenu,
   IonPage,
   IonRefresher,
@@ -21,6 +21,7 @@ import { useHistory } from "react-router-dom";
 import { Organization, UserContext, UserContextType } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
+import { getStatusColor } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
@@ -42,7 +43,7 @@ export const OrganizationsScreen: React.FC = () => {
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
 
-  const [myOrganizations, setMyOrganizations] = useState<Organization[]>();
+  const [myOrganizations, setMyOrganizations] = useState<Organization[]>([]);
 
   const [selectedOrganization, setSelectedOrganization] = useState<
     Organization | undefined
@@ -56,9 +57,10 @@ export const OrganizationsScreen: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      if (storage) {
-        const myOrganizations = await Promise.all(
-          storage.organizations.filter(async (organization) => {
+      if (storage && storage.organizations) {
+        let orgMembers: Map<string, address[]> = new Map();
+        await Promise.all(
+          storage.organizations.map(async (organization) => {
             const membersBigMapId = (
               organization.members as unknown as { id: BigNumber }
             ).id.toNumber();
@@ -68,42 +70,41 @@ export const OrganizationsScreen: React.FC = () => {
               micheline: MichelineFormat.JSON,
             });
 
-            console.log(storage.tezosOrganization.admins);
-            console.log("Members for orga", keys, organization);
+            orgMembers.set(
+              organization.name,
+              Array.from(keys.map((key) => key.key))
+            );
+          })
+        );
+
+        setMyOrganizations(
+          storage.organizations.filter((org) => {
+            const members = orgMembers.get(org.name);
 
             if (
-              Array.from(keys.map((key) => key.key as string)).indexOf(
-                userAddress as address
-              ) >= 0 ||
-              organization.admins.indexOf(userAddress as address) >= 0 ||
+              members!.indexOf(userAddress as address) >= 0 ||
+              org.admins.indexOf(userAddress as address) >= 0 ||
               storage.tezosOrganization.admins.indexOf(
                 userAddress as address
               ) >= 0
             ) {
-              return true;
+              return org;
             } else {
-              return false;
             }
           })
         );
 
-        setMyOrganizations(myOrganizations);
-
-        if (myOrganizations.length > 0)
+        if (myOrganizations.length > 0 && !selectedOrganization)
           setSelectedOrganization(myOrganizations[0]);
       } else {
         console.log("storage is not ready yet");
       }
     })();
-  }, [storage]);
+  }, [storage, userAddress]);
 
-  const getStatusColor = (org: Organization): string => {
-    return "aCTIVE" in org.status
-      ? "success"
-      : "fROZEN" in org.status
-      ? "danger"
-      : "warning";
-  };
+  useEffect(() => {
+    (async () => await refreshStorage())();
+  }, [wallet]);
 
   return (
     <IonPage className="container">
@@ -121,12 +122,22 @@ export const OrganizationsScreen: React.FC = () => {
             </IonItem>
           </div>
         ) : !userAddress ? (
-          <IonList inset={true}>
-            <IonItem>Welcome to Tezos Community !</IonItem>
-          </IonList>
+          <>
+            <h2 style={{ paddingTop: "10vh" }}>Welcome to Tezos Community !</h2>
+
+            <IonImg
+              style={{ paddingTop: "10vh" }}
+              src={process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg"}
+            />
+          </>
         ) : (
           <IonSplitPane when="xs" contentId="main">
-            <IonMenu contentId="main">
+            <IonMenu
+              style={{
+                display: myOrganizations.length === 0 ? "none" : "block",
+              }}
+              contentId="main"
+            >
               <IonContent className="ion-padding">
                 {storage &&
                 storage.tezosOrganization.admins.indexOf(
@@ -134,7 +145,7 @@ export const OrganizationsScreen: React.FC = () => {
                 ) >= 0 ? (
                   <IonItem
                     fill={
-                      selectedOrganization?.name ==
+                      selectedOrganization?.name ===
                       storage.tezosOrganization.name
                         ? "outline"
                         : undefined
@@ -166,11 +177,13 @@ export const OrganizationsScreen: React.FC = () => {
                 {myOrganizations?.map((organization) => (
                   <IonItem
                     fill={
-                      selectedOrganization?.name == organization.name
+                      selectedOrganization?.name === organization.name
                         ? "outline"
                         : undefined
                     }
-                    onClick={() => setSelectedOrganization(organization)}
+                    onClick={() => {
+                      setSelectedOrganization(organization);
+                    }}
                     lines="none"
                     key={organization.name}
                   >

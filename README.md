@@ -9,18 +9,19 @@ Add @ligo/fa lib
 ```
 echo "{}" > esy.json
 taq ligo --command "install @ligo/fa"
+taq install @taqueria/plugin-ligo@next
 ```
 
 Compile with last version
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:next taq compile main.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.63.2 taq compile main.jsligo
 ```
 
 Run test
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:next taq test test.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.63.2 taq test test.jsligo
 ```
 
 deploy
@@ -47,9 +48,29 @@ Override with alice account on .taq/config.local.testing.json
 }
 ```
 
-Mobile app
+# Mobile app
 
 ```
+taq install @taqueria/plugin-contract-types@next
+taq generate types ./app/src
+cd app
 npm run postinstall
 npm run start
+```
+
+# Backend app
+
+Create it
+
+```
+npm i -g @nestjs/cli
+nest new backend --strict
+```
+
+Run it
+
+```
+cd backend
+yarn install
+yarn run start:dev
 ```

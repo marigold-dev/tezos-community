@@ -5,6 +5,7 @@
   "dependencies": {
     "@airgap/beacon-sdk": "^3.3.4",
     "@capacitor/app": "4.1.1",
+    "@capacitor/clipboard": "^4.1.0",
     "@capacitor/core": "4.7.3",
     "@capacitor/haptics": "4.1.0",
     "@capacitor/keyboard": "4.1.1",
@@ -47,7 +48,7 @@
   },
   "scripts": {
     "postinstall": "cd ./node_modules && ln -s crypto-browserify crypto && cd .bin && mv react-scripts react-scripts-real && ln -s ../react-app-rewired/bin/index.js react-scripts",
-    "start": "jq -r '\"REACT_APP_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env && react-scripts start",
+    "start": "if test -f .env; then sed -i \"s/\\(REACT_APP_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"REACT_APP_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && react-app-rewired start",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
     "eject": "react-scripts eject"
