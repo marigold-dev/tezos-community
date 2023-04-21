@@ -1,34 +1,16 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Param,
-  Post,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Client, auth } from 'twitter-api-sdk';
-import { SOCIAL_ACCOUNT_TYPE, UserProfile } from './UserProfile';
+import { UserProfile } from './UserProfile';
 import { UserProfilesService } from './userprofiles.service';
 
 @Controller('user')
 export class UserProfilesController {
-  private twitterClient: Client;
-
-  constructor(
-    private readonly userProfilesService: UserProfilesService,
-    private configService: ConfigService,
-  ) {
-    this.twitterClient = new Client(
-      new auth.OAuth2User({
-        client_id: this.configService.get<string>('TWITTER_API_KEY')!,
-        client_secret: this.configService.get<string>('TWITTER_API_SECRET')!,
-        callback: 'http://127.0.0.1:3001/callback',
-        scopes: ['tweet.read', 'users.read', 'offline.access'],
-      }),
-    );
-  }
+  constructor(private readonly userProfilesService: UserProfilesService) {}
 
   @Get(':address')
   async getUserProfile(
@@ -43,6 +25,7 @@ export class UserProfilesController {
       );
   }
 
+  /*
   @Post(':address/generateProof')
   async generateProof(
     @Param('address') address: string,
@@ -98,11 +81,12 @@ export class UserProfilesController {
     proofUrl: string,
   ): Promise<boolean> {
     console.log('verifyTwitterProof', address, proofUrl);
-    console.log('this.twitterClient', this.twitterClient);
+    console.log('this.twitterClient', this.twitterService.twitterClient);
     try {
-      const tweet = await this.twitterClient.tweets.findTweetById(
-        '1648611708129234944',
-      );
+      const tweet =
+        await this.twitterService.twitterClient.tweets.findTweetById(
+          '1648611708129234944',
+        );
       console.log(tweet);
       if (tweet && tweet.data) console.log(tweet.data.text);
       return new Promise((resolve, reject) => resolve(true));
@@ -110,5 +94,5 @@ export class UserProfilesController {
       console.log('error', error);
       return new Promise((resolve, reject) => reject(false));
     }
-  }
+  }*/
 }

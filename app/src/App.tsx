@@ -29,6 +29,7 @@ import "./theme/variables.css";
 import { NetworkType } from "@airgap/beacon-types";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
+import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MainWalletType, Storage } from "./main.types";
 import { FundingScreen } from "./pages/FundingScreen";
@@ -37,6 +38,16 @@ import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
 
 setupIonicReact();
+
+export type TZIP21TokenMetadata = TokenMetadata & {
+  artifactUri?: string; //A URI (as defined in the JSON Schema Specification) to the asset.
+  displayUri?: string; //A URI (as defined in the JSON Schema Specification) to an image of the asset.
+  thumbnailUri?: string; //A URI (as defined in the JSON Schema Specification) to an image of the asset for wallets and client applications to have a scaled down image to present to end-users.
+  description?: string; //General notes, abstracts, or summaries about the contents of an asset.
+  minter?: string; //The tz address responsible for minting the asset.
+  creators?: string[]; //The primary person, people, or organization(s) responsible for creating the intellectual content of the asset.
+  isBooleanAmount?: boolean; //Describes whether an account can have an amount of exactly 0 or 1. (The purpose of this field is for wallets to determine whether or not to display balance information and an amount field when transferring.)
+};
 
 export enum SOCIAL_ACCOUNT_TYPE {
   // GOOGLE = "GOOGLE",
@@ -60,6 +71,8 @@ export type UserProfile = {
 export type Organization = {
   admins: Array<address>;
   business: string;
+  ipfsNftUrl: string;
+  logoUrl: string;
   memberRequests: Array<{
     joinRequest: {
       contactId: string;
@@ -71,7 +84,9 @@ export type Organization = {
   }>;
   members: BigMap<address, unit>;
   name: string;
+  siteUrl: string;
   status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+  verified: boolean;
 };
 
 export type UserContextType = {
@@ -89,6 +104,7 @@ export type UserContextType = {
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
+  nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
@@ -117,6 +133,11 @@ const App: React.FC = () => {
     null
   );
   const [loading, setLoading] = useState<boolean>(false);
+
+  //NFT
+  const [nftContratTokenMetadataMap, setNftContratTokenMetadataMap] = useState<
+    Map<number, TZIP21TokenMetadata>
+  >(new Map());
 
   useEffect(() => {
     Tezos.setWalletProvider(wallet);
@@ -157,6 +178,21 @@ const App: React.FC = () => {
         );
       const storage: Storage = await mainWalletType.storage();
       setMainWalletType(mainWalletType);
+
+      let c = await Tezos.contract.at(
+        process.env.REACT_APP_CONTRACT_ADDRESS!,
+        tzip12
+      );
+
+      let tokenMetadata: TZIP21TokenMetadata = (await c
+        .tzip12()
+        .getTokenMetadata(0)) as TZIP21TokenMetadata;
+      nftContratTokenMetadataMap.set(0, tokenMetadata);
+
+      setNftContratTokenMetadataMap(new Map(nftContratTokenMetadataMap)); //new Map to force refresh
+      console.log("User NFT refreshed");
+
+      //it has to be last one
       setStorage(storage);
       console.log("Storage refreshed");
     } else {
@@ -198,6 +234,7 @@ const App: React.FC = () => {
           loading,
           setLoading,
           refreshStorage,
+          nftContratTokenMetadataMap,
         }}
       >
         <IonReactRouter>

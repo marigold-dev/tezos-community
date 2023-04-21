@@ -1199,6 +1199,11 @@
   resolved "https://registry.npmjs.org/@capacitor/app/-/app-4.1.1.tgz"
   integrity sha512-SJcJA1rhFQyeH6eLfUEbdKkHzAwzahJNVPNXmU88fdmXpMgM2dJGzZj1vrm6e21aQq+Z4aBVLJ2RCdj92zD7wg==
 
+"@capacitor/browser@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.npmjs.org/@capacitor/browser/-/browser-4.1.1.tgz"
+  integrity sha512-RJKNeRiLm6X668X75YiPN/9t3z1pxVEPjIhLM/AtWAEsHUb8bjroQQ3WGdW/30Wa60a7ywiw3YLqWctfRaYyFw==
+
 "@capacitor/cli@4.7.3":
   version "4.7.3"
   resolved "https://registry.npmjs.org/@capacitor/cli/-/cli-4.7.3.tgz"
@@ -2188,6 +2193,11 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
+"@taquito/axios-fetch-adapter@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.npmjs.org/@taquito/axios-fetch-adapter/-/axios-fetch-adapter-0.3.1.tgz"
+  integrity sha512-emPSsrYQumiUcZsDcTAP68gLJpKoJmbzwyy2D2h2/Zm3Q1TbAJJS1kbnwvQZfq0FjYyYCWYSITtAS3w0EUAG4g==
+
 "@taquito/beacon-wallet@^16.0.1":
   version "16.0.1"
   resolved "https://registry.npmjs.org/@taquito/beacon-wallet/-/beacon-wallet-16.0.1.tgz"
@@ -2196,64 +2206,86 @@
     "@airgap/beacon-dapp" "^3.3.1"
     "@taquito/taquito" "^16.0.1"
 
-"@taquito/http-utils@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/http-utils/-/http-utils-16.0.1.tgz"
-  integrity sha512-jlrP0BFZnUf+LhLL+n4uixzFZAmS9q/fucJ5+5waoSmKJAbRrxmKoniZ6RExbCwiLmG+viMGwijKogLGD7J/8g==
+"@taquito/http-utils@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/http-utils/-/http-utils-16.1.2.tgz"
+  integrity sha512-02J9Q744ZEs0wbjBpm6NFzJCtjscuSOeQ3LaWfS1wx7XfMiNMLCOiWZt1RtjlIbcXKEYcOgvjfIy/A/tYl6cqQ==
   dependencies:
-    "@vespaiach/axios-fetch-adapter" "github:ecadlabs/axios-fetch-adapter"
+    "@taquito/axios-fetch-adapter" "^0.3.1"
     axios "^0.26.0"
 
-"@taquito/local-forging@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/local-forging/-/local-forging-16.0.1.tgz"
-  integrity sha512-63F2QeFSYmaMM5LaKyYGQln+OEW0pUIJ0cMc9MWvE/CbJI8vK1VhbhbZMEULzHaGUMG2cwFJt5rQmeWtPVee2g==
+"@taquito/local-forging@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/local-forging/-/local-forging-16.1.2.tgz"
+  integrity sha512-KSJMO7xo4mdM7cU2iTCNcWNn/vaABaCMXa2ONvb5TD0o3MHizqCP0M2rEfkP48eajlcBLF1RcOExSVWj+5+v/Q==
   dependencies:
-    "@taquito/utils" "^16.0.1"
+    "@taquito/utils" "^16.1.2"
     bignumber.js "^9.1.0"
 
-"@taquito/michel-codec@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/michel-codec/-/michel-codec-16.0.1.tgz"
-  integrity sha512-jZDXICuhyupQqXOVEQ913GRoS0HPWLSQrXOUuvd4mYbKYJuOCLaPVj35kDFQo+DnFzVqTmCaya1k4+fxssl5/g==
+"@taquito/michel-codec@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/michel-codec/-/michel-codec-16.1.2.tgz"
+  integrity sha512-kpVpfFQo96SZhHHUQUq7lNvZM44CTJnBk2sN6pIIxMaQiLXHshkE0KTqSUl3ocp/7ssd/Q7v4MsW/NSt3dthJQ==
 
-"@taquito/michelson-encoder@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/michelson-encoder/-/michelson-encoder-16.0.1.tgz"
-  integrity sha512-/vajs6UHTW8dYYlX+c8+2cPhcrcXi4ejVBIABs8cLTsisvG8wQqQmVX/eKd4aKfq8Eb/7bAJozVrrX4XbjfFcw==
+"@taquito/michelson-encoder@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/michelson-encoder/-/michelson-encoder-16.1.2.tgz"
+  integrity sha512-9gD4sgLgkuy4cTcp9eZ4DCasic3Ymi5BGCCVGXzNzzimbvdBPrMtDQMgBRu07mlTm9/4OENdDTuMk4QtIYfOqQ==
   dependencies:
-    "@taquito/rpc" "^16.0.1"
-    "@taquito/utils" "^16.0.1"
+    "@taquito/rpc" "^16.1.2"
+    "@taquito/utils" "^16.1.2"
     bignumber.js "^9.1.0"
     fast-json-stable-stringify "^2.1.0"
 
-"@taquito/rpc@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/rpc/-/rpc-16.0.1.tgz"
-  integrity sha512-ZHPi/sdAfpz0sZH5KH6aBLHSk8OX4d6co+D6TXe7ewG2+8QupLOAvchgUmtiVDY/jp3IzaE7RnVynXbVgy+qfw==
+"@taquito/rpc@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/rpc/-/rpc-16.1.2.tgz"
+  integrity sha512-r2cwT3tnvofBtytDCP/P8G8i9gw2hgw73hiGhYw4CkYaRyVYcuBMwmr8soy/e3B8U2sHSsiyoUmBC9Z0AfkApQ==
   dependencies:
-    "@taquito/http-utils" "^16.0.1"
-    "@taquito/utils" "^16.0.1"
+    "@taquito/http-utils" "^16.1.2"
+    "@taquito/utils" "^16.1.2"
     bignumber.js "^9.1.0"
 
-"@taquito/taquito@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/taquito/-/taquito-16.0.1.tgz"
-  integrity sha512-fnOvnFJf45xiLXXAQxmzDpaamCWMI5uqT+R7rtUdo8m8bqii76rIINDKRmBG2KAoMNqkVUkGdOrLcGlvWjaCwA==
+"@taquito/taquito@^16.0.1", "@taquito/taquito@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/taquito/-/taquito-16.1.2.tgz"
+  integrity sha512-0yjQRIjr1ZcVzTQ9QvtwZl4QAH2jM21vXTCOcHLxEuxjk052vr4OuS3WI+lk7hACtJXfwlA9DZ3zyNt9WdKFHA==
   dependencies:
-    "@taquito/http-utils" "^16.0.1"
-    "@taquito/local-forging" "^16.0.1"
-    "@taquito/michel-codec" "^16.0.1"
-    "@taquito/michelson-encoder" "^16.0.1"
-    "@taquito/rpc" "^16.0.1"
-    "@taquito/utils" "^16.0.1"
+    "@taquito/http-utils" "^16.1.2"
+    "@taquito/local-forging" "^16.1.2"
+    "@taquito/michel-codec" "^16.1.2"
+    "@taquito/michelson-encoder" "^16.1.2"
+    "@taquito/rpc" "^16.1.2"
+    "@taquito/utils" "^16.1.2"
     bignumber.js "^9.1.0"
     rxjs "^6.6.3"
 
-"@taquito/utils@^16.0.1":
-  version "16.0.1"
-  resolved "https://registry.npmjs.org/@taquito/utils/-/utils-16.0.1.tgz"
-  integrity sha512-7M2A63UCenYM9uxJCrnhb9quzZE0fLMg8LYUz7sI4W2l6BpJH5irg0SlIID3AMimzntgTBSlIysGVe50F/G9nQ==
+"@taquito/tzip12@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/tzip12/-/tzip12-16.1.2.tgz"
+  integrity sha512-6BcDrY7l7noxIioMUFb5nBYW+Q8AGG7JkrNeQACqNzroNm31yRva6SM5fypSX9xbEkimcOaxostcNFWvZ3U0EQ==
+  dependencies:
+    "@taquito/michelson-encoder" "^16.1.2"
+    "@taquito/taquito" "^16.1.2"
+    "@taquito/tzip16" "^16.1.2"
+
+"@taquito/tzip16@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/tzip16/-/tzip16-16.1.2.tgz"
+  integrity sha512-3wsCpusiMi4nXJtaH8O3nYgjrNzY2Xb8Ep6jVOmZCAQrSm7P5Rn6FZzYM9T69+QtAmAEDCAyOF2jzM7QF/hrlg==
+  dependencies:
+    "@taquito/http-utils" "^16.1.2"
+    "@taquito/michelson-encoder" "^16.1.2"
+    "@taquito/rpc" "^16.1.2"
+    "@taquito/taquito" "^16.1.2"
+    "@taquito/utils" "^16.1.2"
+    bignumber.js "^9.1.0"
+    crypto-js "^4.1.1"
+
+"@taquito/utils@^16.1.2":
+  version "16.1.2"
+  resolved "https://registry.npmjs.org/@taquito/utils/-/utils-16.1.2.tgz"
+  integrity sha512-CIs/qu8aFzetuo4B6EuGMD1JN5F+fxj+RYYpg69gTunzGiq8hx3D8BpRqidK4esiiNtUu1UrGiI5k1fr8myezQ==
   dependencies:
     "@stablelib/blake2b" "^1.0.1"
     "@stablelib/ed25519" "^1.0.3"
@@ -2815,10 +2847,6 @@
     "@typescript-eslint/types" "5.57.0"
     eslint-visitor-keys "^3.3.0"
 
-"@vespaiach/axios-fetch-adapter@github:ecadlabs/axios-fetch-adapter":
-  version "0.3.1"
-  resolved "git+ssh://git@github.com/ecadlabs/axios-fetch-adapter.git#05cf8ba547aae387933939850231e8abaf323efe"
-
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
   resolved "https://registry.npmjs.org/@webassemblyjs/ast/-/ast-1.11.1.tgz"
@@ -2954,6 +2982,13 @@ abab@^2.0.3, abab@^2.0.5:
   version "2.0.6"
   resolved "https://registry.npmjs.org/abab/-/abab-2.0.6.tgz"
   integrity sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==
+
+abort-controller@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/abort-controller/-/abort-controller-3.0.0.tgz"
+  integrity sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==
+  dependencies:
+    event-target-shim "^5.0.0"
 
 accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.8:
   version "1.3.8"
@@ -4169,6 +4204,11 @@ crypto-browserify@^3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
+crypto-js@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.npmjs.org/crypto-js/-/crypto-js-4.1.1.tgz"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
+
 crypto-random-string@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-2.0.0.tgz"
@@ -5184,6 +5224,11 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.npmjs.org/etag/-/etag-1.8.1.tgz"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
+
+event-target-shim@^5.0.0:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
+  integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
 eventemitter3@^4.0.0:
   version "4.0.7"
@@ -7468,6 +7513,13 @@ no-case@^3.0.4:
   dependencies:
     lower-case "^2.0.2"
     tslib "^2.0.3"
+
+node-fetch@^2.6.1:
+  version "2.6.9"
+  resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.9.tgz"
+  integrity sha512-DJm/CJkZkRjKKj4Zi4BsKVZh3ValV5IR5s7LVZnW+6YMh0W1BfNA8XSs6DLMGYlId5F3KnA70uu2qepcR08Qqg==
+  dependencies:
+    whatwg-url "^5.0.0"
 
 node-forge@^1:
   version "1.3.1"
@@ -9963,6 +10015,11 @@ tr46@^2.1.0:
   dependencies:
     punycode "^2.1.1"
 
+tr46@~0.0.3:
+  version "0.0.3"
+  resolved "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz"
+  integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
+
 tree-kill@^1.2.2:
   version "1.2.2"
   resolved "https://registry.npmjs.org/tree-kill/-/tree-kill-1.2.2.tgz"
@@ -10009,6 +10066,14 @@ tsutils@^3.21.0:
   integrity sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==
   dependencies:
     tslib "^1.8.1"
+
+twitter-api-sdk@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.npmjs.org/twitter-api-sdk/-/twitter-api-sdk-1.2.1.tgz"
+  integrity sha512-tNQ6DGYucFk94JlnUMsHCkHg5o1wnCdHh71Y2ukygNVssOdD1gNVjOpaojJrdwbEAhoZvcWdGHerCa55F8HKxQ==
+  dependencies:
+    abort-controller "^3.0.0"
+    node-fetch "^2.6.1"
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
@@ -10280,6 +10345,11 @@ web-vitals@^0.2.4:
   resolved "https://registry.npmjs.org/web-vitals/-/web-vitals-0.2.4.tgz"
   integrity sha512-6BjspCO9VriYy12z356nL6JBS0GYeEcA457YyRzD+dD6XYCQ75NKhcOHUMHentOE7OcVCIXXDvOm0jKFfQG2Gg==
 
+webidl-conversions@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz"
+  integrity sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==
+
 webidl-conversions@^4.0.2:
   version "4.0.2"
   resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-4.0.2.tgz"
@@ -10431,6 +10501,14 @@ whatwg-mimetype@^2.3.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/whatwg-mimetype/-/whatwg-mimetype-2.3.0.tgz"
   integrity sha512-M4yMwr6mAnQz76TbJm914+gPpB/nCwvZbJU28cUD6dR004SAxDLOOSUaB1JDRqLtaOV/vi0IC5lEAGFgrjGv/g==
+
+whatwg-url@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz"
+  integrity sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==
+  dependencies:
+    tr46 "~0.0.3"
+    webidl-conversions "^3.0.0"
 
 whatwg-url@^7.0.0:
   version "7.1.0"

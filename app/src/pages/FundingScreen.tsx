@@ -9,6 +9,7 @@ import {
   IonThumbnail,
 } from "@ionic/react";
 import React, { useEffect } from "react";
+import { useHistory, useLocation, useRouteMatch } from "react-router";
 import { UserContext, UserContextType } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
@@ -29,13 +30,17 @@ export const FundingScreen: React.FC = () => {
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
 
+  const history = useHistory();
+  const location = useLocation();
+  const match = useRouteMatch();
+
   useEffect(() => {
     (async () => await refreshStorage())();
   }, [wallet]);
 
   return (
     <IonPage className="container">
-      <Header />
+      <Header history={history} location={location} match={match} />
 
       <IonContent>
         <IonList>

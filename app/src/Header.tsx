@@ -1,8 +1,11 @@
 import { IonHeader, IonTitle, IonToolbar } from "@ionic/react";
 import React from "react";
+import { RouteComponentProps } from "react-router";
 import { UserContext, UserContextType } from "./App";
 
-export const Header: React.FC = () => {
+interface Props extends RouteComponentProps {}
+
+export const Header: React.FC<Props> = ({ match }) => {
   const {
     Tezos,
     wallet,
@@ -22,7 +25,10 @@ export const Header: React.FC = () => {
     <IonHeader>
       <IonToolbar>
         <IonTitle>
-          {userAddress ? "TzCommunity - " + userAddress : "TzCommunity"}
+          {!userAddress
+            ? "TzCommunity"
+            : match.path.replaceAll("/", "").charAt(0).toUpperCase() +
+              match.path.replaceAll("/", "").slice(1)}
         </IonTitle>
       </IonToolbar>
     </IonHeader>

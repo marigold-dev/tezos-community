@@ -8,25 +8,18 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonInput,
+  IonImg,
   IonItem,
   IonLabel,
-  IonList,
   IonModal,
   IonPopover,
-  IonSearchbar,
-  IonSelect,
-  IonSelectOption,
   IonText,
-  IonTextarea,
-  IonThumbnail,
   IonTitle,
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
 import React, { useRef, useState } from "react";
 import {
-  Organization,
   PAGES,
   SOCIAL_ACCOUNT_TYPE,
   UserContext,
@@ -34,11 +27,19 @@ import {
   UserProfile,
 } from "./App";
 
-import { ellipse } from "ionicons/icons";
+import { Browser } from "@capacitor/browser";
+import {
+  arrowBackOutline,
+  cardOutline,
+  cash,
+  home,
+  logOut,
+  personCircle,
+  wallet as walletIcon,
+} from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
-import { getStatusColor } from "./Utils";
-
+import { auth } from "twitter-api-sdk";
+import { address } from "./type-aliases";
 export const Footer: React.FC = () => {
   const history = useHistory();
   const [presentAlert] = useIonAlert();
@@ -56,27 +57,12 @@ export const Footer: React.FC = () => {
     setUserBalance,
     setLoading,
     refreshStorage,
+    nftContratTokenMetadataMap,
   } = React.useContext(UserContext) as UserContextType;
 
-  const modalJoin = useRef<HTMLIonModalElement>(null);
-  const modalAdd = useRef<HTMLIonModalElement>(null);
   const modalProfile = useRef<HTMLIonModalElement>(null);
 
-  const [selectedOrganization, setSelectedOrganization] = useState<
-    Organization | undefined
-  >();
-
-  const [displayName, setDisplayName] = useState<string>("");
-  const [contactId, setContactId] = useState<string>("");
-  const [contactIdProvider, setContactIdProvider] = useState<string>("");
-  const [reason, setReason] = useState<string>("");
   const [proofUrl, setProofUrl] = useState<string>("");
-
-  const [business, setBusiness] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [ipfsNftUrl, setIpfsNftUrl] = useState<string>("");
-  const [logoUrl, setLogoUrl] = useState<string>("");
-  const [siteUrl, setSiteUrl] = useState<string>("");
 
   const connectWallet = async (): Promise<void> => {
     try {
@@ -96,6 +82,9 @@ export const Footer: React.FC = () => {
       setUserBalance(balance.toNumber());
       setUserAddress(userAddress);
       await refreshStorage();
+
+      if (storage && storage.owners.indexOf(userAddress as address) < 0)
+        modalProfile.current?.present();
     } catch (error) {
       console.log("error connectWallet", error);
     }
@@ -118,74 +107,28 @@ export const Footer: React.FC = () => {
     history.replace(PAGES.ORGANIZATIONS);
   };
 
-  const joinOrganization = async (
-    e: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
-  ) => {
-    console.log("joinOrganization");
-    e.preventDefault();
+  const login = async () => {
+    const authClient = new auth.OAuth2User({
+      client_id: process.env["REACT_APP_TWITTER_API_KEY"]!,
+      client_secret: process.env["REACT_APP_TWITTER_API_SECRET"]!,
+      callback: "http://localhost:3000",
+      scopes: ["tweet.read", "users.read", "offline.access"],
+    });
 
-    try {
-      setLoading(true);
-      const op = await mainWalletType!.methods
-        .requestToJoinOrganization(
-          contactId,
-          contactIdProvider,
-          selectedOrganization!.name,
-          reason
-        )
-        .send();
-      await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
-      setLoading(false);
-      history.push(PAGES.ORGANIZATIONS); //it was the id created
-      await modalJoin.current?.dismiss();
-      console.log("newStorage", newStorage);
-    } catch (error) {
-      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
-      let tibe: TransactionInvalidBeaconError =
-        new TransactionInvalidBeaconError(error);
-      presentAlert({
-        header: "Error",
-        message: tibe.data_message,
-        buttons: ["Close"],
-      });
-      setLoading(false);
-    }
-    setLoading(false);
-  };
-
-  const addOrganization = async (
-    e: React.MouseEvent<HTMLIonButtonElement, MouseEvent>
-  ) => {
-    console.log("addOrganization");
-    e.preventDefault();
-
-    try {
-      setLoading(true);
-      const op = await mainWalletType!.methods
-        .addOrganization(business, ipfsNftUrl, logoUrl, name, siteUrl)
-        .send();
-      await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
-      setLoading(false);
-      await modalAdd.current?.dismiss();
-    } catch (error) {
-      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
-      let tibe: TransactionInvalidBeaconError =
-        new TransactionInvalidBeaconError(error);
-      presentAlert({
-        header: "Error",
-        message: tibe.data_message,
-        buttons: ["Close"],
-      });
-      setLoading(false);
-    }
-    setLoading(false);
-  };
-
-  const requestProof = async () => {
+    console.log("twitterClient initialized");
+    const authUrl = authClient.generateAuthURL({
+      state: userAddress,
+      code_challenge_method: "s256",
+    });
+    const POPUP_HEIGHT = 700;
+    const POPUP_WIDTH = 600;
+    await Browser.open({
+      url: authUrl,
+      height: POPUP_HEIGHT,
+      width: POPUP_WIDTH,
+      windowName: "Login",
+    });
+    /*
     const response = await fetch(
       process.env.REACT_APP_BACKEND_URL +
         "/user/" +
@@ -211,7 +154,7 @@ export const Footer: React.FC = () => {
       setUserProfile(json);
     } else {
       console.log("ERROR : " + response.status);
-    }
+    }*/
   };
 
   const verifyProof = async () => {
@@ -239,6 +182,10 @@ export const Footer: React.FC = () => {
     }
   };
 
+  const claimNFT = async () => {
+    //TODO
+  };
+
   const writeToClipboard = async (content: string) => {
     console.log("writeToClipboard", content);
 
@@ -256,228 +203,32 @@ export const Footer: React.FC = () => {
         {userAddress ? (
           <>
             <IonButton color="transparent" routerLink={PAGES.ORGANIZATIONS}>
-              {PAGES.ORGANIZATIONS}
-            </IonButton>
-
-            <IonButton id="join" color="transparent">
-              Join
-            </IonButton>
-
-            <IonButton id="add" color="transparent">
-              Add
+              <IonIcon slot="icon-only" icon={home}></IonIcon>
             </IonButton>
 
             <IonButton color="transparent" routerLink={PAGES.FUNDING}>
-              {PAGES.FUNDING}
+              <IonIcon slot="start" icon={cash}></IonIcon>
+              Funding
             </IonButton>
 
             <IonButton id="profile" color="transparent">
+              <IonIcon slot="start" icon={personCircle}></IonIcon>
               Profile
             </IonButton>
-
-            <IonButton color="transparent" onClick={disconnectWallet}>
-              logOut
-            </IonButton>
-
-            <IonModal trigger="join" ref={modalJoin}>
-              <IonHeader>
-                <IonToolbar>
-                  <IonButtons slot="start">
-                    <IonButton onClick={() => modalJoin.current?.dismiss()}>
-                      Cancel
-                    </IonButton>
-                  </IonButtons>
-                  <IonTitle>Join an organization</IonTitle>
-                  <IonButtons slot="end">
-                    <IonButton onClick={joinOrganization}>Done</IonButton>
-                  </IonButtons>
-                </IonToolbar>
-                <IonToolbar>
-                  <IonSearchbar></IonSearchbar>
-                </IonToolbar>
-              </IonHeader>
-
-              <IonContent color="light" class="ion-padding">
-                <IonInput
-                  labelPlacement="floating"
-                  color="primary"
-                  value={contactId}
-                  label="Contact identifier/alias"
-                  placeholder="@twitterAlias"
-                  type="text"
-                  maxlength={32}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setContactId(str.target.value! as string);
-                  }}
-                />
-                <IonInput
-                  labelPlacement="floating"
-                  value={contactIdProvider}
-                  label="Contact Provider (Twitter,Facebook,Gmail,etc...)"
-                  placeholder="Twitter"
-                  type="text"
-                  maxlength={20}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setContactIdProvider(str.target.value! as string);
-                  }}
-                />
-                <IonInput
-                  labelPlacement="floating"
-                  value={reason}
-                  label="Why do you want to join ?"
-                  placeholder="because ..."
-                  type="text"
-                  maxlength={255}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setReason(str.target.value! as string);
-                  }}
-                />
-
-                <IonText>Select an organization*</IonText>
-                <IonList id="modal-list" inset={true}>
-                  {storage?.organizations.map((organization) => (
-                    <IonItem
-                      fill={
-                        selectedOrganization?.name === organization.name
-                          ? "outline"
-                          : undefined
-                      }
-                      onClick={() => {
-                        setSelectedOrganization(organization);
-                      }}
-                      lines="none"
-                      key={organization.name}
-                    >
-                      <IonTitle>{organization.name}</IonTitle>
-                      <IonText>
-                        <i>{organization.business}</i>
-                      </IonText>
-                      <IonThumbnail slot="start">
-                        <img
-                          alt="Tezos"
-                          src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
-                        />
-                      </IonThumbnail>
-                      <IonIcon
-                        size="small"
-                        slot="end"
-                        icon={ellipse}
-                        color={getStatusColor(organization)}
-                      />
-                    </IonItem>
-                  ))}
-                </IonList>
-              </IonContent>
-            </IonModal>
-
-            <IonModal trigger="add" ref={modalAdd}>
-              <IonHeader>
-                <IonToolbar>
-                  <IonButtons slot="start">
-                    <IonButton onClick={() => modalAdd.current?.dismiss()}>
-                      Cancel
-                    </IonButton>
-                  </IonButtons>
-                  <IonTitle>Add an organization</IonTitle>
-                  <IonButtons slot="end">
-                    <IonButton onClick={addOrganization}>Done</IonButton>
-                  </IonButtons>
-                </IonToolbar>
-              </IonHeader>
-
-              <IonContent color="light" class="ion-padding">
-                <IonInput
-                  labelPlacement="floating"
-                  color="primary"
-                  value={name}
-                  label="Name"
-                  placeholder="my organization name"
-                  type="text"
-                  maxlength={32}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setName(str.target.value! as string);
-                  }}
-                />
-                <IonInput
-                  labelPlacement="floating"
-                  value={business}
-                  label="Business goal"
-                  placeholder="Save the planet ..."
-                  type="text"
-                  maxlength={255}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setBusiness(str.target.value! as string);
-                  }}
-                />
-
-                <IonInput
-                  labelPlacement="floating"
-                  value={ipfsNftUrl}
-                  label="IPFS NFT url"
-                  placeholder="ipfs://"
-                  type="text"
-                  maxlength={255}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setIpfsNftUrl(str.target.value! as string);
-                  }}
-                />
-
-                <IonInput
-                  labelPlacement="floating"
-                  value={logoUrl}
-                  label="Logo url"
-                  placeholder="https://"
-                  type="text"
-                  maxlength={255}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setLogoUrl(str.target.value! as string);
-                  }}
-                />
-
-                <IonInput
-                  labelPlacement="floating"
-                  value={siteUrl}
-                  label="Site url goal"
-                  placeholder="https://"
-                  type="text"
-                  maxlength={255}
-                  counter
-                  required
-                  onIonChange={(str) => {
-                    if (str.detail.value === undefined) return;
-                    setSiteUrl(str.target.value! as string);
-                  }}
-                />
-              </IonContent>
-            </IonModal>
 
             <IonModal trigger="profile" ref={modalProfile}>
               <IonHeader>
                 <IonToolbar>
                   <IonButtons slot="start">
                     <IonButton onClick={() => modalProfile.current?.dismiss()}>
-                      Cancel
+                      <IonIcon slot="start" icon={arrowBackOutline}></IonIcon>
+                      BACK
+                    </IonButton>
+                  </IonButtons>
+                  <IonButtons slot="end">
+                    <IonButton onClick={disconnectWallet}>
+                      <IonIcon slot="start" icon={logOut}></IonIcon>
+                      Logout
                     </IonButton>
                   </IonButtons>
                   <IonTitle>
@@ -499,8 +250,8 @@ export const Footer: React.FC = () => {
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
                         <IonContent class="ion-padding">
-                          You require to verify you social account in order to
-                          join an organization
+                          Soon, you will be requires to verify your social
+                          account in order to create/join an organization
                         </IonContent>
                       </IonPopover>
                     )}
@@ -539,7 +290,45 @@ export const Footer: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <IonTitle>Register and verify your social account</IonTitle>
+                    <IonItem>
+                      <IonLabel>Address : </IonLabel>
+                      <IonText>{userAddress}</IonText>
+                    </IonItem>
+                  </>
+                )}
+
+                {storage &&
+                storage.owners.indexOf(userAddress as address) >= 0 ? (
+                  <IonImg
+                    src={nftContratTokenMetadataMap
+                      .get(0)!
+                      .thumbnailUri?.replace(
+                        "ipfs://",
+                        "https://gateway.pinata.cloud/ipfs/"
+                      )}
+                  />
+                ) : (
+                  <IonButton size="large" onClick={claimNFT} color="warning">
+                    <IonIcon slot="start" icon={cardOutline}></IonIcon>
+                    Claim your Tezos membership NFT card
+                  </IonButton>
+                )}
+              </IonContent>
+            </IonModal>
+          </>
+        ) : (
+          <IonButton color="transparent" onClick={connectWallet}>
+            <IonIcon slot="start" icon={walletIcon}></IonIcon>
+            Connect your wallet
+          </IonButton>
+        )}
+      </IonToolbar>
+    </IonFooter>
+  );
+};
+
+/*
+<IonTitle>Register and verify your social account</IonTitle>
 
                     {!userProfile.displayName ? (
                       <IonInput
@@ -601,9 +390,7 @@ export const Footer: React.FC = () => {
                       ""
                     )}
 
-                    <IonButton onClick={requestProof}>
-                      Request a proof
-                    </IonButton>
+                    <IonButton onClick={login}>Login</IonButton>
 
                     {userProfile.proof ? (
                       <>
@@ -648,17 +435,4 @@ export const Footer: React.FC = () => {
                     ) : (
                       ""
                     )}
-                  </>
-                )}
-              </IonContent>
-            </IonModal>
-          </>
-        ) : (
-          <IonButton color="transparent" onClick={connectWallet}>
-            Connect your wallet
-          </IonButton>
-        )}
-      </IonToolbar>
-    </IonFooter>
-  );
-};
+*/

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TwitterModule } from './twitter/twitter.module';
 import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
 
@@ -17,6 +18,7 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
       entities: [UserProfile],
     }),
     UserProfilesModule,
+    TwitterModule,
   ],
   controllers: [],
   providers: [],
