@@ -18,37 +18,7 @@ const default_storage = {
     organizations : list([]) as list<organization>,
     organizationMax : 100 as nat,
     adminsMax : 50 as nat,
-
-    ledger: Big_map.literal(list([[[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),0 as nat],1 as nat]])) as MULTIASSET.Ledger.t,
-    metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", bytes  `{
-      "name":"Tezos Community NFT",
-      "description":"Membership card for Tezos community member",
-      "version":"0.0.1",
-      "license":{"name":"MIT"},
-      "authors":["Marigold<contact@marigold.dev>"],
-      "homepage":"https://marigold.dev",
-      "source":{
-        "tools":["Ligo"],
-        "location":"https://github.com/ligolang/contract-catalogue/tree/main/lib/fa2"},
-      "interfaces":["TZIP-012"],
-      "errors": [],
-      "views": []
-      }`
-    ]])),
-    token_metadata: Big_map.add(0 as nat, {token_id: 0 as nat,token_info:  Map.literal(list([
-      ["name", (bytes `Tezos Community`)],
-      ["description",(bytes `Membership card for Tezos community member`)],
-      ["interfaces", (bytes `["TZIP-12"]`)],
-      ["thumbnailUri", (bytes`ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej`)],
-      ["symbol",(bytes`NFTTZ`)],
-      ["decimals", (bytes `0`)]
-     ])) as map<string, bytes>
-    
-    
-    },Big_map.empty as MULTIASSET.TokenMetadata.t),
-    operators: Big_map.empty as MULTIASSET.Operators.t,
-    owner_token_ids : Set.add(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address, 0 as nat],Set.empty as set<[MULTIASSET.Storage.owner,MULTIASSET.Storage.token_id]>),
-    token_ids : Set.add(0 as nat,Set.empty as set<MULTIASSET.Storage.token_id>)
+    nftAddress : "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address
 };
 
 
