@@ -19,7 +19,7 @@ const default_storage = {
     organizationMax : 100 as nat,
     adminsMax : 50 as nat,
 
-    ledger: Big_map.literal(list([[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),1 as nat]])) as SINGLEASSET.Ledger.t,
+    ledger: Big_map.literal(list([[[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),0 as nat],1 as nat]])) as MULTIASSET.Ledger.t,
     metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", bytes  `{
       "name":"Tezos Community NFT",
       "description":"Membership card for Tezos community member",
@@ -45,9 +45,10 @@ const default_storage = {
      ])) as map<string, bytes>
     
     
-    },Big_map.empty as SINGLEASSET.TokenMetadata.t),
-    operators: Big_map.empty as SINGLEASSET.Operators.t,
-    owners: Set.add("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address,Set.empty as set<address>)
+    },Big_map.empty as MULTIASSET.TokenMetadata.t),
+    operators: Big_map.empty as MULTIASSET.Operators.t,
+    owner_token_ids : Set.add(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address, 0 as nat],Set.empty as set<[MULTIASSET.Storage.owner,MULTIASSET.Storage.token_id]>),
+    token_ids : Set.add(0 as nat,Set.empty as set<MULTIASSET.Storage.token_id>)
 };
 
 
