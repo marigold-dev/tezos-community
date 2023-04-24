@@ -32,6 +32,7 @@ import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MainWalletType, Storage } from "./main.types";
+import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
@@ -92,6 +93,7 @@ export type Organization = {
 export type UserContextType = {
   storage: Storage | null;
   setStorage: Dispatch<SetStateAction<Storage | null>>;
+  storageNFT: StorageNFT | null;
   userAddress: string;
   setUserAddress: Dispatch<SetStateAction<string>>;
   userProfile: UserProfile;
@@ -101,6 +103,7 @@ export type UserContextType = {
   Tezos: TezosToolkit;
   wallet: BeaconWallet;
   mainWalletType: MainWalletType | null;
+  nftWalletType: NftWalletType | null;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
@@ -130,6 +133,10 @@ const App: React.FC = () => {
   });
   const [storage, setStorage] = useState<Storage | null>(null);
   const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
+    null
+  );
+  const [storageNFT, setStorageNFT] = useState<StorageNFT | null>(null);
+  const [nftWalletType, setNftWalletType] = useState<NftWalletType | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(false);
@@ -179,10 +186,13 @@ const App: React.FC = () => {
       const storage: Storage = await mainWalletType.storage();
       setMainWalletType(mainWalletType);
 
-      let c = await Tezos.contract.at(
-        process.env.REACT_APP_CONTRACT_ADDRESS!,
-        tzip12
+      const nftWalletType: NftWalletType = await Tezos.wallet.at<NftWalletType>(
+        storage.nftAddress
       );
+      const storageNFT: StorageNFT = await nftWalletType.storage();
+      setNftWalletType(nftWalletType);
+
+      let c = await Tezos.contract.at(storage.nftAddress, tzip12);
 
       let tokenMetadata: TZIP21TokenMetadata = (await c
         .tzip12()
@@ -193,6 +203,7 @@ const App: React.FC = () => {
       console.log("User NFT refreshed");
 
       //it has to be last one
+      setStorageNFT(storageNFT);
       setStorage(storage);
       console.log("Storage refreshed");
     } else {
@@ -227,7 +238,9 @@ const App: React.FC = () => {
           Tezos,
           wallet,
           storage,
+          storageNFT,
           mainWalletType,
+          nftWalletType,
           setUserAddress,
           setUserBalance,
           setStorage,

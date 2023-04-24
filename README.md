@@ -65,7 +65,7 @@ taq install @taqueria/plugin-taquito
 taq deploy nft.tz -e "testing"
 ```
 
-> Important : Get the deployed address and change the nftAddress field on main.storageList.jsligo
+> Important : Copy/paste the deployed address and change the nftAddress field on main.storageList.jsligo
 
 ## Registry
 

@@ -52,7 +52,9 @@ export const Footer: React.FC = () => {
     userProfile,
     setUserProfile,
     storage,
+    storageNFT,
     mainWalletType,
+    nftWalletType,
     setStorage,
     setUserAddress,
     setUserBalance,
@@ -85,8 +87,8 @@ export const Footer: React.FC = () => {
       await refreshStorage();
 
       if (
-        storage &&
-        storage.owner_token_ids.findIndex(
+        storageNFT &&
+        storageNFT.owner_token_ids.findIndex(
           (obj) => obj[0] === (userAddress as address)
         ) < 0
       )
@@ -193,12 +195,9 @@ export const Footer: React.FC = () => {
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
-        .createNFTCardForMember(userAddress as address)
-        .send();
+      const op = await nftWalletType!.methods.createNFTCardForMember().send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      await refreshStorage();
       history.replace(PAGES.ORGANIZATIONS);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -325,8 +324,8 @@ export const Footer: React.FC = () => {
                   </>
                 )}
 
-                {storage &&
-                storage.owner_token_ids.findIndex(
+                {storageNFT &&
+                storageNFT.owner_token_ids.findIndex(
                   (obj) => obj[0] === (userAddress as address)
                 ) >= 0 ? (
                   <IonImg

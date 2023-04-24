@@ -104,7 +104,6 @@ const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganiza
     Test.set_source(sender);
     const status = Test.transfer_to_contract(contr, AddOrganization(or), 0 as mutez);
     const _ = Test.log(["status", status]);
-    //const _ = Test.bake_until_n_cycle_end(10 as nat);
     let store : CONTRACT.storage = Test.get_storage(taddr);
     Test.log(store);
     Test.assert_with_error(List.size(store.organizations) == orgSize, "Wrong size on organization list");

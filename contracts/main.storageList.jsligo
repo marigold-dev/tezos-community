@@ -18,7 +18,7 @@ const default_storage = {
     organizations : list([]) as list<organization>,
     organizationMax : 100 as nat,
     adminsMax : 50 as nat,
-    nftAddress : "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address
+    nftAddress : "KT1D9hiv2vmqBDsdoa3tyervd5vAFZRBdNsr" as address
 };
 
 
