@@ -311,37 +311,45 @@ export const OrganizationsScreen: React.FC = () => {
 
                     <IonText>Select an organization*</IonText>
                     <IonList id="modal-list" inset={true}>
-                      {storage?.organizations.map((organization) => (
-                        <IonItem
-                          fill={
-                            selectedOrganization?.name === organization.name
-                              ? "outline"
-                              : undefined
-                          }
-                          onClick={() => {
-                            setSelectedOrganization(organization);
-                          }}
-                          lines="none"
-                          key={organization.name}
-                        >
-                          <IonTitle>{organization.name}</IonTitle>
-                          <IonText>
-                            <i>{organization.business}</i>
-                          </IonText>
-                          <IonThumbnail slot="start">
-                            <img
-                              alt="Tezos"
-                              src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
+                      {storage?.organizations
+                        .filter(
+                          (org) =>
+                            myOrganizations.findIndex(
+                              (orgItem) => orgItem.name === org.name,
+                              org
+                            ) < 0
+                        )
+                        .map((organization) => (
+                          <IonItem
+                            fill={
+                              selectedOrganization?.name === organization.name
+                                ? "outline"
+                                : undefined
+                            }
+                            onClick={() => {
+                              setSelectedOrganization(organization);
+                            }}
+                            lines="none"
+                            key={organization.name}
+                          >
+                            <IonTitle>{organization.name}</IonTitle>
+                            <IonText>
+                              <i>{organization.business}</i>
+                            </IonText>
+                            <IonThumbnail slot="start">
+                              <img
+                                alt="Tezos"
+                                src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
+                              />
+                            </IonThumbnail>
+                            <IonIcon
+                              size="small"
+                              slot="end"
+                              icon={ellipse}
+                              color={getStatusColor(organization)}
                             />
-                          </IonThumbnail>
-                          <IonIcon
-                            size="small"
-                            slot="end"
-                            icon={ellipse}
-                            color={getStatusColor(organization)}
-                          />
-                        </IonItem>
-                      ))}
+                          </IonItem>
+                        ))}
                     </IonList>
                   </IonContent>
                 </IonModal>
