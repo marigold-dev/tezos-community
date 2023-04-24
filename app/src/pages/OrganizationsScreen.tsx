@@ -226,12 +226,7 @@ export const OrganizationsScreen: React.FC = () => {
           </>
         ) : (
           <IonSplitPane when="xs" contentId="main">
-            <IonMenu
-              style={{
-                display: myOrganizations.length === 0 ? "none" : "block",
-              }}
-              contentId="main"
-            >
+            <IonMenu contentId="main">
               <IonContent className="ion-padding">
                 <IonItem lines="none">
                   <IonButton id="addFromOrganizations" color="transparent">
@@ -315,8 +310,7 @@ export const OrganizationsScreen: React.FC = () => {
                         .filter(
                           (org) =>
                             myOrganizations.findIndex(
-                              (orgItem) => orgItem.name === org.name,
-                              org
+                              (orgItem) => orgItem.name === org.name
                             ) < 0
                         )
                         .map((organization) => (

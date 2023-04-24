@@ -14,10 +14,22 @@ import {
 
 export type Storage = {
   adminsMax: nat;
-  ledger: BigMap<address, nat>;
+  ledger: BigMap<
+    {
+      0: address;
+      1: nat;
+    },
+    nat
+  >;
   memberProfileVerified: Array<address>;
   metadata: BigMap<string, bytes>;
-  operators: BigMap<address, Array<address>>;
+  operators: BigMap<
+    {
+      0: address;
+      1: address;
+    },
+    Array<nat>
+  >;
   organizationMax: nat;
   organizations: Array<{
     admins: Array<address>;
@@ -39,7 +51,10 @@ export type Storage = {
     status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
     verified: boolean;
   }>;
-  owners: Array<address>;
+  owner_token_ids: Array<{
+    0: address;
+    1: nat;
+  }>;
   tezosOrganization: {
     admins: Array<address>;
     business: string;
@@ -60,6 +75,7 @@ export type Storage = {
     status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
     verified: boolean;
   };
+  token_ids: Array<nat>;
   token_metadata: BigMap<
     nat,
     {
@@ -85,6 +101,7 @@ type Methods = {
     }>,
     callback: contract
   ) => Promise<void>;
+  createNFTCardForMember: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeMember: (
     member: address,
@@ -141,6 +158,7 @@ type MethodsObject = {
     }>;
     callback: contract;
   }) => Promise<void>;
+  createNFTCardForMember: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeMember: (params: {
     lastAdmin?: address;

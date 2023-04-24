@@ -39,6 +39,7 @@ import {
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { auth } from "twitter-api-sdk";
+import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
 import { address } from "./type-aliases";
 export const Footer: React.FC = () => {
   const history = useHistory();
@@ -83,7 +84,12 @@ export const Footer: React.FC = () => {
       setUserAddress(userAddress);
       await refreshStorage();
 
-      if (storage && storage.owners.indexOf(userAddress as address) < 0)
+      if (
+        storage &&
+        storage.owner_token_ids.findIndex(
+          (obj) => obj[0] === (userAddress as address)
+        ) < 0
+      )
         modalProfile.current?.present();
     } catch (error) {
       console.log("error connectWallet", error);
@@ -183,7 +189,29 @@ export const Footer: React.FC = () => {
   };
 
   const claimNFT = async () => {
-    //TODO
+    console.log("claimNFT");
+
+    try {
+      setLoading(true);
+      const op = await mainWalletType!.methods
+        .createNFTCardForMember(userAddress as address)
+        .send();
+      await op?.confirmation();
+      const newStorage = await mainWalletType!.storage();
+      setStorage(newStorage);
+      history.replace(PAGES.ORGANIZATIONS);
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
   };
 
   const writeToClipboard = async (content: string) => {
@@ -298,7 +326,9 @@ export const Footer: React.FC = () => {
                 )}
 
                 {storage &&
-                storage.owners.indexOf(userAddress as address) >= 0 ? (
+                storage.owner_token_ids.findIndex(
+                  (obj) => obj[0] === (userAddress as address)
+                ) >= 0 ? (
                   <IonImg
                     src={nftContratTokenMetadataMap
                       .get(0)!
