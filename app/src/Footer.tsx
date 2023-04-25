@@ -277,8 +277,9 @@ export const Footer: React.FC = () => {
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
                         <IonContent class="ion-padding">
-                          Soon, you will be requires to verify your social
-                          account in order to create/join an organization
+                          Soon, you will be required to verify your social
+                          account in order to create/join an organization and
+                          receive urgent/important messages
                         </IonContent>
                       </IonPopover>
                     )}
