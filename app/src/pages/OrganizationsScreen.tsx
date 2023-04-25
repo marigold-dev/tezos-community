@@ -99,7 +99,8 @@ export const OrganizationsScreen: React.FC = () => {
   const [joiningOrganization, setJoiningOrganization] = useState<
     Organization | undefined
   >();
-
+  const [joiningOrganizations, setJoiningOrganizations] =
+    useState<Organization[]>();
   //////////////
 
   const [selectedOrganization, setSelectedOrganization] = useState<
@@ -158,6 +159,19 @@ export const OrganizationsScreen: React.FC = () => {
       }
     })();
   }, [storage, userAddress]);
+
+  useEffect(
+    //default organization to join
+    () =>
+      setJoiningOrganizations(
+        storage?.organizations.filter(
+          (org) =>
+            myOrganizations.findIndex((orgItem) => orgItem.name === org.name) <
+            0
+        )
+      ),
+    [myOrganizations]
+  );
 
   useEffect(() => {
     (async () => await refreshStorage())();
@@ -301,7 +315,43 @@ export const OrganizationsScreen: React.FC = () => {
                       </IonButtons>
                     </IonToolbar>
                     <IonToolbar>
-                      <IonSearchbar></IonSearchbar>
+                      <IonSearchbar
+                        onIonInput={(ev) => {
+                          const target = ev.target as HTMLIonSearchbarElement;
+                          console.log("target.value", target.value);
+
+                          if (
+                            target &&
+                            target !== undefined &&
+                            target.value?.trim() !== ""
+                          ) {
+                            setJoiningOrganizations(
+                              storage?.organizations
+                                .filter(
+                                  (org) =>
+                                    myOrganizations.findIndex(
+                                      (orgItem) => orgItem.name === org.name
+                                    ) < 0
+                                )
+                                .filter(
+                                  (orgItem) =>
+                                    orgItem.name
+                                      .toLowerCase()
+                                      .indexOf(target.value!.toLowerCase()) >= 0
+                                )
+                            );
+                          } else {
+                            setJoiningOrganizations(
+                              storage?.organizations.filter(
+                                (org) =>
+                                  myOrganizations.findIndex(
+                                    (orgItem) => orgItem.name === org.name
+                                  ) < 0
+                              )
+                            );
+                          }
+                        }}
+                      ></IonSearchbar>
                     </IonToolbar>
                   </IonHeader>
 
@@ -391,16 +441,10 @@ export const OrganizationsScreen: React.FC = () => {
                       onIonBlur={() => setReasonMarkTouched(true)}
                     />
 
-                    <IonText>Select an organization*</IonText>
+                    <IonText>Select an organization *</IonText>
                     <IonList id="modal-list" inset={true}>
-                      {storage?.organizations
-                        .filter(
-                          (org) =>
-                            myOrganizations.findIndex(
-                              (orgItem) => orgItem.name === org.name
-                            ) < 0
-                        )
-                        .map((organization) => (
+                      {joiningOrganizations &&
+                        joiningOrganizations.map((organization) => (
                           <IonItem
                             fill={
                               joiningOrganization?.name === organization.name
