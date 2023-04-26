@@ -138,8 +138,12 @@ export const OrganizationsScreen: React.FC = () => {
             //cache userprofiles
 
             for (const key of keys) {
-              userProfiles.set(key.key, await getUserProfile(key.key));
-              setUserProfiles(userProfiles);
+              try {
+                userProfiles.set(key.key, await getUserProfile(key.key));
+                setUserProfiles(userProfiles);
+              } catch (error) {
+                console.log("Cannot get user profile", error);
+              }
             }
           })
         );
