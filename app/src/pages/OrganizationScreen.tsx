@@ -1,5 +1,6 @@
 import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
 import {
+  IonBadge,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -15,7 +16,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { address } from "../type-aliases";
 import { OrganizationAdministration } from "./OrganizationAdministration";
@@ -23,6 +24,7 @@ import { OrganizationMessages } from "./OrganizationMessages";
 
 type OrganizationProps = {
   organization: Organization | undefined;
+  setOrganization: Dispatch<SetStateAction<Organization | undefined>>;
 };
 
 enum TABS {
@@ -33,6 +35,7 @@ enum TABS {
 
 export const OrganizationScreen = ({
   organization,
+  setOrganization,
 }: OrganizationProps): JSX.Element => {
   const {
     Tezos,
@@ -108,10 +111,7 @@ export const OrganizationScreen = ({
           {selectedTab == TABS.DESCRIPTION ? (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>
-                  {organization.name}
-                  {" (" + (members ? members.length : 0) + " members)"}
-                </IonCardTitle>
+                <IonCardTitle>{organization.name}</IonCardTitle>
               </IonCardHeader>
 
               <IonCardContent>
@@ -137,14 +137,19 @@ export const OrganizationScreen = ({
                     {organization.verified ? "true" : "false"}
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Members</IonTitle>
-                    <IonList>
-                      {members
-                        ? members.map((member) => (
-                            <IonItem key={member}>{member}</IonItem>
-                          ))
-                        : ""}
-                    </IonList>
+                    <IonItem lines="none">
+                      <IonTitle>Members </IonTitle>
+                      <IonBadge>{members ? members.length : 0}</IonBadge>
+                    </IonItem>
+                    <IonItem lines="none">
+                      <IonList>
+                        {members
+                          ? members.map((member) => (
+                              <IonItem key={member}>{member}</IonItem>
+                            ))
+                          : ""}
+                      </IonList>
+                    </IonItem>
                   </IonItem>
                 </IonList>
               </IonCardContent>
@@ -154,6 +159,7 @@ export const OrganizationScreen = ({
           ) : (
             <OrganizationAdministration
               organization={organization}
+              setOrganization={setOrganization}
               members={members}
             />
           )}

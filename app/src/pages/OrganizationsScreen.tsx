@@ -40,7 +40,7 @@ import {
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { getStatusColor } from "../Utils";
+import { getStatusColor, getUserProfile } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
@@ -54,6 +54,8 @@ export const OrganizationsScreen: React.FC = () => {
     wallet,
     userAddress,
     userBalance,
+    userProfiles,
+    setUserProfiles,
     storage,
     mainWalletType,
     setStorage,
@@ -132,6 +134,13 @@ export const OrganizationsScreen: React.FC = () => {
               organization.name,
               Array.from(keys.map((key) => key.key))
             );
+
+            //cache userprofiles
+
+            for (const key of keys) {
+              userProfiles.set(key.key, await getUserProfile(key.key));
+              setUserProfiles(userProfiles);
+            }
           })
         );
 
@@ -462,7 +471,7 @@ export const OrganizationsScreen: React.FC = () => {
                               <i>{organization.business}</i>
                             </IonText>
                             <IonThumbnail slot="start">
-                              <img alt="." src={organization.logoUrl} />
+                              <IonImg alt="." src={organization.logoUrl} />
                             </IonThumbnail>
                             <IonIcon
                               size="small"
@@ -619,7 +628,8 @@ export const OrganizationsScreen: React.FC = () => {
                     key={storage.tezosOrganization.name}
                   >
                     <IonThumbnail slot="start">
-                      <img
+                      <IonImg
+                        style={{ objectFit: "contain" }}
                         alt="Tezos"
                         src={storage.tezosOrganization.logoUrl}
                       />
@@ -651,7 +661,7 @@ export const OrganizationsScreen: React.FC = () => {
                   >
                     {organization.name}
                     <IonThumbnail slot="start">
-                      <img alt="." src={organization.logoUrl} />
+                      <IonImg alt="." src={organization.logoUrl} />
                     </IonThumbnail>
                     <IonIcon
                       size="small"
@@ -663,7 +673,10 @@ export const OrganizationsScreen: React.FC = () => {
                 ))}
               </IonContent>
             </IonMenu>
-            <OrganizationScreen organization={selectedOrganization} />
+            <OrganizationScreen
+              setOrganization={setSelectedOrganization}
+              organization={selectedOrganization}
+            />
           </IonSplitPane>
         )}
       </IonContent>

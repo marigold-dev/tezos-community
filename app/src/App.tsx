@@ -37,6 +37,7 @@ import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
+import { getUserProfile } from "./Utils";
 
 setupIonicReact();
 
@@ -96,8 +97,8 @@ export type UserContextType = {
   storageNFT: StorageNFT | null;
   userAddress: string;
   setUserAddress: Dispatch<SetStateAction<string>>;
-  userProfile: UserProfile;
-  setUserProfile: Dispatch<SetStateAction<UserProfile>>;
+  userProfiles: Map<address, UserProfile>;
+  setUserProfiles: Dispatch<SetStateAction<Map<address, UserProfile>>>;
   userBalance: number;
   setUserBalance: Dispatch<SetStateAction<number>>;
   Tezos: TezosToolkit;
@@ -123,14 +124,9 @@ const App: React.FC = () => {
   );
   const [userAddress, setUserAddress] = useState<string>("");
   const [userBalance, setUserBalance] = useState<number>(0);
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    displayName: "",
-    proof: "",
-    proofDate: new Date(),
-    socialAccountAlias: "",
-    socialAccountType: SOCIAL_ACCOUNT_TYPE.TWITTER,
-    verified: false,
-  });
+  const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
+    new Map()
+  );
   const [storage, setStorage] = useState<Storage | null>(null);
   const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
     null
@@ -164,9 +160,10 @@ const App: React.FC = () => {
         setUserBalance(balance.toNumber());
 
         try {
+          //always refresh userProfile
           const newUserProfile = await getUserProfile(userAddress);
-          newUserProfile.proofDate = new Date(newUserProfile.proofDate); //convert dates
-          setUserProfile(newUserProfile);
+          userProfiles.set(userAddress as address, newUserProfile);
+          setUserProfiles(userProfiles);
           console.log("userProfile refreshed for " + userAddress);
         } catch (error) {
           console.log("No user profile found..");
@@ -212,29 +209,14 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
-  const getUserProfile = async (userAddress: string): Promise<UserProfile> => {
-    const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL + "/user/" + userAddress
-    );
-    const json = await response.json();
-    if (response.ok) {
-      console.log("data is : ", json);
-      return new Promise((resolve, reject) => resolve(json));
-    } else {
-      return new Promise((resolve, reject) =>
-        reject("ERROR : " + response.status)
-      );
-    }
-  };
-
   return (
     <IonApp>
       <UserContext.Provider
         value={{
           userAddress,
           userBalance,
-          userProfile,
-          setUserProfile,
+          userProfiles,
+          setUserProfiles,
           Tezos,
           wallet,
           storage,

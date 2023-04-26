@@ -1,4 +1,5 @@
 import {
+  IonBadge,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -7,6 +8,7 @@ import {
   IonContent,
   IonIcon,
   IonItem,
+  IonTitle,
   IonToggle,
   useIonAlert,
 } from "@ionic/react";
@@ -18,19 +20,22 @@ import {
   trashBinOutline,
   trashOutline,
 } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
+import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
 
 type OrganizationProps = {
   organization: Organization | undefined;
+  setOrganization: Dispatch<SetStateAction<Organization | undefined>>;
   members: address[];
 };
 
 export const OrganizationAdministration = ({
   organization,
+  setOrganization,
   members,
 }: OrganizationProps): JSX.Element => {
   const {
@@ -38,6 +43,7 @@ export const OrganizationAdministration = ({
     wallet,
     userAddress,
     userBalance,
+    userProfiles,
     storage,
     mainWalletType,
     setStorage,
@@ -72,10 +78,8 @@ export const OrganizationAdministration = ({
         )
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      await refreshStorage();
       setLoading(false);
-      console.log("newStorage", newStorage);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
       let tibe: TransactionInvalidBeaconError =
@@ -99,8 +103,7 @@ export const OrganizationAdministration = ({
         .freezeOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      setOrganization({ ...organization! }); //force refresh
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -116,17 +119,19 @@ export const OrganizationAdministration = ({
     setLoading(false);
   };
 
-  const activateOrganization = async (organizationName: string) => {
-    console.log("addOrganization");
-
+  const activateOrganization = async (
+    e: React.MouseEvent<HTMLIonIconElement, MouseEvent>,
+    organizationName: string
+  ) => {
+    console.log("activateOrganization");
+    e.preventDefault();
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
         .activateOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      setOrganization({ ...organization! }); //force refresh
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -203,39 +208,73 @@ export const OrganizationAdministration = ({
     setMembersToDecline([]);
   }, [organization, storage, userAddress]);
 
+  useEffect(() => {
+    //need to refresh in case of storage changes
+    if (organization) {
+      const org = storage?.organizations.find(
+        (orgItem) => orgItem.name === organization.name
+      );
+      if (org) setOrganization(org);
+    }
+  }, [storage, userAddress]);
+
   return (
     <IonContent className="ion-padding">
       <IonItem>
-        <h1>Administrators</h1>
+        <IonTitle>Administrators</IonTitle>
+        <IonBadge>
+          {organization?.admins ? organization?.admins.length : 0}
+        </IonBadge>
       </IonItem>
 
       {organization?.admins.map((admin) => (
-        <IonItem key={admin}>{admin}</IonItem>
+        <IonItem key={admin}>
+          {userProfiles.get(admin) ? (
+            <UserProfileChip address={admin} userProfiles={userProfiles} />
+          ) : (
+            admin
+          )}
+        </IonItem>
       ))}
 
       {organization?.name !== storage?.tezosOrganization.name ? (
         <>
           <IonItem>
-            <h1>Members</h1>
+            <IonTitle>Members</IonTitle>
+            <IonBadge>{members ? members.length : 0}</IonBadge>
           </IonItem>
           {members.map((member) => (
             <IonItem key={member}>
-              {member}{" "}
+              <UserProfileChip address={member} userProfiles={userProfiles} />
+
               <IonIcon
                 onClick={(e) => removeMember(member)}
                 slot="end"
+                color="white"
                 icon={trashBinOutline}
               />
             </IonItem>
           ))}
 
           <IonItem>
-            <h1>Member requests</h1>
-            <IonIcon
-              onClick={(e) => responseToJoinOrganization(e)}
-              slot="end"
-              icon={checkmarkDoneCircleOutline}
-            />
+            <IonTitle>Member requests</IonTitle>
+            <IonBadge>
+              {organization?.memberRequests
+                ? organization?.memberRequests.length
+                : 0}
+            </IonBadge>
+
+            {organization?.memberRequests &&
+            organization?.memberRequests.length > 0 ? (
+              <IonIcon
+                onClick={(e) => responseToJoinOrganization(e)}
+                slot="end"
+                color="white"
+                icon={checkmarkDoneCircleOutline}
+              />
+            ) : (
+              ""
+            )}
           </IonItem>
           {organization?.memberRequests.map((memberRequest) => (
             <IonCard key={memberRequest.user}>
@@ -292,8 +331,9 @@ export const OrganizationAdministration = ({
               />
               {"fROZEN" in org.status || "pENDING_APPROVAL" in org.status ? (
                 <IonIcon
-                  onClick={(e) => activateOrganization(org.name)}
+                  onClick={(e) => activateOrganization(e, org.name)}
                   slot="end"
+                  color="white"
                   icon={playCircleOutline}
                 />
               ) : (
@@ -304,6 +344,7 @@ export const OrganizationAdministration = ({
                 <IonIcon
                   onClick={(e) => freezeOrganization(org.name)}
                   slot="end"
+                  color="white"
                   icon={stopCircleOutline}
                 />
               ) : (
@@ -313,6 +354,7 @@ export const OrganizationAdministration = ({
               <IonIcon
                 onClick={(e) => removeOrganization(org.name)}
                 slot="end"
+                color="white"
                 icon={trashOutline}
               />
             </IonItem>
