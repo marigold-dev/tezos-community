@@ -24,6 +24,7 @@ import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
+import { LocalNotifications } from "@capacitor/local-notifications";
 import "./theme/variables.css";
 
 import { NetworkType } from "@airgap/beacon-types";
@@ -31,13 +32,13 @@ import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { getUserProfile } from "./Utils";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
-import { getUserProfile } from "./Utils";
 
 setupIonicReact();
 
@@ -142,10 +143,149 @@ const App: React.FC = () => {
     Map<number, TZIP21TokenMetadata>
   >(new Map());
 
+  //for the message subscriptions
+  const [subscriptionsDone, setSubscriptionsDone] = useState<boolean>(false); //do registration only once
+  const organizationActivatedSubscription = Tezos.stream.subscribeEvent({
+    tag: "organizationActivated",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const organizationFrozenSubscription = Tezos.stream.subscribeEvent({
+    tag: "organizationFrozen",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const organizationAddedSubscription = Tezos.stream.subscribeEvent({
+    tag: "organizationAdded",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+
+  const [notificationId, setNotificationId] = useState<number>(0);
+  const getNextNotificationId = () => {
+    const newNextNotificationId = notificationId + 1;
+    setNotificationId(newNextNotificationId);
+    return newNextNotificationId;
+  };
+
   useEffect(() => {
     Tezos.setWalletProvider(wallet);
-    (async () => await refreshStorage())();
+    (async () => {
+      console.log("After wallet change I refresh storage");
+      await refreshStorage();
+    })();
   }, [wallet]);
+
+  //subscriptions
+  useEffect(() => {
+    (async () => {
+      try {
+        // Request/ check permissions
+        const ps = await LocalNotifications.checkPermissions();
+        if (ps.display == "prompt") {
+          await LocalNotifications.requestPermissions();
+          console.log("Ask to allow notifications");
+        } else {
+          console.log("Notifications status : ", ps.display);
+        }
+
+        if (storage && !subscriptionsDone) {
+          // Clear old notifications in prep for refresh (OPTIONAL)
+          const pending = await LocalNotifications.getPending();
+          if (pending.notifications.length > 0)
+            await LocalNotifications.cancel(pending);
+
+          //only for Tezos admins
+          if (
+            storage &&
+            storage?.tezosOrganization.admins.indexOf(userAddress as address) >=
+              0
+          ) {
+            organizationActivatedSubscription.on("data", async (e) => {
+              console.log("on organizationActivated event :", e);
+              if (!e.result.errors || e.result.errors.length === 0)
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Organization activated",
+                      body:
+                        "Tezos organization '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "' has been activated",
+                      id: getNextNotificationId(),
+                      autoCancel: true,
+                    },
+                  ],
+                });
+              else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+
+            organizationFrozenSubscription.on("data", async (e) => {
+              console.log("on organizationFrozen event :", e);
+              if (!e.result.errors || e.result.errors.length === 0)
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Organization frozen",
+                      body:
+                        "Tezos organization '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "' has been frozen",
+                      id: getNextNotificationId(),
+                    },
+                  ],
+                });
+              else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+
+            organizationAddedSubscription.on("data", async (e) => {
+              console.log("on organizationAdded event :", e);
+              if (!e.result.errors || e.result.errors.length === 0)
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Organization added",
+                      body:
+                        "Tezos organization '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "' has been added",
+                      id: getNextNotificationId(),
+                      autoCancel: true,
+                    },
+                  ],
+                });
+              else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+          }
+
+          //only for organization administrators
+          /*
+          if( storage &&
+            storage?.organizations.findIndex( i am on at least 1 org admin ) >=0 ){
+            //TODO joinOrganizationRequest
+            //filter messages only for my orgs
+          }*/
+
+          //for all users
+
+          //TODO orgMemberRequestsUpdated
+          // look at this org member to see if I am in and sent msg, if yes, refresh sotrage to list new org
+
+          setSubscriptionsDone(true);
+          console.log("Event subscription done");
+        } else {
+        }
+      } catch (error) {
+        console.log("Error", error);
+      }
+    })();
+  }, [storage]);
 
   const refreshStorage = async (
     event?: CustomEvent<RefresherEventDetail>

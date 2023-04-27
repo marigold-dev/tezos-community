@@ -6,13 +6,13 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonContent,
+  IonInput,
   IonItem,
   IonLabel,
   IonList,
   IonSegment,
   IonSegmentButton,
   IonText,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
@@ -115,41 +115,60 @@ export const OrganizationScreen = ({
               </IonCardHeader>
 
               <IonCardContent>
-                <IonList>
+                <IonList lines="none">
                   <IonItem>
-                    <IonTitle>Website</IonTitle>
-                    {organization.siteUrl}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Website"
+                      value={organization.siteUrl}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Logo</IonTitle>
-                    {organization.logoUrl}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Logo"
+                      value={organization.logoUrl}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>IPFS membership card url</IonTitle>
-                    {organization.ipfsNftUrl}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="IPFS membership card url"
+                      value={organization.ipfsNftUrl}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Objective</IonTitle>
-                    {organization.business}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Objective"
+                      value={organization.business}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Social account verified ?</IonTitle>
-                    {organization.verified ? "true" : "false"}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Social account verified ?"
+                      value={organization.verified ? "true" : "false"}
+                    ></IonInput>
                   </IonItem>
-                  <IonItem>
-                    <IonItem lines="none">
-                      <IonTitle>Members </IonTitle>
-                      <IonBadge>{members ? members.length : 0}</IonBadge>
-                    </IonItem>
-                    <IonItem lines="none">
-                      <IonList>
-                        {members
-                          ? members.map((member) => (
-                              <IonItem key={member}>{member}</IonItem>
-                            ))
-                          : ""}
-                      </IonList>
-                    </IonItem>
+
+                  <IonItem lines="none">
+                    <IonLabel>Members </IonLabel>
+                    <IonBadge>{members ? members.length : 0}</IonBadge>
+                  </IonItem>
+                  <IonItem lines="none">
+                    <IonList>
+                      {members
+                        ? members.map((member) => (
+                            <IonItem key={member}>{member}</IonItem>
+                          ))
+                        : ""}
+                    </IonList>
                   </IonItem>
                 </IonList>
               </IonCardContent>
