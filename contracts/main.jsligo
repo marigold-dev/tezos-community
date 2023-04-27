@@ -179,7 +179,7 @@ export const requestToJoinOrganization = (jr : joinRequest, store : storage) : _
             if(org.status != ACTIVE()) return failwith("You cannot receive requests until your organization is activated");
             else {            
                 const newOrg = {...org ,memberRequests :  Set.add({ user : Tezos.get_sender(), joinRequest : jr },org.memberRequests)};
-                return [list([Tezos.emit("%joinOrganizationRequest",Tezos.get_sender())]),{...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),newOrg,store.organizations)}];
+                return [list([Tezos.emit("%joinOrganizationRequest",org.name)]),{...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),newOrg,store.organizations)}];
                 }
             }
     });    
@@ -203,7 +203,7 @@ export const responseToJoinOrganization = (jor : joinOrganizationResponse, store
                         newOrg = {...newOrg,memberRequests : Set.remove(mr,newOrg.memberRequests)};
                      }
                  };                
-                return [list([Tezos.emit("%orgMemberRequestsUpdated",org.name)]), {...newStore,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,newStore.organizations)}];
+                return [list([Tezos.emit("%orgMemberRequestsUpdated",[jor.membersToApprove,jor.membersToDecline,org.name])  ]), {...newStore,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,newStore.organizations)}];
             }
         }
     });

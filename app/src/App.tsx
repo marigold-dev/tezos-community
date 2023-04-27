@@ -157,6 +157,14 @@ const App: React.FC = () => {
     tag: "organizationAdded",
     address: process.env.REACT_APP_CONTRACT_ADDRESS!,
   });
+  const joinOrganizationRequestSubscription = Tezos.stream.subscribeEvent({
+    tag: "joinOrganizationRequest",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const orgMemberRequestsUpdatedSubscription = Tezos.stream.subscribeEvent({
+    tag: "orgMemberRequestsUpdated",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
 
   const [notificationId, setNotificationId] = useState<number>(0);
   const getNextNotificationId = () => {
@@ -200,7 +208,7 @@ const App: React.FC = () => {
           ) {
             organizationActivatedSubscription.on("data", async (e) => {
               console.log("on organizationActivated event :", e);
-              if (!e.result.errors || e.result.errors.length === 0)
+              if (!e.result.errors || e.result.errors.length === 0) {
                 await LocalNotifications.schedule({
                   notifications: [
                     {
@@ -214,7 +222,8 @@ const App: React.FC = () => {
                     },
                   ],
                 });
-              else
+                await refreshStorage();
+              } else
                 console.log(
                   "Warning : here we ignore a failing transaction event"
                 );
@@ -222,7 +231,7 @@ const App: React.FC = () => {
 
             organizationFrozenSubscription.on("data", async (e) => {
               console.log("on organizationFrozen event :", e);
-              if (!e.result.errors || e.result.errors.length === 0)
+              if (!e.result.errors || e.result.errors.length === 0) {
                 await LocalNotifications.schedule({
                   notifications: [
                     {
@@ -235,7 +244,8 @@ const App: React.FC = () => {
                     },
                   ],
                 });
-              else
+                await refreshStorage();
+              } else
                 console.log(
                   "Warning : here we ignore a failing transaction event"
                 );
@@ -243,7 +253,7 @@ const App: React.FC = () => {
 
             organizationAddedSubscription.on("data", async (e) => {
               console.log("on organizationAdded event :", e);
-              if (!e.result.errors || e.result.errors.length === 0)
+              if (!e.result.errors || e.result.errors.length === 0) {
                 await LocalNotifications.schedule({
                   notifications: [
                     {
@@ -257,7 +267,9 @@ const App: React.FC = () => {
                     },
                   ],
                 });
-              else
+
+                await refreshStorage();
+              } else
                 console.log(
                   "Warning : here we ignore a failing transaction event"
                 );
@@ -265,17 +277,78 @@ const App: React.FC = () => {
           }
 
           //only for organization administrators
-          /*
-          if( storage &&
-            storage?.organizations.findIndex( i am on at least 1 org admin ) >=0 ){
-            //TODO joinOrganizationRequest
-            //filter messages only for my orgs
-          }*/
+          const myOrganizationsAsAdmin = storage?.organizations.filter(
+            (orgItem) =>
+              orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
+          );
+          if (storage && myOrganizationsAsAdmin.length > 0) {
+            joinOrganizationRequestSubscription.on("data", async (e) => {
+              console.log("on joinOrganizationRequest event :", e);
+              if (
+                (!e.result.errors || e.result.errors.length === 0) &&
+                myOrganizationsAsAdmin.findIndex(
+                  (orgItem) => orgItem === Object.entries(e.payload!)[0][1]
+                )
+              )
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Join organization request",
+                      body:
+                        "As organization administrator of '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "', you have a new member request",
+                      id: getNextNotificationId(),
+                      autoCancel: true,
+                    },
+                  ],
+                });
+              else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+          }
 
           //for all users
 
-          //TODO orgMemberRequestsUpdated
-          // look at this org member to see if I am in and sent msg, if yes, refresh sotrage to list new org
+          orgMemberRequestsUpdatedSubscription.on("data", async (e) => {
+            console.log("on orgMemberRequestsUpdated event :", e);
+            const membersToApprove: address[] = Object.entries(
+              e.payload!
+            )[0][1][0];
+            const membersToDecline: address[] = Object.entries(
+              e.payload!
+            )[0][1][1];
+            const orgname: string = Object.entries(e.payload!)[0][1][2];
+            if (
+              (!e.result.errors || e.result.errors.length === 0) &&
+              (membersToApprove.indexOf(userAddress as address) >= 0 ||
+                membersToDecline.indexOf(userAddress as address) >= 0)
+            ) {
+              await LocalNotifications.schedule({
+                notifications: [
+                  {
+                    title: "TzCommunity - Member join request updated",
+                    body:
+                      "Tezos organization '" +
+                      orgname +
+                      "' has been " +
+                      (membersToApprove.indexOf(userAddress as address) >= 0
+                        ? "accepted"
+                        : "rejected") +
+                      " your request to join",
+                    id: getNextNotificationId(),
+                    autoCancel: true,
+                  },
+                ],
+              });
+              await refreshStorage();
+            } else
+              console.log(
+                "Warning : here we ignore a failing transaction event"
+              );
+          });
 
           setSubscriptionsDone(true);
           console.log("Event subscription done");
