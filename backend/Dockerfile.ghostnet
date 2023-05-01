@@ -1,0 +1,12 @@
+ARG RUNNER_IMAGE="node:latest"
+
+FROM ${RUNNER_IMAGE}
+
+WORKDIR /tezos-community
+
+COPY ./backend .
+
+RUN npm ci
+RUN npm run build
+
+ENTRYPOINT ["npm", "run", "start:prod"]

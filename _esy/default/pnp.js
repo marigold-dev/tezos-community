@@ -91,23 +91,23 @@ function blacklistCheck(locator) {
 
 let packageInformationStores = new Map([
 ["@ligo/fa",
-new Map([["1.0.3",
+new Map([["1.0.5",
          {
-           packageLocation: "./.ligo/source/i/ligo__s__fa__1.0.3__38563cc5/",
-           packageDependencies: new Map([["@ligo/fa", "1.0.3"]])}]])],
+           packageLocation: "./.ligo/source/i/ligo__s__fa__1.0.5__03096c62/",
+           packageDependencies: new Map([["@ligo/fa", "1.0.5"]])}]])],
   [null,
   new Map([[null,
            {
              packageLocation: "/project/",
-             packageDependencies: new Map([["@ligo/fa", "1.0.3"]])}]])]]);
+             packageDependencies: new Map([["@ligo/fa", "1.0.5"]])}]])]]);
 
 let topLevelLocatorPath = "../../";
 let locatorsByLocations = new Map([
 ["../../", topLevelLocator],
-  ["./.ligo/source/i/ligo__s__fa__1.0.3__38563cc5/",
+  ["./.ligo/source/i/ligo__s__fa__1.0.5__03096c62/",
   {
     name: "@ligo/fa",
-    reference: "1.0.3"}]]);
+    reference: "1.0.5"}]]);
 
 
   exports.findPackageLocator = function findPackageLocator(location) {
