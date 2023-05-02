@@ -68,6 +68,11 @@ export const OrganizationsScreen: React.FC = () => {
 
   const [myOrganizations, setMyOrganizations] = useState<Organization[]>([]);
 
+  //page cache for big_map
+  const [orgMembers, setOrgMembers] = useState<Map<string, address[]>>(
+    new Map()
+  );
+
   //modal ADD
   const modalAdd = useRef<HTMLIonModalElement>(null);
   const [business, setBusiness] = useState<string>("");
@@ -148,6 +153,9 @@ export const OrganizationsScreen: React.FC = () => {
           })
         );
 
+        //set on a page cache
+        setOrgMembers(orgMembers); //refresh cache
+
         setMyOrganizations(
           storage.organizations.filter((org) => {
             const members = orgMembers.get(org.name);
@@ -167,6 +175,7 @@ export const OrganizationsScreen: React.FC = () => {
 
         if (myOrganizations.length > 0 && !selectedOrganization)
           setSelectedOrganization(myOrganizations[0]);
+        console.log("myOrganizations", myOrganizations);
       } else {
         console.log("storage is not ready yet");
       }
@@ -174,15 +183,15 @@ export const OrganizationsScreen: React.FC = () => {
   }, [storage, userAddress]);
 
   useEffect(
-    //default organization to join
-    () =>
+    //default organization to join. I can join only organization I am not member of
+    () => {
       setJoiningOrganizations(
         storage?.organizations.filter(
           (org) =>
-            myOrganizations.findIndex((orgItem) => orgItem.name === org.name) <
-            0
+            orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0
         )
-      ),
+      );
+    },
     [myOrganizations]
   );
 
@@ -314,13 +323,7 @@ export const OrganizationsScreen: React.FC = () => {
                             !contactIdIsValid ||
                             !contactIdProviderIsValid ||
                             !reasonIsValid ||
-                            !joiningOrganization ||
-                            storage?.organizations.filter(
-                              (org) =>
-                                myOrganizations.findIndex(
-                                  (orgItem) => orgItem.name === org.name
-                                ) < 0
-                            ).length === 0
+                            !joiningOrganization
                           }
                         >
                           Done
@@ -342,9 +345,9 @@ export const OrganizationsScreen: React.FC = () => {
                               storage?.organizations
                                 .filter(
                                   (org) =>
-                                    myOrganizations.findIndex(
-                                      (orgItem) => orgItem.name === org.name
-                                    ) < 0
+                                    orgMembers
+                                      .get(org.name)!
+                                      ?.indexOf(userAddress as address) < 0
                                 )
                                 .filter(
                                   (orgItem) =>
@@ -357,9 +360,9 @@ export const OrganizationsScreen: React.FC = () => {
                             setJoiningOrganizations(
                               storage?.organizations.filter(
                                 (org) =>
-                                  myOrganizations.findIndex(
-                                    (orgItem) => orgItem.name === org.name
-                                  ) < 0
+                                  orgMembers
+                                    .get(org.name)!
+                                    ?.indexOf(userAddress as address) < 0
                               )
                             );
                           }

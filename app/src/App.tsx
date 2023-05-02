@@ -27,7 +27,8 @@ import "@ionic/react/css/text-transformation.css";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import "./theme/variables.css";
 
-import { NetworkType } from "@airgap/beacon-types";
+import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
+import { MichelineMichelsonV1Expression } from "@airgap/beacon-types/dist/esm/types/tezos/MichelineMichelsonV1Expression";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
@@ -281,14 +282,21 @@ const App: React.FC = () => {
             (orgItem) =>
               orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
           );
+          console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
+
           if (storage && myOrganizationsAsAdmin.length > 0) {
             joinOrganizationRequestSubscription.on("data", async (e) => {
               console.log("on joinOrganizationRequest event :", e);
+              const orgname = (
+                e.payload! as {
+                  string: string;
+                }
+              ).string;
               if (
                 (!e.result.errors || e.result.errors.length === 0) &&
                 myOrganizationsAsAdmin.findIndex(
-                  (orgItem) => orgItem === Object.entries(e.payload!)[0][1]
-                )
+                  (orgItem) => orgItem.name === orgname
+                ) >= 0
               )
                 await LocalNotifications.schedule({
                   notifications: [
@@ -296,7 +304,7 @@ const App: React.FC = () => {
                       title: "TzCommunity - Join organization request",
                       body:
                         "As organization administrator of '" +
-                        Object.entries(e.payload!)[0][1] +
+                        orgname +
                         "', you have a new member request",
                       id: getNextNotificationId(),
                       autoCancel: true,
@@ -311,16 +319,63 @@ const App: React.FC = () => {
           }
 
           //for all users
-
           orgMemberRequestsUpdatedSubscription.on("data", async (e) => {
             console.log("on orgMemberRequestsUpdated event :", e);
-            const membersToApprove: address[] = Object.entries(
-              e.payload!
-            )[0][1][0];
-            const membersToDecline: address[] = Object.entries(
-              e.payload!
-            )[0][1][1];
-            const orgname: string = Object.entries(e.payload!)[0][1][2];
+            const membersToApprove: address[] = (
+              (
+                (
+                  e.payload! as {
+                    prim: MichelsonPrimitives;
+                    args?: MichelineMichelsonV1Expression[] | undefined;
+                    annots?: string[] | undefined;
+                  }
+                ).args![0] as {
+                  prim: MichelsonPrimitives;
+                  args?: MichelineMichelsonV1Expression[] | undefined;
+                  annots?: string[] | undefined;
+                }
+              ).args![0] as {
+                bytes: string;
+              }[]
+            ).map((addr) => addr.bytes as address);
+
+            const membersToDecline: address[] = (
+              (
+                (
+                  e.payload! as {
+                    prim: MichelsonPrimitives;
+                    args?: MichelineMichelsonV1Expression[] | undefined;
+                    annots?: string[] | undefined;
+                  }
+                ).args![0] as {
+                  prim: MichelsonPrimitives;
+                  args?: MichelineMichelsonV1Expression[] | undefined;
+                  annots?: string[] | undefined;
+                }
+              ).args![1] as {
+                bytes: string;
+              }[]
+            ).map((addr) => addr.bytes as address);
+            const orgname: string = (
+              (
+                e.payload! as {
+                  prim: MichelsonPrimitives;
+                  args?: MichelineMichelsonV1Expression[] | undefined;
+                  annots?: string[] | undefined;
+                }
+              ).args![1] as {
+                string: string;
+              }
+            ).string;
+            console.log(
+              "membersToApprove",
+              membersToApprove,
+              "membersToDecline",
+              membersToDecline,
+              "orgname",
+              orgname
+            );
+
             if (
               (!e.result.errors || e.result.errors.length === 0) &&
               (membersToApprove.indexOf(userAddress as address) >= 0 ||
@@ -344,10 +399,7 @@ const App: React.FC = () => {
                 ],
               });
               await refreshStorage();
-            } else
-              console.log(
-                "Warning : here we ignore a failing transaction event"
-              );
+            }
           });
 
           setSubscriptionsDone(true);

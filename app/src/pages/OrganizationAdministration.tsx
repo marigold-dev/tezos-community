@@ -275,7 +275,6 @@ export const OrganizationAdministration = ({
                 organization?.memberRequests.length > 0 ? (
                   <IonIcon
                     onClick={(e) => responseToJoinOrganization(e)}
-                    slot="end"
                     color="white"
                     icon={checkmarkDoneCircleOutline}
                   />
