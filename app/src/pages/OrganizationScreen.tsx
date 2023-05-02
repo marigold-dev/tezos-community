@@ -1,21 +1,22 @@
 import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
 import {
+  IonBadge,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
   IonContent,
+  IonInput,
   IonItem,
   IonLabel,
   IonList,
   IonSegment,
   IonSegmentButton,
   IonText,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { address } from "../type-aliases";
 import { OrganizationAdministration } from "./OrganizationAdministration";
@@ -23,6 +24,7 @@ import { OrganizationMessages } from "./OrganizationMessages";
 
 type OrganizationProps = {
   organization: Organization | undefined;
+  setOrganization: Dispatch<SetStateAction<Organization | undefined>>;
 };
 
 enum TABS {
@@ -33,6 +35,7 @@ enum TABS {
 
 export const OrganizationScreen = ({
   organization,
+  setOrganization,
 }: OrganizationProps): JSX.Element => {
   const {
     Tezos,
@@ -108,36 +111,57 @@ export const OrganizationScreen = ({
           {selectedTab == TABS.DESCRIPTION ? (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>
-                  {organization.name}
-                  {" (" + (members ? members.length : 0) + " members)"}
-                </IonCardTitle>
+                <IonCardTitle>{organization.name}</IonCardTitle>
               </IonCardHeader>
 
               <IonCardContent>
-                <IonList>
+                <IonList lines="none">
                   <IonItem>
-                    <IonTitle>Website</IonTitle>
-                    {organization.siteUrl}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Website"
+                      value={organization.siteUrl}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Logo</IonTitle>
-                    {organization.logoUrl}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Logo"
+                      value={organization.logoUrl}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>IPFS membership card url</IonTitle>
-                    {organization.ipfsNftUrl}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="IPFS membership card url"
+                      value={organization.ipfsNftUrl}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Objective</IonTitle>
-                    {organization.business}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Objective"
+                      value={organization.business}
+                    ></IonInput>
                   </IonItem>
                   <IonItem>
-                    <IonTitle>Social account verified ?</IonTitle>
-                    {organization.verified ? "true" : "false"}
+                    <IonInput
+                      readonly
+                      label-placement="stacked"
+                      label="Social account verified ?"
+                      value={organization.verified ? "true" : "false"}
+                    ></IonInput>
                   </IonItem>
-                  <IonItem>
-                    <IonTitle>Members</IonTitle>
+
+                  <IonItem lines="none">
+                    <IonLabel>Members </IonLabel>
+                    <IonBadge>{members ? members.length : 0}</IonBadge>
+                  </IonItem>
+                  <IonItem lines="none">
                     <IonList>
                       {members
                         ? members.map((member) => (
@@ -154,6 +178,7 @@ export const OrganizationScreen = ({
           ) : (
             <OrganizationAdministration
               organization={organization}
+              setOrganization={setOrganization}
               members={members}
             />
           )}

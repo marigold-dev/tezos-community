@@ -16,6 +16,8 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
   IonSplitPane,
   IonText,
@@ -28,11 +30,17 @@ import { BigNumber } from "bignumber.js";
 import { addCircle, ellipse, peopleCircle } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
-import { Organization, PAGES, UserContext, UserContextType } from "../App";
+import {
+  Organization,
+  PAGES,
+  SOCIAL_ACCOUNT_TYPE,
+  UserContext,
+  UserContextType,
+} from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { getStatusColor } from "../Utils";
+import { getStatusColor, getUserProfile } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
@@ -46,6 +54,8 @@ export const OrganizationsScreen: React.FC = () => {
     wallet,
     userAddress,
     userBalance,
+    userProfiles,
+    setUserProfiles,
     storage,
     mainWalletType,
     setStorage,
@@ -58,10 +68,20 @@ export const OrganizationsScreen: React.FC = () => {
 
   const [myOrganizations, setMyOrganizations] = useState<Organization[]>([]);
 
+  //page cache for big_map
+  const [orgMembers, setOrgMembers] = useState<Map<string, address[]>>(
+    new Map()
+  );
+
   //modal ADD
   const modalAdd = useRef<HTMLIonModalElement>(null);
   const [business, setBusiness] = useState<string>("");
+  const [businessIsValid, setBusinessIsValid] = useState<boolean>(false);
+  const [businessMarkTouched, setBusinessMarkTouched] =
+    useState<boolean>(false);
   const [name, setName] = useState<string>("");
+  const [nameIsValid, setNameIsValid] = useState<boolean>(false);
+  const [nameMarkTouched, setNameMarkTouched] = useState<boolean>(false);
   const [ipfsNftUrl, setIpfsNftUrl] = useState<string>("");
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [siteUrl, setSiteUrl] = useState<string>("");
@@ -69,8 +89,26 @@ export const OrganizationsScreen: React.FC = () => {
   //modal JOIN
   const modalJoin = useRef<HTMLIonModalElement>(null);
   const [contactId, setContactId] = useState<string>("");
+  const [contactIdIsValid, setContactIdIsValid] = useState<boolean>(false);
+  const [contactIdMarkTouched, setContactIdMarkTouched] =
+    useState<boolean>(false);
+
   const [contactIdProvider, setContactIdProvider] = useState<string>("");
+  const [contactIdProviderIsValid, setContactIdProviderIsValid] =
+    useState<boolean>(false);
+  const [contactIdProviderMarkTouched, setContactIdProviderMarkTouched] =
+    useState<boolean>(false);
+
   const [reason, setReason] = useState<string>("");
+  const [reasonIsValid, setReasonIsValid] = useState<boolean>(false);
+  const [reasonMarkTouched, setReasonMarkTouched] = useState<boolean>(false);
+
+  const [joiningOrganization, setJoiningOrganization] = useState<
+    Organization | undefined
+  >();
+  const [joiningOrganizations, setJoiningOrganizations] =
+    useState<Organization[]>();
+  //////////////
 
   const [selectedOrganization, setSelectedOrganization] = useState<
     Organization | undefined
@@ -101,8 +139,22 @@ export const OrganizationsScreen: React.FC = () => {
               organization.name,
               Array.from(keys.map((key) => key.key))
             );
+
+            //cache userprofiles
+
+            for (const key of keys) {
+              try {
+                userProfiles.set(key.key, await getUserProfile(key.key));
+                setUserProfiles(userProfiles);
+              } catch (error) {
+                console.log("Cannot get user profile", error);
+              }
+            }
           })
         );
+
+        //set on a page cache
+        setOrgMembers(orgMembers); //refresh cache
 
         setMyOrganizations(
           storage.organizations.filter((org) => {
@@ -123,11 +175,25 @@ export const OrganizationsScreen: React.FC = () => {
 
         if (myOrganizations.length > 0 && !selectedOrganization)
           setSelectedOrganization(myOrganizations[0]);
+        console.log("myOrganizations", myOrganizations);
       } else {
         console.log("storage is not ready yet");
       }
     })();
   }, [storage, userAddress]);
+
+  useEffect(
+    //default organization to join. I can join only organization I am not member of
+    () => {
+      setJoiningOrganizations(
+        storage?.organizations.filter(
+          (org) =>
+            orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0
+        )
+      );
+    },
+    [myOrganizations]
+  );
 
   useEffect(() => {
     (async () => await refreshStorage())();
@@ -145,7 +211,7 @@ export const OrganizationsScreen: React.FC = () => {
         .requestToJoinOrganization(
           contactId,
           contactIdProvider,
-          selectedOrganization!.name,
+          joiningOrganization!.name,
           reason
         )
         .send();
@@ -251,11 +317,57 @@ export const OrganizationsScreen: React.FC = () => {
                       </IonButtons>
                       <IonTitle>Join an organization</IonTitle>
                       <IonButtons slot="end">
-                        <IonButton onClick={joinOrganization}>Done</IonButton>
+                        <IonButton
+                          onClick={joinOrganization}
+                          disabled={
+                            !contactIdIsValid ||
+                            !contactIdProviderIsValid ||
+                            !reasonIsValid ||
+                            !joiningOrganization
+                          }
+                        >
+                          Done
+                        </IonButton>
                       </IonButtons>
                     </IonToolbar>
                     <IonToolbar>
-                      <IonSearchbar></IonSearchbar>
+                      <IonSearchbar
+                        onIonInput={(ev) => {
+                          const target = ev.target as HTMLIonSearchbarElement;
+                          console.log("target.value", target.value);
+
+                          if (
+                            target &&
+                            target !== undefined &&
+                            target.value?.trim() !== ""
+                          ) {
+                            setJoiningOrganizations(
+                              storage?.organizations
+                                .filter(
+                                  (org) =>
+                                    orgMembers
+                                      .get(org.name)!
+                                      ?.indexOf(userAddress as address) < 0
+                                )
+                                .filter(
+                                  (orgItem) =>
+                                    orgItem.name
+                                      .toLowerCase()
+                                      .indexOf(target.value!.toLowerCase()) >= 0
+                                )
+                            );
+                          } else {
+                            setJoiningOrganizations(
+                              storage?.organizations.filter(
+                                (org) =>
+                                  orgMembers
+                                    .get(org.name)!
+                                    ?.indexOf(userAddress as address) < 0
+                              )
+                            );
+                          }
+                        }}
+                      ></IonSearchbar>
                     </IonToolbar>
                   </IonHeader>
 
@@ -264,64 +376,99 @@ export const OrganizationsScreen: React.FC = () => {
                       labelPlacement="floating"
                       color="primary"
                       value={contactId}
-                      label="Contact identifier/alias"
+                      label="Contact identifier/alias *"
                       placeholder="@twitterAlias"
                       type="text"
                       maxlength={32}
                       counter
-                      required
                       onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        setContactId(str.target.value! as string);
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setContactIdIsValid(false);
+                        } else {
+                          setContactId(str.target.value as string);
+                          setContactIdIsValid(true);
+                        }
                       }}
+                      helperText="Enter an alias as identifier from your social account provider"
+                      errorText="Alias required"
+                      className={`${contactIdIsValid && "ion-valid"} ${
+                        contactIdIsValid === false && "ion-invalid"
+                      } ${contactIdMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setContactIdMarkTouched(true)}
                     />
-                    <IonInput
+
+                    <IonSelect
                       labelPlacement="floating"
                       value={contactIdProvider}
-                      label="Contact Provider (Twitter,Facebook,Gmail,etc...)"
-                      placeholder="Twitter"
-                      type="text"
-                      maxlength={20}
-                      counter
-                      required
+                      label="Select your Social account provider *"
                       onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        setContactIdProvider(str.target.value! as string);
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setContactIdProviderIsValid(false);
+                        } else {
+                          setContactIdProvider(str.target.value as string);
+                          setContactIdProviderIsValid(true);
+                        }
                       }}
-                    />
+                      className={`${contactIdProviderIsValid && "ion-valid"} ${
+                        contactIdProviderIsValid === false && "ion-invalid"
+                      } ${contactIdProviderMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setContactIdProviderMarkTouched(true)}
+                    >
+                      {Object.keys(SOCIAL_ACCOUNT_TYPE).map((e) => (
+                        <IonSelectOption key={e} value={e}>
+                          {e}
+                        </IonSelectOption>
+                      ))}
+                    </IonSelect>
+
                     <IonInput
                       labelPlacement="floating"
                       value={reason}
-                      label="Why do you want to join ?"
+                      label="Reason *"
                       placeholder="because ..."
                       type="text"
                       maxlength={255}
                       counter
-                      required
                       onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        setReason(str.target.value! as string);
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setReasonIsValid(false);
+                        } else {
+                          setReason(str.target.value as string);
+                          setReasonIsValid(true);
+                        }
                       }}
+                      helperText="Enter the reason why you want to join"
+                      errorText="Reason required"
+                      className={`${reasonIsValid && "ion-valid"} ${
+                        reasonIsValid === false && "ion-invalid"
+                      } ${reasonMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setReasonMarkTouched(true)}
                     />
 
-                    <IonText>Select an organization*</IonText>
+                    <IonText>Select an organization *</IonText>
                     <IonList id="modal-list" inset={true}>
-                      {storage?.organizations
-                        .filter(
-                          (org) =>
-                            myOrganizations.findIndex(
-                              (orgItem) => orgItem.name === org.name
-                            ) < 0
-                        )
-                        .map((organization) => (
+                      {joiningOrganizations &&
+                        joiningOrganizations.map((organization) => (
                           <IonItem
                             fill={
-                              selectedOrganization?.name === organization.name
+                              joiningOrganization?.name === organization.name
                                 ? "outline"
                                 : undefined
                             }
                             onClick={() => {
-                              setSelectedOrganization(organization);
+                              setJoiningOrganization(organization);
                             }}
                             lines="none"
                             key={organization.name}
@@ -331,10 +478,7 @@ export const OrganizationsScreen: React.FC = () => {
                               <i>{organization.business}</i>
                             </IonText>
                             <IonThumbnail slot="start">
-                              <img
-                                alt="Tezos"
-                                src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
-                              />
+                              <IonImg alt="." src={organization.logoUrl} />
                             </IonThumbnail>
                             <IonIcon
                               size="small"
@@ -358,7 +502,12 @@ export const OrganizationsScreen: React.FC = () => {
                       </IonButtons>
                       <IonTitle>Add an organization</IonTitle>
                       <IonButtons slot="end">
-                        <IonButton onClick={addOrganization}>Done</IonButton>
+                        <IonButton
+                          onClick={addOrganization}
+                          disabled={!nameIsValid || !businessIsValid}
+                        >
+                          Done
+                        </IonButton>
                       </IonButtons>
                     </IonToolbar>
                   </IonHeader>
@@ -368,30 +517,57 @@ export const OrganizationsScreen: React.FC = () => {
                       labelPlacement="floating"
                       color="primary"
                       value={name}
-                      label="Name"
+                      label="Name *"
                       placeholder="my organization name"
                       type="text"
                       maxlength={32}
                       counter
-                      required
                       onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        setName(str.target.value! as string);
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setNameIsValid(false);
+                        } else {
+                          setName(str.target.value as string);
+                          setNameIsValid(true);
+                        }
                       }}
+                      helperText="Enter a name"
+                      errorText="Name required"
+                      className={`${nameIsValid && "ion-valid"} ${
+                        nameIsValid === false && "ion-invalid"
+                      } ${nameMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setNameMarkTouched(true)}
                     />
                     <IonInput
                       labelPlacement="floating"
                       value={business}
-                      label="Business goal"
+                      label="Business *"
                       placeholder="Save the planet ..."
                       type="text"
                       maxlength={255}
                       counter
                       required
                       onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        setBusiness(str.target.value! as string);
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setBusinessIsValid(false);
+                        } else {
+                          setBusiness(str.target.value as string);
+                          setBusinessIsValid(true);
+                        }
                       }}
+                      helperText="Enter a business, goal or objective"
+                      errorText="Business required"
+                      className={`${businessIsValid && "ion-valid"} ${
+                        businessIsValid === false && "ion-invalid"
+                      } ${businessMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setBusinessMarkTouched(true)}
                     />
 
                     <IonInput
@@ -402,7 +578,7 @@ export const OrganizationsScreen: React.FC = () => {
                       type="text"
                       maxlength={255}
                       counter
-                      required
+                      helperText="Enter ipfs URL to your member card"
                       onIonChange={(str) => {
                         if (str.detail.value === undefined) return;
                         setIpfsNftUrl(str.target.value! as string);
@@ -417,7 +593,7 @@ export const OrganizationsScreen: React.FC = () => {
                       type="text"
                       maxlength={255}
                       counter
-                      required
+                      helperText="Enter logo image URL to display"
                       onIonChange={(str) => {
                         if (str.detail.value === undefined) return;
                         setLogoUrl(str.target.value! as string);
@@ -432,7 +608,7 @@ export const OrganizationsScreen: React.FC = () => {
                       type="text"
                       maxlength={255}
                       counter
-                      required
+                      helperText="Enter your website url"
                       onIonChange={(str) => {
                         if (str.detail.value === undefined) return;
                         setSiteUrl(str.target.value! as string);
@@ -459,7 +635,8 @@ export const OrganizationsScreen: React.FC = () => {
                     key={storage.tezosOrganization.name}
                   >
                     <IonThumbnail slot="start">
-                      <img
+                      <IonImg
+                        style={{ objectFit: "contain" }}
                         alt="Tezos"
                         src={storage.tezosOrganization.logoUrl}
                       />
@@ -491,7 +668,7 @@ export const OrganizationsScreen: React.FC = () => {
                   >
                     {organization.name}
                     <IonThumbnail slot="start">
-                      <img alt="." src={organization.logoUrl} />
+                      <IonImg alt="." src={organization.logoUrl} />
                     </IonThumbnail>
                     <IonIcon
                       size="small"
@@ -503,7 +680,10 @@ export const OrganizationsScreen: React.FC = () => {
                 ))}
               </IonContent>
             </IonMenu>
-            <OrganizationScreen organization={selectedOrganization} />
+            <OrganizationScreen
+              setOrganization={setSelectedOrganization}
+              organization={selectedOrganization}
+            />
           </IonSplitPane>
         )}
       </IonContent>

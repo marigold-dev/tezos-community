@@ -19,13 +19,7 @@ import {
   useIonAlert,
 } from "@ionic/react";
 import React, { useRef, useState } from "react";
-import {
-  PAGES,
-  SOCIAL_ACCOUNT_TYPE,
-  UserContext,
-  UserContextType,
-  UserProfile,
-} from "./App";
+import { PAGES, UserContext, UserContextType } from "./App";
 
 import { Browser } from "@capacitor/browser";
 import {
@@ -49,10 +43,12 @@ export const Footer: React.FC = () => {
     Tezos,
     wallet,
     userAddress,
-    userProfile,
-    setUserProfile,
+    userProfiles,
+    setUserProfiles,
     storage,
+    storageNFT,
     mainWalletType,
+    nftWalletType,
     setStorage,
     setUserAddress,
     setUserBalance,
@@ -85,8 +81,8 @@ export const Footer: React.FC = () => {
       await refreshStorage();
 
       if (
-        storage &&
-        storage.owner_token_ids.findIndex(
+        storageNFT &&
+        storageNFT.owner_token_ids.findIndex(
           (obj) => obj[0] === (userAddress as address)
         ) < 0
       )
@@ -99,14 +95,6 @@ export const Footer: React.FC = () => {
   const disconnectWallet = async (): Promise<void> => {
     setUserAddress("");
     setUserBalance(0);
-    setUserProfile({
-      displayName: "",
-      proof: "",
-      proofDate: new Date(),
-      socialAccountAlias: "",
-      socialAccountType: SOCIAL_ACCOUNT_TYPE.TWITTER,
-      verified: false,
-    });
     console.log("disconnecting wallet");
     await wallet.clearActiveAccount();
 
@@ -163,6 +151,7 @@ export const Footer: React.FC = () => {
     }*/
   };
 
+  /*
   const verifyProof = async () => {
     const response = await fetch(
       process.env.REACT_APP_BACKEND_URL +
@@ -187,18 +176,15 @@ export const Footer: React.FC = () => {
       console.log("ERROR : " + response.status);
     }
   };
-
+*/
   const claimNFT = async () => {
     console.log("claimNFT");
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
-        .createNFTCardForMember(userAddress as address)
-        .send();
+      const op = await nftWalletType!.methods.createNFTCardForMember().send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      await refreshStorage();
       history.replace(PAGES.ORGANIZATIONS);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -264,22 +250,26 @@ export const Footer: React.FC = () => {
                     <IonChip
                       id="verified"
                       color={
-                        userProfile && userProfile.verified
+                        userProfiles.get(userAddress as address) &&
+                        userProfiles.get(userAddress as address)!.verified
                           ? "success"
                           : "warning"
                       }
                     >
-                      {userProfile && userProfile.verified
+                      {userProfiles.get(userAddress as address) &&
+                      userProfiles.get(userAddress as address)!.verified
                         ? "Verified"
                         : "Unverified"}
                     </IonChip>
-                    {userProfile && userProfile.verified ? (
+                    {userProfiles.get(userAddress as address) &&
+                    userProfiles.get(userAddress as address)!.verified ? (
                       ""
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
                         <IonContent class="ion-padding">
-                          Soon, you will be requires to verify your social
-                          account in order to create/join an organization
+                          Soon, you will be required to verify your social
+                          account in order to create/join an organization and
+                          receive urgent/important messages
                         </IonContent>
                       </IonPopover>
                     )}
@@ -287,33 +277,44 @@ export const Footer: React.FC = () => {
                 </IonToolbar>
               </IonHeader>
               <IonContent color="light" class="ion-padding">
-                {userProfile.verified ? (
+                {userProfiles.get(userAddress as address) &&
+                userProfiles.get(userAddress as address)!.verified ? (
                   <>
                     <IonItem>
                       <IonLabel>Display name : </IonLabel>
-                      {userProfile.displayName}
+                      {userProfiles.get(userAddress as address)!.displayName}
                     </IonItem>
                     <IonItem>
                       <IonLabel>Social account type : </IonLabel>
-                      {userProfile.socialAccountType}
+                      {
+                        userProfiles.get(userAddress as address)!
+                          .socialAccountType
+                      }
                     </IonItem>
                     <IonItem>
                       <IonLabel>Social account alias : </IonLabel>
-                      {userProfile.socialAccountAlias}
+                      {
+                        userProfiles.get(userAddress as address)!
+                          .socialAccountAlias
+                      }
                     </IonItem>
                     <IonItem>
                       <IonLabel>Proof : </IonLabel>
-                      {userProfile.proof}
+                      {userProfiles.get(userAddress as address)!.proof}
                     </IonItem>
                     <IonItem>
                       <IonLabel>Proof date : </IonLabel>
-                      {userProfile.proofDate
-                        ? userProfile.proofDate?.toLocaleString()
+                      {userProfiles.get(userAddress as address)!.proofDate
+                        ? userProfiles
+                            .get(userAddress as address)!
+                            .proofDate?.toLocaleString()
                         : ""}
                     </IonItem>
                     <IonItem>
                       <IonLabel>Verified : </IonLabel>
-                      {userProfile.verified ? "true" : "false"}
+                      {userProfiles.get(userAddress as address)!.verified
+                        ? "true"
+                        : "false"}
                     </IonItem>
                   </>
                 ) : (
@@ -325,8 +326,8 @@ export const Footer: React.FC = () => {
                   </>
                 )}
 
-                {storage &&
-                storage.owner_token_ids.findIndex(
+                {storageNFT &&
+                storageNFT.owner_token_ids.findIndex(
                   (obj) => obj[0] === (userAddress as address)
                 ) >= 0 ? (
                   <IonImg

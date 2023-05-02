@@ -1,5 +1,7 @@
 # tezos-community
 
+## Build / compile
+
 Project to build a dapp for Tezos community that includes a DAO, organization rules, multisig, message broadcast, etc ...
 
 [slides](https://docs.google.com/presentation/d/1Tao9c4QZm_YGRz9PxwZlPks2EbUCN8K_XKldVN4V0zQ/edit#slide=id.g2133bbaece6_0_0)
@@ -12,28 +14,37 @@ taq ligo --command "install @ligo/fa"
 taq install @taqueria/plugin-ligo@next
 ```
 
+### NFT
+
 Compile with last version
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.63.2 taq compile main.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.64.2 taq compile nft.jsligo
+```
+
+### Registry
+
+Compile with last version
+
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.64.2 taq compile main.jsligo
 ```
 
 Run test
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.63.2 taq test test.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.64.2 taq test test.jsligo
 ```
 
-deploy
+## Deploy
+
+intall plugin first
 
 ```
 taq install @taqueria/plugin-taquito
-taq deploy main.tz -e "testing"
 ```
 
-> Note, change file name on storage
-
-Override with alice account on .taq/config.local.testing.json
+> Note : When deploying on first time, override with alice account on .taq/config.local.testing.json
 
 ```json
 {
@@ -46,6 +57,23 @@ Override with alice account on .taq/config.local.testing.json
     }
   }
 }
+```
+
+## NFT (first)
+
+```
+taq deploy nft.tz -e "testing"
+```
+
+> Important : Copy/paste the deployed address and change the nftAddress field on main.storageList.jsligo
+
+## Registry
+
+Compile again as you need to have the last nft deployment address to change the initial storage file, then deploy
+
+```
+TAQ_LIGO_IMAGE=ligolang/ligo:0.64.2 taq compile main.jsligo
+taq deploy main.tz -e "testing"
 ```
 
 # Mobile app

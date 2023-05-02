@@ -1,0 +1,41 @@
+#import "@ligo/fa/lib/fa2/asset/multi_asset.jsligo" "MULTIASSET"
+
+export type storage = {
+    ledger: MULTIASSET.Ledger.t,
+    metadata: MULTIASSET.Metadata.t,
+    token_metadata: MULTIASSET.TokenMetadata.t,
+    operators: MULTIASSET.Operators.t,
+    owner_token_ids : set<[MULTIASSET.Storage.owner,MULTIASSET.Storage.token_id]>,
+    token_ids : set<MULTIASSET.Storage.token_id>
+};
+
+export type _return = [list<operation>,storage];
+
+////////////////////// NFT card membership
+
+//@entry
+const createNFTCardForMember = (_ : unit,s : storage) : _return => {
+    return [list([]),{...s,
+            ledger: Big_map.add([Tezos.get_source(),(0 as nat)],(1 as nat),s.ledger),
+            owner_token_ids : Set.add([Tezos.get_source(),(0 as nat)],s.owner_token_ids)}];
+};
+
+/*Soulbound tokens are not transferable*/
+//@entry
+const transfer = (_p: MULTIASSET.transfer, s : storage) : _return => {
+    if(1 == 1) return failwith("Soulbound tokens are not transferable");
+    return [list([]),s]; 
+};
+
+//@entry
+const balance_of = (p: MULTIASSET.balance_of, s : storage) : _return => {
+    const ret2 = MULTIASSET.balance_of([p,{ledger:s.ledger,metadata:s.metadata,token_metadata:s.token_metadata,operators:s.operators,owner_token_ids:s.owner_token_ids,token_ids:s.token_ids}]);
+    return [ret2[0],{...s,ledger:ret2[1].ledger,metadata:ret2[1].metadata,token_metadata:ret2[1].token_metadata,operators:ret2[1].operators,owner_token_ids:ret2[1].owner_token_ids,token_ids:ret2[1].token_ids}];
+};
+
+//@entry
+const update_operators = (p: MULTIASSET.update_operators, s : storage) : _return => {
+    const ret2 = MULTIASSET.update_ops([p,{ledger:s.ledger,metadata:s.metadata,token_metadata:s.token_metadata,operators:s.operators,owner_token_ids:s.owner_token_ids,token_ids:s.token_ids}]);
+    return [ret2[0],{...s,ledger:ret2[1].ledger,metadata:ret2[1].metadata,token_metadata:ret2[1].token_metadata,operators:ret2[1].operators,owner_token_ids:ret2[1].owner_token_ids,token_ids:ret2[1].token_ids}];
+};
+

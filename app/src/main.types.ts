@@ -1,12 +1,4 @@
-import {
-  BigMap,
-  MMap,
-  address,
-  bytes,
-  contract,
-  nat,
-  unit,
-} from "./type-aliases";
+import { BigMap, address, nat, unit } from "./type-aliases";
 import {
   ContractAbstractionFromContractType,
   WalletContractAbstractionFromContractType,
@@ -14,22 +6,8 @@ import {
 
 export type Storage = {
   adminsMax: nat;
-  ledger: BigMap<
-    {
-      0: address;
-      1: nat;
-    },
-    nat
-  >;
   memberProfileVerified: Array<address>;
-  metadata: BigMap<string, bytes>;
-  operators: BigMap<
-    {
-      0: address;
-      1: address;
-    },
-    Array<nat>
-  >;
+  nftAddress: address;
   organizationMax: nat;
   organizations: Array<{
     admins: Array<address>;
@@ -51,10 +29,6 @@ export type Storage = {
     status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
     verified: boolean;
   }>;
-  owner_token_ids: Array<{
-    0: address;
-    1: nat;
-  }>;
   tezosOrganization: {
     admins: Array<address>;
     business: string;
@@ -75,14 +49,6 @@ export type Storage = {
     status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
     verified: boolean;
   };
-  token_ids: Array<nat>;
-  token_metadata: BigMap<
-    nat,
-    {
-      token_id: nat;
-      token_info: MMap<string, bytes>;
-    }
-  >;
 };
 
 type Methods = {
@@ -94,14 +60,6 @@ type Methods = {
     name: string,
     siteUrl: string
   ) => Promise<void>;
-  balance_of: (
-    requests: Array<{
-      owner: address;
-      token_id: nat;
-    }>,
-    callback: contract
-  ) => Promise<void>;
-  createNFTCardForMember: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeMember: (
     member: address,
@@ -120,26 +78,6 @@ type Methods = {
     membersToDecline: Array<address>,
     orgName: string
   ) => Promise<void>;
-  transfer: (
-    param: Array<{
-      from_: address;
-      txs: Array<{
-        to_: address;
-        token_id: nat;
-        amount: nat;
-      }>;
-    }>
-  ) => Promise<void>;
-  add_operator: (
-    owner: address,
-    operator: address,
-    token_id: nat
-  ) => Promise<void>;
-  remove_operator: (
-    owner: address,
-    operator: address,
-    token_id: nat
-  ) => Promise<void>;
 };
 
 type MethodsObject = {
@@ -151,14 +89,6 @@ type MethodsObject = {
     name: string;
     siteUrl: string;
   }) => Promise<void>;
-  balance_of: (params: {
-    requests: Array<{
-      owner: address;
-      token_id: nat;
-    }>;
-    callback: contract;
-  }) => Promise<void>;
-  createNFTCardForMember: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeMember: (params: {
     lastAdmin?: address;
@@ -176,26 +106,6 @@ type MethodsObject = {
     membersToApprove: Array<address>;
     membersToDecline: Array<address>;
     orgName: string;
-  }) => Promise<void>;
-  transfer: (
-    param: Array<{
-      from_: address;
-      txs: Array<{
-        to_: address;
-        token_id: nat;
-        amount: nat;
-      }>;
-    }>
-  ) => Promise<void>;
-  add_operator: (params: {
-    owner: address;
-    operator: address;
-    token_id: nat;
-  }) => Promise<void>;
-  remove_operator: (params: {
-    owner: address;
-    operator: address;
-    token_id: nat;
   }) => Promise<void>;
 };
 

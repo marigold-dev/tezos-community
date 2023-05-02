@@ -1,6 +1,7 @@
 #import "./main.jsligo" "CONTRACT"
-#import "@ligo/fa/lib/fa2/asset/multi_asset.jsligo" "MULTIASSET"
+#import "./nft.jsligo" "NFT"
 
+#import "@ligo/fa/lib/fa2/asset/multi_asset.jsligo" "MULTIASSET"
 
 // reset state
 const _ = Test.reset_state ( 3 as nat, list([]) as list <tez> );
@@ -55,13 +56,9 @@ const token_info: map<string, bytes> =
       "views": []
       }` ;
 
-const initial_storage : CONTRACT.storage = {
-    memberProfileVerified : Set.empty as set<address>,
-    tezosOrganization : tezosOrganization,
-    organizations : list([]) as list<CONTRACT.organization>,
-    organizationMax : 100 as nat,
-    adminsMax : 50 as nat,
 
+
+const initial_storageNFT : NFT.storage = {
     ledger: Big_map.literal(list([[[("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),0 as nat],1 as nat]])) as MULTIASSET.Ledger.t,
     metadata : Big_map.literal(list([["",  bytes `tezos-storage:data`],["data", metadata]])),
     token_metadata: Big_map.add(0 as nat, {token_id: 0 as nat,token_info:token_info},Big_map.empty as MULTIASSET.TokenMetadata.t),
@@ -70,17 +67,43 @@ const initial_storage : CONTRACT.storage = {
     token_ids : Set.add(0 as nat,Set.empty as set<MULTIASSET.Storage.token_id>)
 };
 
+const [taddrNFT, _, _] = Test.originate_module(contract_of(NFT), initial_storageNFT, 0 as tez);
+const contrNFT = Test.to_contract(taddrNFT);
+
+const initial_storage : CONTRACT.storage = {
+    memberProfileVerified : Set.empty as set<address>,
+    tezosOrganization : tezosOrganization,
+    organizations : list([]) as list<CONTRACT.organization>,
+    organizationMax : 100 as nat,
+    adminsMax : 50 as nat,
+
+    nftAddress : Tezos.address(contrNFT)
+};
+
 const [taddr, _, _] = Test.originate_module(contract_of(CONTRACT), initial_storage, 0 as tez);
 const contr = Test.to_contract(taddr);
 
 ///////////
+
+
+
+const _testClaimNFT = (sender : address, ledgerSize : nat) : bool => {
+    Test.set_source(sender);
+    const status = Test.transfer_to_contract(contrNFT, CreateNFTCardForMember(), 0 as mutez);
+    const _ = Test.log(["status", status]);
+    let store : NFT.storage = Test.get_storage(taddrNFT);
+    Test.log(store);
+    Test.assert_with_error(Set.cardinal(store.owner_token_ids) == ledgerSize, "Wrong size on ledger");
+    const ownerTokenIds : set<[MULTIASSET.Storage.owner,MULTIASSET.Storage.token_id]> = Set.filter_map((tupleItem : [MULTIASSET.Storage.owner,MULTIASSET.Storage.token_id]) => tupleItem[0] == sender ? Some(tupleItem) : None(),store.owner_token_ids);
+    Test.assert_with_error(Set.cardinal(ownerTokenIds) == (1 as nat),"Cannot find the user_token on the tuple");
+    return true;
+}
 
 const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganizationRequest, orgSize : nat //,status : CONTRACT.ORGANIZATION_STATUS
 ) : bool => {
     Test.set_source(sender);
     const status = Test.transfer_to_contract(contr, AddOrganization(or), 0 as mutez);
     const _ = Test.log(["status", status]);
-    //const _ = Test.bake_until_n_cycle_end(10 as nat);
     let store : CONTRACT.storage = Test.get_storage(taddr);
     Test.log(store);
     Test.assert_with_error(List.size(store.organizations) == orgSize, "Wrong size on organization list");
@@ -97,7 +120,13 @@ const _testAddOrganizationNotAdmin = (sender : address,or : CONTRACT.addOrganiza
     return true;
 }
 
-///////////
+/////////// Test suite
+
+
+
+const testClaimNFT = _testClaimNFT(user, 2 as nat);
+
+
 
 const newOrganization : CONTRACT.addOrganizationRequest = {
    name : "Marigold",
@@ -108,3 +137,4 @@ const newOrganization : CONTRACT.addOrganizationRequest = {
 };
 
 const testAddOrganizationNotAdmin = _testAddOrganizationNotAdmin(user,newOrganization,1 as nat); //,PENDING_APPROVAL());
+
