@@ -24,13 +24,16 @@ import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
+import { LocalNotifications } from "@capacitor/local-notifications";
 import "./theme/variables.css";
 
-import { NetworkType } from "@airgap/beacon-types";
+import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
+import { MichelineMichelsonV1Expression } from "@airgap/beacon-types/dist/esm/types/tezos/MichelineMichelsonV1Expression";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { getUserProfile } from "./Utils";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FundingScreen } from "./pages/FundingScreen";
@@ -96,8 +99,8 @@ export type UserContextType = {
   storageNFT: StorageNFT | null;
   userAddress: string;
   setUserAddress: Dispatch<SetStateAction<string>>;
-  userProfile: UserProfile;
-  setUserProfile: Dispatch<SetStateAction<UserProfile>>;
+  userProfiles: Map<address, UserProfile>;
+  setUserProfiles: Dispatch<SetStateAction<Map<address, UserProfile>>>;
   userBalance: number;
   setUserBalance: Dispatch<SetStateAction<number>>;
   Tezos: TezosToolkit;
@@ -123,14 +126,9 @@ const App: React.FC = () => {
   );
   const [userAddress, setUserAddress] = useState<string>("");
   const [userBalance, setUserBalance] = useState<number>(0);
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    displayName: "",
-    proof: "",
-    proofDate: new Date(),
-    socialAccountAlias: "",
-    socialAccountType: SOCIAL_ACCOUNT_TYPE.TWITTER,
-    verified: false,
-  });
+  const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
+    new Map()
+  );
   const [storage, setStorage] = useState<Storage | null>(null);
   const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
     null
@@ -146,10 +144,273 @@ const App: React.FC = () => {
     Map<number, TZIP21TokenMetadata>
   >(new Map());
 
+  //for the message subscriptions
+  const [subscriptionsDone, setSubscriptionsDone] = useState<boolean>(false); //do registration only once
+  const organizationActivatedSubscription = Tezos.stream.subscribeEvent({
+    tag: "organizationActivated",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const organizationFrozenSubscription = Tezos.stream.subscribeEvent({
+    tag: "organizationFrozen",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const organizationAddedSubscription = Tezos.stream.subscribeEvent({
+    tag: "organizationAdded",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const joinOrganizationRequestSubscription = Tezos.stream.subscribeEvent({
+    tag: "joinOrganizationRequest",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+  const orgMemberRequestsUpdatedSubscription = Tezos.stream.subscribeEvent({
+    tag: "orgMemberRequestsUpdated",
+    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+  });
+
+  const [notificationId, setNotificationId] = useState<number>(0);
+  const getNextNotificationId = () => {
+    const newNextNotificationId = notificationId + 1;
+    setNotificationId(newNextNotificationId);
+    return newNextNotificationId;
+  };
+
   useEffect(() => {
     Tezos.setWalletProvider(wallet);
-    (async () => await refreshStorage())();
+    (async () => {
+      console.log("After wallet change I refresh storage");
+      await refreshStorage();
+    })();
   }, [wallet]);
+
+  //subscriptions
+  useEffect(() => {
+    (async () => {
+      try {
+        // Request/ check permissions
+        const ps = await LocalNotifications.checkPermissions();
+        if (ps.display == "prompt") {
+          await LocalNotifications.requestPermissions();
+          console.log("Ask to allow notifications");
+        } else {
+          console.log("Notifications status : ", ps.display);
+        }
+
+        if (storage && !subscriptionsDone) {
+          // Clear old notifications in prep for refresh (OPTIONAL)
+          const pending = await LocalNotifications.getPending();
+          if (pending.notifications.length > 0)
+            await LocalNotifications.cancel(pending);
+
+          //only for Tezos admins
+          if (
+            storage &&
+            storage?.tezosOrganization.admins.indexOf(userAddress as address) >=
+              0
+          ) {
+            organizationActivatedSubscription.on("data", async (e) => {
+              console.log("on organizationActivated event :", e);
+              if (!e.result.errors || e.result.errors.length === 0) {
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Organization activated",
+                      body:
+                        "Tezos organization '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "' has been activated",
+                      id: getNextNotificationId(),
+                      autoCancel: true,
+                    },
+                  ],
+                });
+                await refreshStorage();
+              } else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+
+            organizationFrozenSubscription.on("data", async (e) => {
+              console.log("on organizationFrozen event :", e);
+              if (!e.result.errors || e.result.errors.length === 0) {
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Organization frozen",
+                      body:
+                        "Tezos organization '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "' has been frozen",
+                      id: getNextNotificationId(),
+                    },
+                  ],
+                });
+                await refreshStorage();
+              } else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+
+            organizationAddedSubscription.on("data", async (e) => {
+              console.log("on organizationAdded event :", e);
+              if (!e.result.errors || e.result.errors.length === 0) {
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Organization added",
+                      body:
+                        "Tezos organization '" +
+                        Object.entries(e.payload!)[0][1] +
+                        "' has been added",
+                      id: getNextNotificationId(),
+                      autoCancel: true,
+                    },
+                  ],
+                });
+
+                await refreshStorage();
+              } else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+          }
+
+          //only for organization administrators
+          const myOrganizationsAsAdmin = storage?.organizations.filter(
+            (orgItem) =>
+              orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
+          );
+          console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
+
+          if (storage && myOrganizationsAsAdmin.length > 0) {
+            joinOrganizationRequestSubscription.on("data", async (e) => {
+              console.log("on joinOrganizationRequest event :", e);
+              const orgname = (
+                e.payload! as {
+                  string: string;
+                }
+              ).string;
+              if (
+                (!e.result.errors || e.result.errors.length === 0) &&
+                myOrganizationsAsAdmin.findIndex(
+                  (orgItem) => orgItem.name === orgname
+                ) >= 0
+              )
+                await LocalNotifications.schedule({
+                  notifications: [
+                    {
+                      title: "TzCommunity - Join organization request",
+                      body:
+                        "As organization administrator of '" +
+                        orgname +
+                        "', you have a new member request",
+                      id: getNextNotificationId(),
+                      autoCancel: true,
+                    },
+                  ],
+                });
+              else
+                console.log(
+                  "Warning : here we ignore a failing transaction event"
+                );
+            });
+          }
+
+          //for all users
+          orgMemberRequestsUpdatedSubscription.on("data", async (e) => {
+            console.log("on orgMemberRequestsUpdated event :", e);
+            const membersToApprove: address[] = (
+              (
+                (
+                  e.payload! as {
+                    prim: MichelsonPrimitives;
+                    args?: MichelineMichelsonV1Expression[] | undefined;
+                    annots?: string[] | undefined;
+                  }
+                ).args![0] as {
+                  prim: MichelsonPrimitives;
+                  args?: MichelineMichelsonV1Expression[] | undefined;
+                  annots?: string[] | undefined;
+                }
+              ).args![0] as {
+                bytes: string;
+              }[]
+            ).map((addr) => addr.bytes as address);
+
+            const membersToDecline: address[] = (
+              (
+                (
+                  e.payload! as {
+                    prim: MichelsonPrimitives;
+                    args?: MichelineMichelsonV1Expression[] | undefined;
+                    annots?: string[] | undefined;
+                  }
+                ).args![0] as {
+                  prim: MichelsonPrimitives;
+                  args?: MichelineMichelsonV1Expression[] | undefined;
+                  annots?: string[] | undefined;
+                }
+              ).args![1] as {
+                bytes: string;
+              }[]
+            ).map((addr) => addr.bytes as address);
+            const orgname: string = (
+              (
+                e.payload! as {
+                  prim: MichelsonPrimitives;
+                  args?: MichelineMichelsonV1Expression[] | undefined;
+                  annots?: string[] | undefined;
+                }
+              ).args![1] as {
+                string: string;
+              }
+            ).string;
+            console.log(
+              "membersToApprove",
+              membersToApprove,
+              "membersToDecline",
+              membersToDecline,
+              "orgname",
+              orgname
+            );
+
+            if (
+              (!e.result.errors || e.result.errors.length === 0) &&
+              (membersToApprove.indexOf(userAddress as address) >= 0 ||
+                membersToDecline.indexOf(userAddress as address) >= 0)
+            ) {
+              await LocalNotifications.schedule({
+                notifications: [
+                  {
+                    title: "TzCommunity - Member join request updated",
+                    body:
+                      "Tezos organization '" +
+                      orgname +
+                      "' has been " +
+                      (membersToApprove.indexOf(userAddress as address) >= 0
+                        ? "accepted"
+                        : "rejected") +
+                      " your request to join",
+                    id: getNextNotificationId(),
+                    autoCancel: true,
+                  },
+                ],
+              });
+              await refreshStorage();
+            }
+          });
+
+          setSubscriptionsDone(true);
+          console.log("Event subscription done");
+        } else {
+        }
+      } catch (error) {
+        console.log("Error", error);
+      }
+    })();
+  }, [storage]);
 
   const refreshStorage = async (
     event?: CustomEvent<RefresherEventDetail>
@@ -164,9 +425,10 @@ const App: React.FC = () => {
         setUserBalance(balance.toNumber());
 
         try {
+          //always refresh userProfile
           const newUserProfile = await getUserProfile(userAddress);
-          newUserProfile.proofDate = new Date(newUserProfile.proofDate); //convert dates
-          setUserProfile(newUserProfile);
+          userProfiles.set(userAddress as address, newUserProfile);
+          setUserProfiles(userProfiles);
           console.log("userProfile refreshed for " + userAddress);
         } catch (error) {
           console.log("No user profile found..");
@@ -212,29 +474,14 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
-  const getUserProfile = async (userAddress: string): Promise<UserProfile> => {
-    const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL + "/user/" + userAddress
-    );
-    const json = await response.json();
-    if (response.ok) {
-      console.log("data is : ", json);
-      return new Promise((resolve, reject) => resolve(json));
-    } else {
-      return new Promise((resolve, reject) =>
-        reject("ERROR : " + response.status)
-      );
-    }
-  };
-
   return (
     <IonApp>
       <UserContext.Provider
         value={{
           userAddress,
           userBalance,
-          userProfile,
-          setUserProfile,
+          userProfiles,
+          setUserProfiles,
           Tezos,
           wallet,
           storage,

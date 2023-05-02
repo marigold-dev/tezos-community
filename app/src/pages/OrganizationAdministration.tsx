@@ -1,4 +1,5 @@
 import {
+  IonBadge,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -7,6 +8,8 @@ import {
   IonContent,
   IonIcon,
   IonItem,
+  IonList,
+  IonTitle,
   IonToggle,
   useIonAlert,
 } from "@ionic/react";
@@ -18,19 +21,22 @@ import {
   trashBinOutline,
   trashOutline,
 } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
+import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
 
 type OrganizationProps = {
   organization: Organization | undefined;
+  setOrganization: Dispatch<SetStateAction<Organization | undefined>>;
   members: address[];
 };
 
 export const OrganizationAdministration = ({
   organization,
+  setOrganization,
   members,
 }: OrganizationProps): JSX.Element => {
   const {
@@ -38,6 +44,7 @@ export const OrganizationAdministration = ({
     wallet,
     userAddress,
     userBalance,
+    userProfiles,
     storage,
     mainWalletType,
     setStorage,
@@ -72,10 +79,8 @@ export const OrganizationAdministration = ({
         )
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      await refreshStorage();
       setLoading(false);
-      console.log("newStorage", newStorage);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
       let tibe: TransactionInvalidBeaconError =
@@ -99,8 +104,7 @@ export const OrganizationAdministration = ({
         .freezeOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      setOrganization({ ...organization! }); //force refresh
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -116,17 +120,19 @@ export const OrganizationAdministration = ({
     setLoading(false);
   };
 
-  const activateOrganization = async (organizationName: string) => {
-    console.log("addOrganization");
-
+  const activateOrganization = async (
+    e: React.MouseEvent<HTMLIonIconElement, MouseEvent>,
+    organizationName: string
+  ) => {
+    console.log("activateOrganization");
+    e.preventDefault();
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
         .activateOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+      setOrganization({ ...organization! }); //force refresh
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -174,7 +180,7 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .removeMember(member, organization!.name, undefined) //FIXME workaround not working
+        .removeMember(member, organization!.name, undefined)
         .send();
       await op?.confirmation();
       const newStorage = await mainWalletType!.storage();
@@ -203,122 +209,177 @@ export const OrganizationAdministration = ({
     setMembersToDecline([]);
   }, [organization, storage, userAddress]);
 
+  useEffect(() => {
+    //need to refresh in case of storage changes
+    if (organization) {
+      const org = storage?.organizations.find(
+        (orgItem) => orgItem.name === organization.name
+      );
+      if (org) setOrganization(org);
+    }
+  }, [storage, userAddress]);
+
   return (
     <IonContent className="ion-padding">
-      <IonItem>
-        <h1>Administrators</h1>
-      </IonItem>
+      <IonList lines="none">
+        <IonTitle>
+          Administrators{" "}
+          <IonBadge>
+            {organization?.admins ? organization?.admins.length : 0}
+          </IonBadge>
+        </IonTitle>
 
-      {organization?.admins.map((admin) => (
-        <IonItem key={admin}>{admin}</IonItem>
-      ))}
-
-      {organization?.name !== storage?.tezosOrganization.name ? (
-        <>
-          <IonItem>
-            <h1>Members</h1>
+        {organization?.admins.map((admin) => (
+          <IonItem key={admin}>
+            {userProfiles.get(admin) ? (
+              <UserProfileChip address={admin} userProfiles={userProfiles} />
+            ) : (
+              admin
+            )}
           </IonItem>
-          {members.map((member) => (
-            <IonItem key={member}>
-              {member}{" "}
-              <IonIcon
-                onClick={(e) => removeMember(member)}
-                slot="end"
-                icon={trashBinOutline}
-              />
-            </IonItem>
-          ))}
+        ))}
 
-          <IonItem>
-            <h1>Member requests</h1>
-            <IonIcon
-              onClick={(e) => responseToJoinOrganization(e)}
-              slot="end"
-              icon={checkmarkDoneCircleOutline}
-            />
-          </IonItem>
-          {organization?.memberRequests.map((memberRequest) => (
-            <IonCard key={memberRequest.user}>
-              <IonCardHeader>
-                <IonCardTitle>{memberRequest.user}</IonCardTitle>
-                <IonCardSubtitle>
-                  {memberRequest.joinRequest.contactIdProvider +
-                    " - " +
-                    memberRequest.joinRequest.contactId}
-                </IonCardSubtitle>
-                <IonToggle
-                  labelPlacement="end"
-                  checked={membersToApprove.indexOf(memberRequest.user) >= 0}
-                  aria-label="approve/reject"
-                  onClick={(e) => {
-                    if (e.currentTarget.checked) {
-                      membersToApprove.push(memberRequest.user);
-                      setMembersToApprove(membersToApprove);
-                      setMembersToDecline(
-                        membersToDecline.filter(
-                          (mtod) => mtod !== memberRequest.user
-                        )
-                      );
-                    } else {
-                      membersToDecline.push(memberRequest.user);
-                      setMembersToDecline(membersToDecline);
-                      let newMembersToApprove = membersToApprove.filter(
-                        (mtoa) => mtoa !== memberRequest.user
-                      );
-                      setMembersToApprove(newMembersToApprove);
-                    }
-                  }}
-                />
-              </IonCardHeader>
-              <IonCardContent>
-                {memberRequest.joinRequest.reason}
-              </IonCardContent>
-            </IonCard>
-          ))}
-        </>
-      ) : (
-        <>
-          <IonItem>
-            <h1>Organizations</h1>
-          </IonItem>
-          {storage?.organizations.map((org) => (
-            <IonItem key={org.name}>
-              {org.name}
-              <IonIcon
-                size="small"
-                slot="end"
-                icon={ellipse}
-                color={getStatusColor(org)}
-              />
-              {"fROZEN" in org.status || "pENDING_APPROVAL" in org.status ? (
-                <IonIcon
-                  onClick={(e) => activateOrganization(org.name)}
-                  slot="end"
-                  icon={playCircleOutline}
-                />
-              ) : (
-                ""
-              )}
+        {organization?.name !== storage?.tezosOrganization.name ? (
+          <>
+            <IonList lines="none">
+              <IonTitle>
+                Members <IonBadge>{members ? members.length : 0}</IonBadge>
+              </IonTitle>
 
-              {"aCTIVE" in org.status || "pENDING_APPROVAL" in org.status ? (
-                <IonIcon
-                  onClick={(e) => freezeOrganization(org.name)}
-                  slot="end"
-                  icon={stopCircleOutline}
-                />
-              ) : (
-                ""
-              )}
+              {members.map((member) => (
+                <IonItem key={member}>
+                  <UserProfileChip
+                    address={member}
+                    userProfiles={userProfiles}
+                  />
 
-              <IonIcon
-                onClick={(e) => removeOrganization(org.name)}
-                slot="end"
-                icon={trashOutline}
-              />
-            </IonItem>
-          ))}
-        </>
-      )}
+                  <IonIcon
+                    onClick={(e) => removeMember(member)}
+                    slot="end"
+                    color="white"
+                    icon={trashBinOutline}
+                  />
+                </IonItem>
+              ))}
+            </IonList>
+
+            <IonList lines="none">
+              <IonTitle>
+                Member requests{" "}
+                <IonBadge>
+                  {organization?.memberRequests
+                    ? organization?.memberRequests.length
+                    : 0}
+                </IonBadge>
+                {organization?.memberRequests &&
+                organization?.memberRequests.length > 0 ? (
+                  <IonIcon
+                    onClick={(e) => responseToJoinOrganization(e)}
+                    color="white"
+                    icon={checkmarkDoneCircleOutline}
+                  />
+                ) : (
+                  ""
+                )}
+              </IonTitle>
+
+              {organization?.memberRequests.map((memberRequest) => (
+                <IonCard key={memberRequest.user}>
+                  <IonCardHeader>
+                    <IonCardTitle>{memberRequest.user}</IonCardTitle>
+                    <IonCardSubtitle>
+                      {memberRequest.joinRequest.contactIdProvider +
+                        " - " +
+                        memberRequest.joinRequest.contactId}
+                    </IonCardSubtitle>
+                    <IonToggle
+                      labelPlacement="end"
+                      checked={
+                        membersToApprove.indexOf(memberRequest.user) >= 0
+                      }
+                      aria-label="approve/reject"
+                      onClick={(e) => {
+                        if (e.currentTarget.checked) {
+                          membersToApprove.push(memberRequest.user);
+                          setMembersToApprove(membersToApprove);
+                          setMembersToDecline(
+                            membersToDecline.filter(
+                              (mtod) => mtod !== memberRequest.user
+                            )
+                          );
+                        } else {
+                          membersToDecline.push(memberRequest.user);
+                          setMembersToDecline(membersToDecline);
+                          let newMembersToApprove = membersToApprove.filter(
+                            (mtoa) => mtoa !== memberRequest.user
+                          );
+                          setMembersToApprove(newMembersToApprove);
+                        }
+                      }}
+                    />
+                  </IonCardHeader>
+                  <IonCardContent>
+                    {memberRequest.joinRequest.reason}
+                  </IonCardContent>
+                </IonCard>
+              ))}
+            </IonList>
+          </>
+        ) : (
+          <>
+            <IonList lines="none">
+              <IonTitle>
+                Organizations{" "}
+                <IonBadge>
+                  {storage?.organizations ? storage?.organizations.length : 0}
+                </IonBadge>
+              </IonTitle>
+
+              {storage?.organizations.map((org) => (
+                <IonItem key={org.name}>
+                  {org.name}
+                  <IonIcon
+                    size="small"
+                    slot="end"
+                    icon={ellipse}
+                    color={getStatusColor(org)}
+                  />
+                  {"fROZEN" in org.status ||
+                  "pENDING_APPROVAL" in org.status ? (
+                    <IonIcon
+                      onClick={(e) => activateOrganization(e, org.name)}
+                      slot="end"
+                      color="white"
+                      icon={playCircleOutline}
+                    />
+                  ) : (
+                    ""
+                  )}
+
+                  {"aCTIVE" in org.status ||
+                  "pENDING_APPROVAL" in org.status ? (
+                    <IonIcon
+                      onClick={(e) => freezeOrganization(org.name)}
+                      slot="end"
+                      color="white"
+                      icon={stopCircleOutline}
+                    />
+                  ) : (
+                    ""
+                  )}
+
+                  <IonIcon
+                    onClick={(e) => removeOrganization(org.name)}
+                    slot="end"
+                    color="white"
+                    icon={trashOutline}
+                  />
+                </IonItem>
+              ))}
+            </IonList>
+          </>
+        )}
+      </IonList>
     </IonContent>
   );
 };
