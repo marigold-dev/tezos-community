@@ -180,7 +180,7 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .removeMember(member, organization!.name, undefined)
+        .removeMember(undefined, member, organization!.name)
         .send();
       await op?.confirmation();
       const newStorage = await mainWalletType!.storage();

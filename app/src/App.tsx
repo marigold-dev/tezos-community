@@ -75,6 +75,7 @@ export type UserProfile = {
 export type Organization = {
   admins: Array<address>;
   business: string;
+  fundingAddress?: address;
   ipfsNftUrl: string;
   logoUrl: string;
   memberRequests: Array<{
@@ -176,11 +177,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     Tezos.setWalletProvider(wallet);
+    setTezos(Tezos); //object changed and needs propagation
+
     (async () => {
       console.log("After wallet change I refresh storage");
       await refreshStorage();
     })();
-  }, [wallet]);
+  }, [userAddress]);
 
   //subscriptions
   useEffect(() => {

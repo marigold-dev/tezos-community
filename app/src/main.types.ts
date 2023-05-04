@@ -12,6 +12,7 @@ export type Storage = {
   organizations: Array<{
     admins: Array<address>;
     business: string;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -32,6 +33,7 @@ export type Storage = {
   tezosOrganization: {
     admins: Array<address>;
     business: string;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -55,6 +57,7 @@ type Methods = {
   activateOrganization: (param: string) => Promise<void>;
   addOrganization: (
     business: string,
+    fundingAddress: address | undefined,
     ipfsNftUrl: string,
     logoUrl: string,
     name: string,
@@ -62,9 +65,9 @@ type Methods = {
   ) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeMember: (
+    lastAdmin: address | undefined,
     member: address,
-    orgName: string,
-    lastAdmin?: address
+    orgName: string
   ) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
   requestToJoinOrganization: (
@@ -84,6 +87,7 @@ type MethodsObject = {
   activateOrganization: (param: string) => Promise<void>;
   addOrganization: (params: {
     business: string;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     name: string;

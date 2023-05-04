@@ -85,6 +85,9 @@ export const OrganizationsScreen: React.FC = () => {
   const [ipfsNftUrl, setIpfsNftUrl] = useState<string>("");
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [siteUrl, setSiteUrl] = useState<string>("");
+  const [fundingAddress, setFundingAddress] = useState<address | undefined>(
+    undefined
+  );
 
   //modal JOIN
   const modalJoin = useRef<HTMLIonModalElement>(null);
@@ -245,7 +248,14 @@ export const OrganizationsScreen: React.FC = () => {
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .addOrganization(business, ipfsNftUrl, logoUrl, name, siteUrl)
+        .addOrganization(
+          business,
+          fundingAddress,
+          ipfsNftUrl,
+          logoUrl,
+          name,
+          siteUrl
+        )
         .send();
       await op?.confirmation();
       const newStorage = await mainWalletType!.storage();
@@ -612,6 +622,23 @@ export const OrganizationsScreen: React.FC = () => {
                       onIonChange={(str) => {
                         if (str.detail.value === undefined) return;
                         setSiteUrl(str.target.value! as string);
+                      }}
+                    />
+
+                    <IonInput
+                      labelPlacement="floating"
+                      value={fundingAddress}
+                      label="Funding address"
+                      placeholder="tzxxxx or KT1xxxxx"
+                      type="text"
+                      maxlength={36}
+                      counter
+                      helperText="Enter your funding address (if you have)"
+                      onIonChange={(str) => {
+                        if (str.detail.value === undefined) return;
+                        setFundingAddress(
+                          str.target.value! as unknown as address
+                        );
                       }}
                     />
                   </IonContent>
