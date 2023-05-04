@@ -27,7 +27,7 @@ export type Storage = {
     members: BigMap<address, unit>;
     name: string;
     siteUrl: string;
-    status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+    status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
     verified: boolean;
   }>;
   tezosOrganization: {
@@ -48,7 +48,7 @@ export type Storage = {
     members: BigMap<address, unit>;
     name: string;
     siteUrl: string;
-    status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+    status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
     verified: boolean;
   };
 };

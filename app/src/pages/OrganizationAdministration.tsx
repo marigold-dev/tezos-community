@@ -1,14 +1,18 @@
 import {
   IonBadge,
+  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
+  IonCol,
   IonContent,
+  IonGrid,
   IonIcon,
   IonItem,
   IonList,
+  IonRow,
   IonTitle,
   IonToggle,
   useIonAlert,
@@ -60,11 +64,8 @@ export const OrganizationAdministration = ({
   const [membersToApprove, setMembersToApprove] = useState<address[]>([]);
   const [membersToDecline, setMembersToDecline] = useState<address[]>([]);
 
-  const responseToJoinOrganization = async (
-    e: React.MouseEvent<HTMLIonIconElement, MouseEvent>
-  ) => {
+  const responseToJoinOrganization = async () => {
     console.log("responseToJoinOrganization");
-    e.preventDefault();
 
     console.log("membersToApprove", membersToApprove);
     console.log("membersToDecline", membersToDecline);
@@ -183,8 +184,9 @@ export const OrganizationAdministration = ({
         .removeMember(undefined, member, organization!.name)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
-      setStorage(newStorage);
+
+      await refreshStorage();
+
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -265,22 +267,38 @@ export const OrganizationAdministration = ({
 
             <IonList lines="none">
               <IonTitle>
-                Member requests{" "}
-                <IonBadge>
-                  {organization?.memberRequests
-                    ? organization?.memberRequests.length
-                    : 0}
-                </IonBadge>
-                {organization?.memberRequests &&
-                organization?.memberRequests.length > 0 ? (
-                  <IonIcon
-                    onClick={(e) => responseToJoinOrganization(e)}
-                    color="white"
-                    icon={checkmarkDoneCircleOutline}
-                  />
-                ) : (
-                  ""
-                )}
+                <IonGrid fixed={true}>
+                  <IonRow>
+                    <IonCol>
+                      {" "}
+                      Member requests{" "}
+                      <IonBadge>
+                        {organization?.memberRequests
+                          ? organization?.memberRequests.length
+                          : 0}
+                      </IonBadge>
+                    </IonCol>
+
+                    {organization?.memberRequests &&
+                    organization?.memberRequests.length > 0 ? (
+                      <IonCol>
+                        {" "}
+                        <IonButton
+                          color="transparent"
+                          onClick={responseToJoinOrganization}
+                        >
+                          <IonIcon
+                            icon={checkmarkDoneCircleOutline}
+                            slot="end"
+                          />
+                          Apply all requests
+                        </IonButton>{" "}
+                      </IonCol>
+                    ) : (
+                      ""
+                    )}
+                  </IonRow>
+                </IonGrid>
               </IonTitle>
 
               {organization?.memberRequests.map((memberRequest) => (
@@ -344,8 +362,7 @@ export const OrganizationAdministration = ({
                     icon={ellipse}
                     color={getStatusColor(org)}
                   />
-                  {"fROZEN" in org.status ||
-                  "pENDING_APPROVAL" in org.status ? (
+                  {"frozen" in org.status || "pendingApproval" in org.status ? (
                     <IonIcon
                       onClick={(e) => activateOrganization(e, org.name)}
                       slot="end"
@@ -356,8 +373,7 @@ export const OrganizationAdministration = ({
                     ""
                   )}
 
-                  {"aCTIVE" in org.status ||
-                  "pENDING_APPROVAL" in org.status ? (
+                  {"active" in org.status || "pendingApproval" in org.status ? (
                     <IonIcon
                       onClick={(e) => freezeOrganization(org.name)}
                       slot="end"

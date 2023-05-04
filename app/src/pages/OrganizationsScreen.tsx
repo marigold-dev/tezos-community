@@ -191,7 +191,8 @@ export const OrganizationsScreen: React.FC = () => {
       setJoiningOrganizations(
         storage?.organizations.filter(
           (org) =>
-            orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0
+            orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0 &&
+            "active" in org.status
         )
       );
     },
@@ -357,7 +358,8 @@ export const OrganizationsScreen: React.FC = () => {
                                   (org) =>
                                     orgMembers
                                       .get(org.name)!
-                                      ?.indexOf(userAddress as address) < 0
+                                      ?.indexOf(userAddress as address) < 0 &&
+                                    "active" in org.status
                                 )
                                 .filter(
                                   (orgItem) =>
@@ -372,7 +374,8 @@ export const OrganizationsScreen: React.FC = () => {
                                 (org) =>
                                   orgMembers
                                     .get(org.name)!
-                                    ?.indexOf(userAddress as address) < 0
+                                    ?.indexOf(userAddress as address) < 0 &&
+                                  "active" in org.status
                               )
                             );
                           }

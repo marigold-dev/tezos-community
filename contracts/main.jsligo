@@ -1,4 +1,4 @@
-export type ORGANIZATION_STATUS = ["PENDING_APPROVAL"] | ["ACTIVE"] | ["FROZEN"];
+export type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
 
 export type removeMemberRequest = {
   member: address,
@@ -38,7 +38,7 @@ export type organization = {
   ipfsNftUrl: string,
   members: big_map<address, unit>,
   admins: set<address>,
-  status: ORGANIZATION_STATUS,
+  status: organizationStatus,
   memberRequests: set<joinOrganizationRequest>,
   verified: bool,
   fundingAddress: option<address>
@@ -74,7 +74,7 @@ const activateOrganization = (orgName: string, store: storage): _return => {
               ...store,
               organizations: List.update_with(
                 (orgItem: organization) => (orgName == orgItem.name),
-                { ...org, status: ACTIVE() },
+                { ...org, status: Active() },
                 store.organizations
               )
             }
@@ -102,7 +102,7 @@ const freezeOrganization = (name: string, store: storage): _return => {
               ...store,
               organizations: List.update_with(
                 (orgItem: organization) => orgItem.name == name,
-                { ...org, status: FROZEN() },
+                { ...org, status: Frozen() },
                 store.organizations
               )
             }
@@ -122,7 +122,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
       siteUrl: org.siteUrl,
       logoUrl: org.logoUrl,
       ipfsNftUrl: org.ipfsNftUrl,
-      status: PENDING_APPROVAL(),
+      status: PendingApproval(),
       admins: Set.literal(list([Tezos.get_sender()])) as set<address>,
       members: Big_map.empty as big_map<address, unit>,
       memberRequests: Set.empty as set<joinOrganizationRequest>,
@@ -152,7 +152,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
                 store.tezosOrganization.admins
               ) ? list(
                   [
-                    { ...newOrg, status: ACTIVE() } as organization,
+                    { ...newOrg, status: Active() } as organization,
                     ...store.organizations
                   ]
                 ) : list(
@@ -291,7 +291,7 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
       None: () =>
         failwith("Cannot find organization with name passed on parameter"),
       Some: (org) => {
-        if (org.status != ACTIVE()) return failwith(
+        if (org.status != Active()) return failwith(
           "You cannot receive requests until your organization is activated"
         ) else {
           const newOrg =
@@ -340,7 +340,7 @@ const responseToJoinOrganization = (
         ) else {
           let newOrg = { ...org };
           let newStore = { ...store };
-          for (const mr of newOrg.memberRequests) {
+          for (const mr of org.memberRequests) {
             if (Set.mem(mr.user, jor.membersToApprove)) {
               newOrg =
                 {

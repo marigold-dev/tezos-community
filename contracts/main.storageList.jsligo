@@ -14,7 +14,7 @@ const default_storage =
       admins: Set.literal(
         list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])
       ) as set<address>,
-      status: ACTIVE(),
+      status: Active(),
       memberRequests: Set.empty as set<joinOrganizationRequest>,
       verified: true,
       fundingAddress: None() as option<address>

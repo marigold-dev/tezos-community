@@ -90,7 +90,7 @@ export type Organization = {
   members: BigMap<address, unit>;
   name: string;
   siteUrl: string;
-  status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+  status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
   verified: boolean;
 };
 
@@ -300,7 +300,7 @@ const App: React.FC = () => {
                 myOrganizationsAsAdmin.findIndex(
                   (orgItem) => orgItem.name === orgname
                 ) >= 0
-              )
+              ) {
                 await LocalNotifications.schedule({
                   notifications: [
                     {
@@ -314,7 +314,9 @@ const App: React.FC = () => {
                     },
                   ],
                 });
-              else
+
+                await refreshStorage(); //we need to refresh automaticcaly to display new user requests
+              } else
                 console.log(
                   "Warning : here we ignore a failing transaction event"
                 );

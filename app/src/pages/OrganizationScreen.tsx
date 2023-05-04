@@ -33,6 +33,7 @@ import React, {
 } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
+import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
 import { OrganizationAdministration } from "./OrganizationAdministration";
 import { OrganizationMessages } from "./OrganizationMessages";
@@ -64,6 +65,7 @@ export const OrganizationScreen = ({
     setUserBalance,
     setLoading,
     loading,
+    userProfiles,
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
   const [presentAlert] = useIonAlert();
@@ -309,7 +311,13 @@ export const OrganizationScreen = ({
                     <IonList>
                       {members
                         ? members.map((member) => (
-                            <IonItem key={member}>{member}</IonItem>
+                            <IonItem key={member}>
+                              {" "}
+                              <UserProfileChip
+                                address={member}
+                                userProfiles={userProfiles}
+                              />
+                            </IonItem>
                           ))
                         : ""}
                     </IonList>

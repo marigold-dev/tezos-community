@@ -1,7 +1,7 @@
 #import "./main.jsligo" "CONTRACT"
 #import "./nft.jsligo" "NFT"
 #import "@ligo/fa/lib/fa2/asset/multi_asset.jsligo" "MULTIASSET"
-const _ = Test.reset_state(3 as nat, list([]) as list<tez>);
+const _ = Test.reset_state(4 as nat, list([]) as list<tez>);
 
 const baker = Test.nth_bootstrap_account(0);
 
@@ -23,6 +23,14 @@ const _ = Test.log(Test.get_balance(user));
 
 const _ = Test.log(user);
 
+const user2: address = Test.nth_bootstrap_account(3);
+
+const _ = Test.log("user2 has balance : ");
+
+const _ = Test.log(Test.get_balance(user2));
+
+const _ = Test.log(user2);
+
 const tezosOrganization: CONTRACT.organization =
   {
     name: "TEZOS",
@@ -32,9 +40,9 @@ const tezosOrganization: CONTRACT.organization =
     ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
     members: Big_map.empty as big_map<address, unit>,
     admins: Set.literal(
-      list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])
+      list([tezosAdmin])
     ) as set<address>,
-    status: ACTIVE(),
+    status: Active(),
     memberRequests: Set.empty as set<CONTRACT.joinOrganizationRequest>,
     verified: true,
     fundingAddress: None() as option<address>
@@ -80,7 +88,7 @@ const initial_storageNFT: NFT.storage =
       list(
         [
           [
-            [("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address), 0 as nat],
+            [tezosAdmin, 0 as nat],
             1 as nat
           ]
         ]
@@ -96,7 +104,7 @@ const initial_storageNFT: NFT.storage =
     ),
     operators: Big_map.empty as MULTIASSET.Operators.t,
     owner_token_ids: Set.add(
-      ["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address, 0 as nat],
+      [tezosAdmin, 0 as nat],
       Set.empty as set<[MULTIASSET.Storage.owner, MULTIASSET.Storage.token_id]>
     ),
     token_ids: Set.add(0 as nat, Set.empty as set<MULTIASSET.Storage.token_id>)
@@ -151,11 +159,12 @@ const _testAddOrganizationNotAdmin = (
   sender: address,
   or: CONTRACT.addOrganizationRequest,
   orgSize: nat
+  ,status : CONTRACT.organizationStatus
 ): bool => {
   Test.set_source(sender);
-  const status =
+  const transferStatus =
     Test.transfer_to_contract(contr, AddOrganization(or), 0 as mutez);
-  const _ = Test.log(["status", status]);
+  const _ = Test.log(["transferStatus", transferStatus]);
   let store: CONTRACT.storage = Test.get_storage(taddr);
   Test.log(store);
   Test.assert_with_error(
@@ -179,6 +188,8 @@ const _testAddOrganizationNotAdmin = (
   );
   const org = Option.unopt(orgOpt);
   Test.assert_with_error(org.name == or.name, "organization name is different");
+  Test.assert_with_error(org.status == status,"organization status is different");
+
   const events =
     Test.get_last_events_from(taddr, "organizationAdded") as list<string>;
   Test.assert_with_error(List.size(events) == (1 as nat), "Cannot find event");
@@ -189,8 +200,159 @@ const _testAddOrganizationNotAdmin = (
   return true
 };
 
+
+
+const _testActivateOrganization = (
+  sender: address,
+  organizationName: string,
+  orgSize: nat,
+  status : CONTRACT.organizationStatus
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, ActivateOrganization(organizationName), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  Test.assert_with_error(
+    List.size(store.organizations) == orgSize,
+    "Wrong size on organization list"
+  );
+  const orgList: list<CONTRACT.organization> =
+    List.filter_map(
+      (orgItem: CONTRACT.organization) =>
+        orgItem.name == organizationName ? Some(orgItem) : None(),
+      store.organizations
+    );
+  Test.assert_with_error(
+    List.size(orgList) == (1 as nat),
+    "Cannot find the organization on the list"
+  );
+  const orgOpt = List.head_opt(orgList);
+  Test.assert_with_error(
+    Option.is_some(orgOpt),
+    "Cannot extract the organization on the list"
+  );
+  const org = Option.unopt(orgOpt);
+  Test.assert_with_error(org.name == organizationName, "organization name is different");
+  Test.assert_with_error(org.status == status,"organization status is different");
+
+ 
+  return true
+};
+
+
+const _testRequestToJoinOrganization = (
+  sender: address,
+  userJoinRequest: CONTRACT.joinRequest,
+  memberRequestsSize: nat
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, RequestToJoinOrganization(userJoinRequest), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  const orgList: list<CONTRACT.organization> =
+    List.filter_map(
+      (orgItem: CONTRACT.organization) =>
+        orgItem.name == userJoinRequest.orgName ? Some(orgItem) : None(),
+      store.organizations
+    );
+  Test.assert_with_error(
+    List.size(orgList) == (1 as nat),
+    "Cannot find the organization on the list"
+  );
+  const orgOpt = List.head_opt(orgList);
+  Test.assert_with_error(
+    Option.is_some(orgOpt),
+    "Cannot extract the organization on the list"
+  );
+  const org = Option.unopt(orgOpt);
+
+  Test.assert_with_error(Set.cardinal(org.memberRequests) == memberRequestsSize, "memberRequests size is different");
+
+  return true;
+};
+
+
+
+const _testResponseToJoinOrganization = (
+  sender: address,
+  member : address,
+  userJoinOrganizationResponse: CONTRACT.joinOrganizationResponse,
+  memberRequestsSize: nat,
+  shouldFindMember: bool
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, ResponseToJoinOrganization(userJoinOrganizationResponse), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  const orgList: list<CONTRACT.organization> =
+    List.filter_map(
+      (orgItem: CONTRACT.organization) =>
+        orgItem.name == userJoinOrganizationResponse.orgName ? Some(orgItem) : None(),
+      store.organizations
+    );
+  Test.assert_with_error(
+    List.size(orgList) == (1 as nat),
+    "Cannot find the organization on the list"
+  );
+  const orgOpt = List.head_opt(orgList);
+  Test.assert_with_error(
+    Option.is_some(orgOpt),
+    "Cannot extract the organization on the list"
+  );
+  const org = Option.unopt(orgOpt);
+  Test.log(Set.cardinal(org.memberRequests));
+  Test.log(memberRequestsSize);
+
+  Test.assert_with_error(Set.cardinal(org.memberRequests) == memberRequestsSize, "memberRequests size is different");
+  //Test.assert_with_error( Big_map.mem(member,org.members) == shouldFindMember, "Problem finding member or not on the list");
+
+  return true;
+};
+
+
+
+
+const _testRemoveMember = (
+  sender: address,
+  removeMember: CONTRACT.removeMemberRequest,
+  shouldFindMember: bool
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, RemoveMember(removeMember), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  const orgList: list<CONTRACT.organization> =
+    List.filter_map(
+      (orgItem: CONTRACT.organization) =>
+        orgItem.name == removeMember.orgName ? Some(orgItem) : None(),
+      store.organizations
+    );
+ 
+  const orgOpt = List.head_opt(orgList);
+  Test.assert_with_error(
+    Option.is_some(orgOpt),
+    "Cannot extract the organization on the list"
+  );
+  const org = Option.unopt(orgOpt);
+  Test.assert_with_error( Big_map.mem(removeMember.member,org.members) == shouldFindMember, "Problem finding member or not on the list");
+
+  return true;
+};
+
+// TEST SUITE
+
+//testClaimNFT
 const testClaimNFT = _testClaimNFT(user, 2 as nat);
 
+//testAddOrganizationNotAdmin
 const newOrganization: CONTRACT.addOrganizationRequest =
   {
     name: "Marigold",
@@ -202,5 +364,37 @@ const newOrganization: CONTRACT.addOrganizationRequest =
   };
 
 const testAddOrganizationNotAdmin =
-  _testAddOrganizationNotAdmin(user, newOrganization, 1 as nat); //,PENDING_APPROVAL());
+  _testAddOrganizationNotAdmin(user, newOrganization, 1 as nat, PendingApproval());
+
+//testActivateOrganization
+const testActivateOrganization =
+  _testActivateOrganization(tezosAdmin, newOrganization.name, 1 as nat, Active());
+
+//requestToJoinOrganization
+const user2joinRequest = {
+  orgName: newOrganization.name,
+  contactId: "user2",
+  contactIdProvider: "TWITTER",
+  reason: "reason"
+};
+const testRequestToJoinOrganization =
+  _testRequestToJoinOrganization(user2, user2joinRequest, 1 as nat);
+
+//responseToJoinOrganization
+const userJoinOrganizationResponse = {
+  membersToApprove: Set.literal(list([user])) as set<address>,
+  membersToDecline: Set.empty as set<address>,
+  orgName: newOrganization.name
+}
+const testResponseToJoinOrganization =
+  _testResponseToJoinOrganization(user,user2,userJoinOrganizationResponse , 0 as nat,true);
+
+//removeMember
+const userRemoveMemberRequest = {
+  member: user2,
+  orgName: newOrganization.name,
+  lastAdmin: None() as option<address>
+};
+const testRemoveMember =
+  _testRemoveMember(user, userRemoveMemberRequest, false);
 
