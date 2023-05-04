@@ -256,14 +256,13 @@ const removeMember = (rmr: removeMemberRequest, store: storage): _return => {
             Tezos.get_sender() != rmr.member &&
               Set.mem(Tezos.get_sender(), org.admins)
         ) {
-          const newOrg = { ...org, admins: Set.remove(rmr.member, org.admins) };
           return [
             list([]),
             {
               ...store,
-              organizations: List.update_with(
-                (orgItem: organization) => (orgItem.name == newOrg.name),
-                newOrg,
+              organizations: List.filter_map(
+                (orgItem: organization) => orgItem.name == org.name ? Some(
+                { ...org, members: Big_map.remove(rmr.member, org.members) }): None() as option<organization> ,
                 store.organizations
               )
             }
