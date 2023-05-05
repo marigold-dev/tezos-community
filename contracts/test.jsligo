@@ -382,7 +382,7 @@ const testRequestToJoinOrganization =
 
 //responseToJoinOrganization
 const userJoinOrganizationResponse = {
-  membersToApprove: Set.literal(list([user])) as set<address>,
+  membersToApprove: Set.literal(list([user2])) as set<address>,
   membersToDecline: Set.empty as set<address>,
   orgName: newOrganization.name
 }
