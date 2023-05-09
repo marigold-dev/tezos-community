@@ -1,8 +1,10 @@
 name: Build and deploy ui with new contract Ghostnet
 
 on:
+  push:
+    branches:
+      - ghostnet
   workflow_dispatch: # adding the workflow_dispatch so it can be triggered manually
-
 
 jobs:
   ui:
@@ -22,7 +24,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - run: echo "{}" > esy.json
       - run: npm ci
       - name: Prepare deployment information
@@ -45,14 +47,14 @@ jobs:
       - name: deploy main contract on ghostnet
         uses: laucans/taqueria-github-action@main
         with:
-            plugins: '@taqueria/plugin-contract-types@next, @taqueria/plugin-taquito, @taqueria/plugin-ligo, @taqueria/plugin-jest'
-            environment: testing
-            compile_contracts: main.jsligo
-            compile_plugin: ligo
-            taq_ligo_image: ligolang/ligo_ci:next
-            ligo_libraries: '@ligo/fa'
-            test_files: test.jsligo
-            deploy_contracts: main.tz
+          plugins: "@taqueria/plugin-contract-types@next, @taqueria/plugin-taquito, @taqueria/plugin-ligo, @taqueria/plugin-jest"
+          environment: testing
+          compile_contracts: main.jsligo
+          compile_plugin: ligo
+          taq_ligo_image: ligolang/ligo_ci:next
+          ligo_libraries: "@ligo/fa"
+          test_files: test.jsligo
+          deploy_contracts: main.tz
 
       - name: UI build and push version
         uses: docker/build-push-action@v4
