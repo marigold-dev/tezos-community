@@ -85,9 +85,7 @@ export const OrganizationsScreen: React.FC = () => {
   const [ipfsNftUrl, setIpfsNftUrl] = useState<string>("");
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [siteUrl, setSiteUrl] = useState<string>("");
-  const [fundingAddress, setFundingAddress] = useState<address | undefined>(
-    undefined
-  );
+  const [fundingAddress, setFundingAddress] = useState<address | null>(null);
 
   //modal JOIN
   const modalJoin = useRef<HTMLIonModalElement>(null);
@@ -140,7 +138,11 @@ export const OrganizationsScreen: React.FC = () => {
 
             orgMembers.set(
               organization.name,
-              Array.from(keys.map((key) => key.key))
+              Array.from(
+                keys
+                  .filter((key) => (key.active ? true : false)) // take only active ones
+                  .map((key) => key.key)
+              )
             );
 
             //cache userprofiles
@@ -392,7 +394,7 @@ export const OrganizationsScreen: React.FC = () => {
                       label="Contact identifier/alias *"
                       placeholder="@twitterAlias"
                       type="text"
-                      maxlength={32}
+                      maxlength={36}
                       counter
                       onIonChange={(str) => {
                         if (
@@ -533,7 +535,7 @@ export const OrganizationsScreen: React.FC = () => {
                       label="Name *"
                       placeholder="my organization name"
                       type="text"
-                      maxlength={32}
+                      maxlength={36}
                       counter
                       onIonChange={(str) => {
                         if (

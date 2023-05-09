@@ -55,20 +55,22 @@ export type Storage = {
 
 type Methods = {
   activateOrganization: (param: string) => Promise<void>;
+  addAdmin: (admin: address, orgName: string) => Promise<void>;
   addOrganization: (
     business: string,
-    fundingAddress: address | undefined,
+    fundingAddress: address | null,
     ipfsNftUrl: string,
     logoUrl: string,
     name: string,
     siteUrl: string
   ) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
-  removeMember: (
-    lastAdmin: address | undefined,
-    member: address,
+  removeAdmin: (
+    admin: address,
+    lastAdmin: address | null,
     orgName: string
   ) => Promise<void>;
+  removeMember: (member: address, orgName: string) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
   requestToJoinOrganization: (
     contactId: string,
@@ -85,6 +87,7 @@ type Methods = {
 
 type MethodsObject = {
   activateOrganization: (param: string) => Promise<void>;
+  addAdmin: (params: { admin: address; orgName: string }) => Promise<void>;
   addOrganization: (params: {
     business: string;
     fundingAddress?: address;
@@ -94,11 +97,12 @@ type MethodsObject = {
     siteUrl: string;
   }) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
-  removeMember: (params: {
+  removeAdmin: (params: {
+    admin: address;
     lastAdmin?: address;
-    member: address;
     orgName: string;
   }) => Promise<void>;
+  removeMember: (params: { member: address; orgName: string }) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
   requestToJoinOrganization: (params: {
     contactId: string;

@@ -114,23 +114,32 @@ export const OrganizationScreen = ({
     setLoading(false);
   };
 
+  const refreshOrganization = async () => {
+    if (organization) {
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+
+      const keys: BigMapKey[] = await bigMapsService.getKeys({
+        id: membersBigMapId,
+        micheline: MichelineFormat.JSON,
+      });
+
+      setMembers(
+        Array.from(
+          keys
+            .filter((key) => (key.active ? true : false))
+            .map((key) => key.key as address)
+        )
+      ); //take only active keys
+      console.log("refreshOrganization", members, membersBigMapId, keys);
+    } else {
+      console.log("organization fetch his not ready yet");
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      if (organization) {
-        const membersBigMapId = (
-          organization?.members as unknown as { id: BigNumber }
-        ).id.toNumber();
-
-        const keys: BigMapKey[] = await bigMapsService.getKeys({
-          id: membersBigMapId,
-          micheline: MichelineFormat.JSON,
-        });
-
-        setMembers(Array.from(keys.map((key) => key.key as address)));
-      } else {
-        console.log("selected org is null", organization);
-      }
-    })();
+    refreshOrganization();
   }, [organization, userAddress]);
 
   return (

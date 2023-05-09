@@ -1,6 +1,7 @@
 import {
   IonBadge,
   IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -9,23 +10,36 @@ import {
   IonCol,
   IonContent,
   IonGrid,
+  IonHeader,
   IonIcon,
+  IonInput,
   IonItem,
   IonList,
+  IonModal,
   IonRow,
   IonTitle,
   IonToggle,
+  IonToolbar,
   useIonAlert,
 } from "@ionic/react";
 import {
+  addCircleOutline,
+  arrowBackOutline,
   checkmarkDoneCircleOutline,
   ellipse,
+  flagOutline,
   playCircleOutline,
   stopCircleOutline,
   trashBinOutline,
   trashOutline,
 } from "ionicons/icons";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
@@ -61,8 +75,19 @@ export const OrganizationAdministration = ({
 
   const [presentAlert] = useIonAlert();
 
+  //member requests
   const [membersToApprove, setMembersToApprove] = useState<address[]>([]);
   const [membersToDecline, setMembersToDecline] = useState<address[]>([]);
+
+  // admin removal or added
+  const [selectedAdmin, setSelectedAdmin] = useState<address | null>(null);
+  const [selectedAdminIsValid, setSelectedAdminIsValid] =
+    useState<boolean>(false);
+  const [selectedAdminMarkTouched, setSelectedAdminMarkTouched] =
+    useState<boolean>(false);
+
+  //pass flag
+  const modalPassFlag = useRef<HTMLIonModalElement>(null);
 
   const responseToJoinOrganization = async () => {
     console.log("responseToJoinOrganization");
@@ -181,11 +206,67 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .removeMember(undefined, member, organization!.name)
+        .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();
 
       await refreshStorage();
+
+      setLoading(false);
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
+  const removeAdmin = async (adminToRemove: address) => {
+    console.log("removeAdmin", adminToRemove, organization!.name);
+
+    try {
+      setLoading(true);
+      const op = await mainWalletType!.methods
+        .removeAdmin(adminToRemove, selectedAdmin, organization!.name)
+        .send();
+      await op?.confirmation();
+
+      await refreshStorage();
+      setSelectedAdmin(null); //reset
+
+      setLoading(false);
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
+  const addAdmin = async () => {
+    console.log("addAdmin", selectedAdmin, organization!.name);
+
+    try {
+      setLoading(true);
+      const op = await mainWalletType!.methods
+        .addAdmin(selectedAdmin!, organization!.name)
+        .send();
+      await op?.confirmation();
+
+      await refreshStorage();
+      setSelectedAdmin(null); //reset
 
       setLoading(false);
     } catch (error) {
@@ -223,12 +304,60 @@ export const OrganizationAdministration = ({
 
   return (
     <IonContent className="ion-padding">
-      <IonList lines="none">
+      <IonList>
         <IonTitle>
-          Administrators{" "}
-          <IonBadge>
-            {organization?.admins ? organization?.admins.length : 0}
-          </IonBadge>
+          <IonGrid fixed={true}>
+            <IonRow>
+              <IonCol>
+                Administrators{" "}
+                <IonBadge>
+                  {organization?.admins ? organization?.admins.length : 0}
+                </IonBadge>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonInput
+                  labelPlacement="floating"
+                  color="primary"
+                  value={selectedAdmin}
+                  label="Administrator *"
+                  placeholder="tzxxxx"
+                  type="text"
+                  maxlength={36}
+                  counter
+                  onIonChange={(str) => {
+                    if (
+                      str.detail.value === undefined ||
+                      !str.target.value ||
+                      str.target.value === ""
+                    ) {
+                      setSelectedAdminIsValid(false);
+                    } else {
+                      setSelectedAdmin(str.target.value! as address);
+                      setSelectedAdminIsValid(true);
+                    }
+                  }}
+                  helperText="Enter an address"
+                  errorText="Address required"
+                  className={`${selectedAdminIsValid && "ion-valid"} ${
+                    selectedAdminIsValid === false && "ion-invalid"
+                  } ${selectedAdminMarkTouched && "ion-touched"}`}
+                  onIonBlur={() => setSelectedAdminMarkTouched(true)}
+                />
+              </IonCol>
+              <IonCol>
+                <IonButton
+                  color="transparent"
+                  disabled={!selectedAdminIsValid}
+                  onClick={addAdmin}
+                >
+                  <IonIcon icon={addCircleOutline} />
+                  Add admin
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         </IonTitle>
 
         {organization?.admins.map((admin) => (
@@ -238,12 +367,88 @@ export const OrganizationAdministration = ({
             ) : (
               admin
             )}
+
+            {organization.admins.length > 1 ? (
+              <IonIcon
+                onClick={(e) => removeAdmin(admin)}
+                slot="end"
+                color="white"
+                icon={trashBinOutline}
+              />
+            ) : members.filter((u) => u !== admin).length > 0 ? (
+              <>
+                <IonButton id="passFlag" color="transparent" slot="end">
+                  <IonIcon
+                    onClick={(e) => removeAdmin(admin)}
+                    color="white"
+                    icon={flagOutline}
+                  />
+                  Pass the flag
+                </IonButton>
+
+                <IonModal trigger="passFlag" ref={modalPassFlag}>
+                  <IonHeader>
+                    <IonToolbar>
+                      <IonButtons slot="start">
+                        <IonButton
+                          onClick={() => modalPassFlag.current?.dismiss()}
+                        >
+                          <IonIcon
+                            slot="start"
+                            icon={arrowBackOutline}
+                          ></IonIcon>
+                          BACK
+                        </IonButton>
+                      </IonButtons>
+                      <IonButtons slot="end">
+                        <IonButton
+                          disabled={!selectedAdminIsValid}
+                          onClick={() => removeAdmin(userAddress as address)}
+                        >
+                          <IonIcon slot="start" icon={flagOutline}></IonIcon>
+                          Done
+                        </IonButton>
+                      </IonButtons>
+                      <IonTitle> Pass Flag to another member</IonTitle>
+                    </IonToolbar>
+                  </IonHeader>
+                  <IonContent color="light" class="ion-padding">
+                    <IonInput
+                      labelPlacement="floating"
+                      color="primary"
+                      value={selectedAdmin}
+                      label="New admin *"
+                      type="text"
+                      onIonChange={(str) => {
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setSelectedAdminIsValid(false);
+                        } else {
+                          setSelectedAdmin(str.target.value as address);
+                          setSelectedAdminIsValid(true);
+                        }
+                      }}
+                      helperText="Enter the address of the new administrator of the organization"
+                      errorText="Adress is required"
+                      className={`${selectedAdminIsValid && "ion-valid"} ${
+                        selectedAdminIsValid === false && "ion-invalid"
+                      } ion-touched `}
+                    />
+                  </IonContent>
+                </IonModal>
+              </>
+            ) : (
+              ""
+            )}
           </IonItem>
         ))}
 
         {organization?.name !== storage?.tezosOrganization.name ? (
           <>
-            <IonList lines="none">
+            <IonList>
               <IonTitle>
                 Members <IonBadge>{members ? members.length : 0}</IonBadge>
               </IonTitle>
@@ -259,13 +464,20 @@ export const OrganizationAdministration = ({
                     onClick={(e) => removeMember(member)}
                     slot="end"
                     color="white"
+                    style={{
+                      display:
+                        organization &&
+                        organization?.admins.indexOf(member) >= 0
+                          ? "none"
+                          : "block",
+                    }}
                     icon={trashBinOutline}
                   />
                 </IonItem>
               ))}
             </IonList>
 
-            <IonList lines="none">
+            <IonList>
               <IonTitle>
                 <IonGrid fixed={true}>
                   <IonRow>
@@ -345,7 +557,7 @@ export const OrganizationAdministration = ({
           </>
         ) : (
           <>
-            <IonList lines="none">
+            <IonList>
               <IonTitle>
                 Organizations{" "}
                 <IonBadge>

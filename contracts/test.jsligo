@@ -320,7 +320,7 @@ const _testResponseToJoinOrganization = (
 
 const _testRemoveMember = (
   sender: address,
-  removeMember: CONTRACT.removeMemberRequest,
+  removeMember: CONTRACT.removeMemberParameters,
   shouldFindMember: bool
 ): bool => {
   Test.set_source(sender);
@@ -392,9 +392,8 @@ const testResponseToJoinOrganization =
 //removeMember
 const userRemoveMemberRequest = {
   member: user2,
-  orgName: newOrganization.name,
-  lastAdmin: None() as option<address>
-};
+  orgName: newOrganization.name
+  };
 const testRemoveMember =
   _testRemoveMember(user, userRemoveMemberRequest, false);
 

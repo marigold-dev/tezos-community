@@ -1,10 +1,14 @@
 export type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
 
-export type removeMemberRequest = {
-  member: address,
+export type removeMemberParameters = { member: address, orgName: string };
+
+export type removeAdminParameters = {
+  admin: address,
   orgName: string,
   lastAdmin: option<address>
 };
+
+export type addAdminParameters = { admin: address, orgName: string };
 
 export type joinRequest = {
   orgName: string,
@@ -124,7 +128,8 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
       ipfsNftUrl: org.ipfsNftUrl,
       status: PendingApproval(),
       admins: Set.literal(list([Tezos.get_sender()])) as set<address>,
-      members: Big_map.empty as big_map<address, unit>,
+      members: Big_map.add(Tezos.get_sender(), unit, Big_map.empty) as
+        big_map<address, unit>,
       memberRequests: Set.empty as set<joinOrganizationRequest>,
       verified: false,
       fundingAddress: org.fundingAddress
@@ -195,49 +200,75 @@ const removeOrganization = (name: string, store: storage): _return => {
 };
 
 const leaveOrganizationAsAdmin = (
-  orgName: string,
-  lastAdmin: option<address>,
+  org: organization,
+  lastAdminOpt: option<address>,
   store: storage
 ): storage => {
-  return match(
-    List.find_opt(
-      (org: organization) => (org.name == orgName),
-      store.organizations
-    ),
-    {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) => {
-        if (!Set.mem(Tezos.get_sender(), org.admins)) return failwith(
-          "You need to be an admin to use this function"
-        ) else if (
-          Set.cardinal(org.admins) == (1 as nat) && Option.is_none(lastAdmin)
-        ) return failwith(
-          "You cannot leave an organization empty without naming another admin"
-        ) else {
-          let newAdmins = Set.remove(Tezos.get_sender(), org.admins);
-          if (
-            Set.cardinal(org.admins) == (1 as nat) && Option.is_some(lastAdmin)
-          ) newAdmins = Set.add(Option.unopt(lastAdmin), newAdmins);
-          return {
+  if (!Set.mem(Tezos.get_sender(), org.admins)) return failwith(
+    "You need to be an admin to use this function"
+  ) else {
+    return match(
+      lastAdminOpt,
+      {
+        None: () => {
+          if (Set.cardinal(org.admins) == (1 as nat)) failwith(
+            "You cannot leave an organization empty without naming another admin from members"
+          ) else return {
             ...store,
-            organizations: List.update_with(
-              (orgItem: organization) => (orgItem.name == orgName),
-              { ...org, admins: newAdmins },
+            organizations: List.filter_map(
+              (orgItem: organization) =>
+                (orgItem.name == org.name) ? Some(
+                    {
+                      ...org,
+                      admins: Set.remove(Tezos.get_sender(), org.admins)
+                    }
+                  ) : None() as option<organization>,
               store.organizations
             )
           }
+        },
+        Some: (lastAdmin) => {
+          if (Set.cardinal(org.admins) != (1 as nat)) return failwith(
+            "Don't name another admin to replace you if there are enough admins on the organization"
+          ) else if (
+            Set.cardinal(org.admins) == (1 as nat) &&
+              (
+                lastAdmin == Tezos.get_sender() ||
+                  !Big_map.mem(lastAdmin, org.members)
+              )
+          ) return failwith(
+            "You cannot leave an organization empty naming yourself or not a member"
+          ) else {
+            const newAdmins =
+              Set.cardinal(org.admins) == (1 as nat) ? Set.add(
+                  lastAdmin,
+                  org.admins
+                ) : org.admins;
+            return {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  (orgItem.name == org.name) ? Some(
+                      {
+                        ...org,
+                        admins: Set.remove(Tezos.get_sender(), newAdmins)
+                      }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          }
         }
       }
-    }
-  )
+    )
+  }
 };
 
 export /* @entry */
-const removeMember = (rmr: removeMemberRequest, store: storage): _return => {
+const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
-      (orgItem: organization) => (orgItem.name == rmr.orgName),
+      (orgItem: organization) => (orgItem.name == rmp.orgName),
       store.organizations
     );
   return match(
@@ -246,30 +277,110 @@ const removeMember = (rmr: removeMemberRequest, store: storage): _return => {
       None: () =>
         failwith("Cannot find organization with name passed on parameter"),
       Some: (org) => {
-        if (Tezos.get_sender() == rmr.member && Set.mem(rmr.member, org.admins)) {
-          return [
-            list([]),
-            leaveOrganizationAsAdmin(rmr.orgName, rmr.lastAdmin, store)
-          ]
-        } else if (
-          Tezos.get_sender() == rmr.member && !Set.mem(rmr.member, org.admins) ||
-            Tezos.get_sender() != rmr.member &&
-              Set.mem(Tezos.get_sender(), org.admins)
-        ) {
+        if (Set.mem(rmp.member, org.admins)) failwith(
+          "Cannot remove a member who is administrator, use removeAdmin endpoint instead"
+        ) else if (Set.mem(Tezos.get_sender(), org.admins)) {
           return [
             list([]),
             {
               ...store,
               organizations: List.filter_map(
-                (orgItem: organization) => orgItem.name == org.name ? Some(
-                { ...org, members: Big_map.remove(rmr.member, org.members) }): None() as option<organization> ,
+                (orgItem: organization) =>
+                  orgItem.name == org.name ? Some(
+                      {
+                        ...org,
+                        members: Big_map.remove(rmp.member, org.members)
+                      }
+                    ) : None() as option<organization>,
                 store.organizations
               )
             }
           ]
         } else {
           return failwith(
-            "You don't have the rights to remove a member from an organization"
+            "You don't have the rights to remove a member from this organization"
+          )
+        }
+      }
+    }
+  )
+};
+
+export /* @entry */
+const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
+  const orgOpt =
+    List.find_opt(
+      (orgItem: organization) => (orgItem.name == rap.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (Tezos.get_sender() == rap.admin && Set.mem(rap.admin, org.admins)) {
+          return [list([]), leaveOrganizationAsAdmin(org, rap.lastAdmin, store)]
+        } else if (
+          Tezos.get_sender() != rap.admin && Set.mem(rap.admin, org.admins)
+        ) {
+          return [
+            list([]),
+            {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  orgItem.name == org.name ? Some(
+                      { ...org, admins: Set.remove(rap.admin, org.admins) }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          ]
+        } else {
+          return failwith(
+            "You don't have the rights to remove an administrator from this organization"
+          )
+        }
+      }
+    }
+  )
+};
+
+export /* @entry */
+const addAdmin = (aap: addAdminParameters, store: storage): _return => {
+  const orgOpt =
+    List.find_opt(
+      (orgItem: organization) => (orgItem.name == aap.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (Set.mem(Tezos.get_sender(), org.admins)) {
+          return [
+            list([]),
+            {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  orgItem.name == org.name ? Some(
+                      {
+                        ...org,
+                        members: Big_map.add(aap.admin, unit, org.members),
+                        admins: Set.add(aap.admin, org.admins)
+                      }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          ]
+        } else {
+          return failwith(
+            "You don't have the rights to add an administrator from this organization"
           )
         }
       }
