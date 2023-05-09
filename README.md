@@ -73,7 +73,11 @@ Compile again as you need to have the last nft deployment address to change the 
 
 ```
 TAQ_LIGO_IMAGE=ligolang/ligo:0.64.3 taq compile main.jsligo
-taq deploy main.tz -e "testing"
+taq deploy main.tz -e "testing" --storage main.storage.ghostnet.tz
+
+or
+
+taq deploy main.tz -e "production" --storage main.storage.mainnet.tz
 ```
 
 # Mobile app
