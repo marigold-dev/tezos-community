@@ -64,6 +64,7 @@ type Methods = {
     name: string,
     siteUrl: string
   ) => Promise<void>;
+  addTezosAdmin: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (
     admin: address,
@@ -96,6 +97,7 @@ type MethodsObject = {
     name: string;
     siteUrl: string;
   }) => Promise<void>;
+  addTezosAdmin: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (params: {
     admin: address;

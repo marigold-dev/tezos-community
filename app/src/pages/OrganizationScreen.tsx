@@ -326,7 +326,7 @@ export const OrganizationScreen = ({
                     )}
                   </IonItem>
 
-                  {isTezosOrganization ? (
+                  {!isTezosOrganization ? (
                     <>
                       <IonItem lines="none">
                         <IonLabel>Members </IonLabel>

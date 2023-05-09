@@ -254,13 +254,20 @@ export const OrganizationAdministration = ({
   };
 
   const addAdmin = async () => {
-    console.log("addAdmin", selectedAdmin, organization!.name);
+    console.log(
+      "addAdmin",
+      selectedAdmin,
+      organization!.name,
+      isTezosOrganization
+    );
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
-        .addAdmin(selectedAdmin!, organization!.name)
-        .send();
+      const op = !isTezosOrganization
+        ? await mainWalletType!.methods
+            .addAdmin(selectedAdmin!, organization!.name)
+            .send()
+        : await mainWalletType!.methods.addTezosAdmin(selectedAdmin!).send();
       await op?.confirmation();
 
       await refreshStorage();
@@ -281,7 +288,7 @@ export const OrganizationAdministration = ({
     setLoading(false);
   };
 
-  useEffect(() => {
+  const refreshOrganization = () => {
     if (organizationName) {
       const organization = !isTezosOrganization
         ? storage?.organizations.find((org) => org.name === organizationName)
@@ -293,8 +300,17 @@ export const OrganizationAdministration = ({
           : []
       );
       setMembersToDecline([]);
+      setOrganization(organization);
     }
-  }, [organizationName, storage, userAddress]);
+  };
+
+  useEffect(() => {
+    refreshOrganization();
+  }, [organizationName, userAddress]);
+
+  useEffect(() => {
+    refreshOrganization();
+  }, []);
 
   return (
     <IonContent className="ion-padding">
@@ -362,7 +378,7 @@ export const OrganizationAdministration = ({
               admin
             )}
 
-            {organization.admins.length > 1 ? (
+            {organization.admins.length > 1 && !isTezosOrganization ? (
               <IonIcon
                 onClick={(e) => removeAdmin(admin)}
                 slot="end"

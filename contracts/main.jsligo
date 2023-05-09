@@ -389,6 +389,26 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
 };
 
 export /* @entry */
+const addTezosAdmin = (admin: address, store: storage): _return => {
+  if (Set.mem(Tezos.get_sender(), store.tezosOrganization.admins)) {
+    return [
+      list([]),
+      {
+        ...store,
+        tezosOrganization: {
+          ...store.tezosOrganization,
+          admins: Set.add(admin, store.tezosOrganization.admins)
+        }
+      }
+    ]
+  } else {
+    return failwith(
+      "You don't have the rights to add an administrator from this organization"
+    )
+  }
+};
+
+export /* @entry */
 const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => {
   const orgOpt =
     List.find_opt(
