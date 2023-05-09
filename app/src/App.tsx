@@ -40,7 +40,6 @@ import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
-
 setupIonicReact();
 
 export type TZIP21TokenMetadata = TokenMetadata & {
