@@ -15,8 +15,8 @@ COPY . .
 
 RUN npm ci
 RUN taq init
-RUN taq install @taqueria/plugin-contract-types@next
-RUN taq generate types ./src
+#RUN taq install @taqueria/plugin-contract-types@next
+#RUN taq generate types ./src
 RUN cd app && npm ci 
 RUN cd app && npm run postinstall
 
