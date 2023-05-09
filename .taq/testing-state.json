@@ -1,0 +1,19 @@
+{
+    "operations": {},
+    "tasks": {
+        "@taqueria/plugin-taquito.deploy.1683643007756": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1683643007756,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT1TFZ6GsbDdasqyBDRgpzF82oWzui93tA1b",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://ghostnet.tezos.marigold.dev"
+                }
+            ]
+        }
+    }
+}
