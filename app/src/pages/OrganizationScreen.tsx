@@ -24,13 +24,7 @@ import {
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
 import { arrowBackOutline, cashOutline, sendOutline } from "ionicons/icons";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { UserProfileChip } from "../components/UserProfileChip";
@@ -39,8 +33,8 @@ import { OrganizationAdministration } from "./OrganizationAdministration";
 import { OrganizationMessages } from "./OrganizationMessages";
 
 type OrganizationProps = {
-  organization: Organization | undefined;
-  setOrganization: Dispatch<SetStateAction<Organization | undefined>>;
+  organizationName: string | undefined;
+  isTezosOrganization: boolean;
 };
 
 enum TABS {
@@ -50,8 +44,8 @@ enum TABS {
 }
 
 export const OrganizationScreen = ({
-  organization,
-  setOrganization,
+  organizationName,
+  isTezosOrganization,
 }: OrganizationProps): JSX.Element => {
   const {
     Tezos,
@@ -69,6 +63,10 @@ export const OrganizationScreen = ({
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
   const [presentAlert] = useIonAlert();
+
+  const [organization, setOrganization] = useState<Organization | undefined>(
+    undefined
+  );
 
   const [selectedTab, setSelectedTab] = useState<TABS>(TABS.DESCRIPTION);
   const [members, setMembers] = useState<address[]>([]);
@@ -115,7 +113,11 @@ export const OrganizationScreen = ({
   };
 
   const refreshOrganization = async () => {
-    if (organization) {
+    if (organizationName) {
+      const organization = !isTezosOrganization
+        ? storage?.organizations.find((org) => org.name === organizationName)
+        : storage?.tezosOrganization;
+
       const membersBigMapId = (
         organization?.members as unknown as { id: BigNumber }
       ).id.toNumber();
@@ -132,7 +134,15 @@ export const OrganizationScreen = ({
             .map((key) => key.key as address)
         )
       ); //take only active keys
-      console.log("refreshOrganization", members, membersBigMapId, keys);
+
+      setOrganization(organization!);
+      console.log(
+        "refreshOrganization",
+        organization,
+        members,
+        membersBigMapId,
+        keys
+      );
     } else {
       console.log("organization fetch his not ready yet");
     }
@@ -140,7 +150,11 @@ export const OrganizationScreen = ({
 
   useEffect(() => {
     refreshOrganization();
-  }, [organization, userAddress]);
+  }, [organizationName, userAddress]);
+
+  useEffect(() => {
+    refreshOrganization();
+  }, []);
 
   return (
     <div className="ion-page" id="main">
@@ -312,34 +326,40 @@ export const OrganizationScreen = ({
                     )}
                   </IonItem>
 
-                  <IonItem lines="none">
-                    <IonLabel>Members </IonLabel>
-                    <IonBadge>{members ? members.length : 0}</IonBadge>
-                  </IonItem>
-                  <IonItem lines="none">
-                    <IonList>
-                      {members
-                        ? members.map((member) => (
-                            <IonItem key={member}>
-                              {" "}
-                              <UserProfileChip
-                                address={member}
-                                userProfiles={userProfiles}
-                              />
-                            </IonItem>
-                          ))
-                        : ""}
-                    </IonList>
-                  </IonItem>
+                  {isTezosOrganization ? (
+                    <>
+                      <IonItem lines="none">
+                        <IonLabel>Members </IonLabel>
+                        <IonBadge>{members ? members.length : 0}</IonBadge>
+                      </IonItem>
+                      <IonItem lines="none">
+                        <IonList>
+                          {members
+                            ? members.map((member) => (
+                                <IonItem key={member}>
+                                  {" "}
+                                  <UserProfileChip
+                                    address={member}
+                                    userProfiles={userProfiles}
+                                  />
+                                </IonItem>
+                              ))
+                            : ""}
+                        </IonList>
+                      </IonItem>
+                    </>
+                  ) : (
+                    ""
+                  )}
                 </IonList>
               </IonCardContent>
             </IonCard>
           ) : selectedTab == TABS.MESSAGES ? (
-            <OrganizationMessages organization={organization} />
+            <OrganizationMessages organizationName={organizationName} />
           ) : (
             <OrganizationAdministration
-              organization={organization}
-              setOrganization={setOrganization}
+              organizationName={organizationName}
+              isTezosOrganization={isTezosOrganization}
               members={members}
             />
           )}

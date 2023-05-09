@@ -7,14 +7,13 @@ import {
   IonSkeletonText,
   IonThumbnail,
 } from "@ionic/react";
-import { Organization } from "../App";
 
 type OrganizationProps = {
-  organization: Organization | undefined;
+  organizationName: string | undefined;
 };
 
 export const OrganizationMessages = ({
-  organization,
+  organizationName,
 }: OrganizationProps): JSX.Element => {
   return (
     <IonContent className="ion-padding">

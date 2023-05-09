@@ -17,6 +17,8 @@ import {
   IonList,
   IonModal,
   IonRow,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonToggle,
   IonToolbar,
@@ -33,13 +35,7 @@ import {
   trashBinOutline,
   trashOutline,
 } from "ionicons/icons";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
@@ -47,14 +43,14 @@ import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
 
 type OrganizationProps = {
-  organization: Organization | undefined;
-  setOrganization: Dispatch<SetStateAction<Organization | undefined>>;
+  organizationName: string | undefined;
+  isTezosOrganization: boolean;
   members: address[];
 };
 
 export const OrganizationAdministration = ({
-  organization,
-  setOrganization,
+  organizationName,
+  isTezosOrganization,
   members,
 }: OrganizationProps): JSX.Element => {
   const {
@@ -74,6 +70,8 @@ export const OrganizationAdministration = ({
   } = React.useContext(UserContext) as UserContextType;
 
   const [presentAlert] = useIonAlert();
+
+  const [organization, setOrganization] = useState<Organization>();
 
   //member requests
   const [membersToApprove, setMembersToApprove] = useState<address[]>([]);
@@ -284,23 +282,19 @@ export const OrganizationAdministration = ({
   };
 
   useEffect(() => {
-    setMembersToApprove(
-      organization?.memberRequests
-        ? organization?.memberRequests.map((mr) => mr.user)
-        : []
-    );
-    setMembersToDecline([]);
-  }, [organization, storage, userAddress]);
+    if (organizationName) {
+      const organization = !isTezosOrganization
+        ? storage?.organizations.find((org) => org.name === organizationName)
+        : storage?.tezosOrganization;
 
-  useEffect(() => {
-    //need to refresh in case of storage changes
-    if (organization) {
-      const org = storage?.organizations.find(
-        (orgItem) => orgItem.name === organization.name
+      setMembersToApprove(
+        organization?.memberRequests
+          ? organization?.memberRequests.map((mr) => mr.user)
+          : []
       );
-      if (org) setOrganization(org);
+      setMembersToDecline([]);
     }
-  }, [storage, userAddress]);
+  }, [organizationName, storage, userAddress]);
 
   return (
     <IonContent className="ion-padding">
@@ -413,12 +407,11 @@ export const OrganizationAdministration = ({
                     </IonToolbar>
                   </IonHeader>
                   <IonContent color="light" class="ion-padding">
-                    <IonInput
+                    <IonSelect
+                      interface="action-sheet"
                       labelPlacement="floating"
-                      color="primary"
                       value={selectedAdmin}
                       label="New admin *"
-                      type="text"
                       onIonChange={(str) => {
                         if (
                           str.detail.value === undefined ||
@@ -431,12 +424,21 @@ export const OrganizationAdministration = ({
                           setSelectedAdminIsValid(true);
                         }
                       }}
-                      helperText="Enter the address of the new administrator of the organization"
-                      errorText="Adress is required"
                       className={`${selectedAdminIsValid && "ion-valid"} ${
                         selectedAdminIsValid === false && "ion-invalid"
                       } ion-touched `}
-                    />
+                    >
+                      {members
+                        .filter((member) => member != userAddress)
+                        .map((member) => (
+                          <IonSelectOption key={member} value={member}>
+                            <UserProfileChip
+                              address={member}
+                              userProfiles={userProfiles}
+                            />
+                          </IonSelectOption>
+                        ))}
+                    </IonSelect>
                   </IonContent>
                 </IonModal>
               </>
@@ -446,7 +448,7 @@ export const OrganizationAdministration = ({
           </IonItem>
         ))}
 
-        {organization?.name !== storage?.tezosOrganization.name ? (
+        {!isTezosOrganization ? (
           <>
             <IonList>
               <IonTitle>

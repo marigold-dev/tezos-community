@@ -111,9 +111,11 @@ export const OrganizationsScreen: React.FC = () => {
     useState<Organization[]>();
   //////////////
 
-  const [selectedOrganization, setSelectedOrganization] = useState<
-    Organization | undefined
+  const [selectedOrganizationName, setSelectedOrganizationName] = useState<
+    string | undefined
   >();
+  const [isTezosOrganization, setIsTezosOrganization] =
+    useState<boolean>(false);
 
   const bigMapsService = new BigMapsService({
     baseUrl: "https://api.ghostnet.tzkt.io",
@@ -178,14 +180,27 @@ export const OrganizationsScreen: React.FC = () => {
           })
         );
 
-        if (myOrganizations.length > 0 && !selectedOrganization)
-          setSelectedOrganization(myOrganizations[0]);
+        if (myOrganizations.length > 0 && !selectedOrganizationName) {
+          setSelectedOrganizationName(myOrganizations[0].name); //init
+          setIsTezosOrganization(false);
+        }
         console.log("myOrganizations", myOrganizations);
       } else {
         console.log("storage is not ready yet");
       }
     })();
   }, [storage, userAddress]);
+
+  useEffect(() => {
+    if (
+      myOrganizations &&
+      myOrganizations.length > 0 &&
+      !selectedOrganizationName
+    ) {
+      setSelectedOrganizationName(myOrganizations[0].name); //init
+      setIsTezosOrganization(false);
+    }
+  }, []);
 
   useEffect(
     //default organization to join. I can join only organization I am not member of
@@ -655,14 +670,17 @@ export const OrganizationsScreen: React.FC = () => {
                 ) >= 0 ? (
                   <IonItem
                     fill={
-                      selectedOrganization?.name ===
+                      selectedOrganizationName ===
                       storage.tezosOrganization.name
                         ? "outline"
                         : undefined
                     }
-                    onClick={() =>
-                      setSelectedOrganization(storage.tezosOrganization)
-                    }
+                    onClick={() => {
+                      setSelectedOrganizationName(
+                        storage.tezosOrganization.name
+                      );
+                      setIsTezosOrganization(true);
+                    }}
                     lines="none"
                     key={storage.tezosOrganization.name}
                   >
@@ -688,12 +706,13 @@ export const OrganizationsScreen: React.FC = () => {
                 {myOrganizations?.map((organization) => (
                   <IonItem
                     fill={
-                      selectedOrganization?.name === organization.name
+                      selectedOrganizationName === organization.name
                         ? "outline"
                         : undefined
                     }
                     onClick={() => {
-                      setSelectedOrganization(organization);
+                      setSelectedOrganizationName(organization.name);
+                      setIsTezosOrganization(false);
                     }}
                     lines="none"
                     key={organization.name}
@@ -713,8 +732,8 @@ export const OrganizationsScreen: React.FC = () => {
               </IonContent>
             </IonMenu>
             <OrganizationScreen
-              setOrganization={setSelectedOrganization}
-              organization={selectedOrganization}
+              organizationName={selectedOrganizationName}
+              isTezosOrganization={isTezosOrganization}
             />
           </IonSplitPane>
         )}
