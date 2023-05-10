@@ -14,6 +14,34 @@
                     "destination": "https://ghostnet.tezos.marigold.dev"
                 }
             ]
+        },
+        "@taqueria/plugin-taquito.deploy.1683759486522": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1683759486522,
+            "output": [
+                {
+                    "contract": "nft.tz",
+                    "address": "KT1ScBUgQH2TTxJQuocwF6pzgRLDcrGwDUwB",
+                    "alias": "nft",
+                    "balanceInMutez": "0",
+                    "destination": "https://ghostnet.tezos.marigold.dev"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1683759509639": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1683759509639,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT1FpWqxQuyYjxEz1DxnCu6gXJaYsuJtS6Mp",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://ghostnet.tezos.marigold.dev"
+                }
+            ]
         }
     }
 }
