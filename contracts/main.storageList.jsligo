@@ -8,7 +8,7 @@ const default_storage =
       name: "TEZOS",
       business: "Save the planet",
       siteUrl: "https://tezos.com",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
+      logoUrl: "https://bit.ly/TZIMAGE",
       ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
       members: Big_map.empty as big_map<address, unit>,
       admins: Set.literal(
@@ -34,7 +34,7 @@ const mainnet =
       name: "TEZOS",
       business: "Save the planet",
       siteUrl: "https://tezos.com",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
+      logoUrl: "https://bit.ly/TZIMAGE",
       ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
       members: Big_map.empty as big_map<address, unit>,
       admins: Set.literal(
