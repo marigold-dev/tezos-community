@@ -84,6 +84,7 @@ type Methods = {
     membersToDecline: Array<address>,
     orgName: string
   ) => Promise<void>;
+  sendMessage: (_0: string, _1: string) => Promise<void>;
 };
 
 type MethodsObject = {
@@ -117,6 +118,7 @@ type MethodsObject = {
     membersToDecline: Array<address>;
     orgName: string;
   }) => Promise<void>;
+  sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
 };
 
 type contractTypes = {

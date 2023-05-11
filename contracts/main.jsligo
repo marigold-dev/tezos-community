@@ -510,3 +510,10 @@ const responseToJoinOrganization = (
   )
 };
 
+export /* @entry */
+const sendMessage = ([to, message]: [string, string], store: storage): _return => {
+  return [
+    list([Tezos.emit("%message", [Tezos.get_source(), to, message])]),
+    store
+  ]
+};

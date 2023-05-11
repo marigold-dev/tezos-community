@@ -21,13 +21,14 @@ import {
   IonSpinner,
   IonSplitPane,
   IonText,
+  IonTextarea,
   IonThumbnail,
   IonTitle,
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
-import { addCircle, ellipse, peopleCircle } from "ionicons/icons";
+import { addCircle, ellipse, mailOutline, peopleCircle } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import {
@@ -109,6 +110,19 @@ export const OrganizationsScreen: React.FC = () => {
   >();
   const [joiningOrganizations, setJoiningOrganizations] =
     useState<Organization[]>();
+
+  //modal write
+  const modalWrite = useRef<HTMLIonModalElement>(null);
+  const [message, setMessage] = useState<string>("");
+  const [messageIsValid, setMessageIsValid] = useState<boolean>(false);
+  const [messageMarkTouched, setMessageMarkTouched] = useState<boolean>(false);
+
+  const [messagingOrganizations, setMessagingOrganizations] =
+    useState<Organization[]>();
+  const [messagingOrganization, setMessagingOrganization] = useState<
+    Organization | undefined
+  >();
+
   //////////////
 
   const [selectedOrganizationName, setSelectedOrganizationName] = useState<
@@ -212,6 +226,10 @@ export const OrganizationsScreen: React.FC = () => {
             "active" in org.status
         )
       );
+
+      setMessagingOrganizations(
+        storage?.organizations.filter((org) => "active" in org.status)
+      );
     },
     [myOrganizations]
   );
@@ -294,6 +312,33 @@ export const OrganizationsScreen: React.FC = () => {
     setLoading(false);
   };
 
+  const writeToOrganization = async () => {
+    console.log("writeToOrganization", Tezos);
+
+    try {
+      setLoading(true);
+
+      const op = await mainWalletType!.methods
+        .sendMessage(messagingOrganization!.name, message)
+        .send();
+
+      await op.confirmation();
+
+      await modalWrite.current?.dismiss();
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
   return (
     <IonPage className="container">
       <Header history={history} location={location} match={match} />
@@ -334,7 +379,12 @@ export const OrganizationsScreen: React.FC = () => {
                     Join an organization
                   </IonButton>
                 </IonItem>
-
+                <IonItem lines="none">
+                  <IonButton id="writeToOrganization" color="transparent">
+                    <IonIcon slot="start" icon={mailOutline}></IonIcon>
+                    Write to an organization
+                  </IonButton>
+                </IonItem>
                 <IonModal trigger="joinFromOrganizations" ref={modalJoin}>
                   <IonHeader>
                     <IonToolbar>
@@ -661,6 +711,123 @@ export const OrganizationsScreen: React.FC = () => {
                         );
                       }}
                     />
+                  </IonContent>
+                </IonModal>
+
+                <IonModal trigger="writeToOrganization" ref={modalWrite}>
+                  <IonHeader>
+                    <IonToolbar>
+                      <IonButtons slot="start">
+                        <IonButton
+                          onClick={() => modalWrite.current?.dismiss()}
+                        >
+                          Cancel
+                        </IonButton>
+                      </IonButtons>
+                      <IonTitle>Write message</IonTitle>
+                      <IonButtons slot="end">
+                        <IonButton
+                          onClick={writeToOrganization}
+                          disabled={!messageIsValid || !messagingOrganization}
+                        >
+                          Send
+                        </IonButton>
+                      </IonButtons>
+                    </IonToolbar>
+                    <IonToolbar>
+                      <IonSearchbar
+                        onIonInput={(ev) => {
+                          const target = ev.target as HTMLIonSearchbarElement;
+                          console.log("target.value", target.value);
+
+                          if (
+                            target &&
+                            target !== undefined &&
+                            target.value?.trim() !== ""
+                          ) {
+                            setMessagingOrganizations(
+                              storage?.organizations.filter(
+                                (orgItem) =>
+                                  orgItem.name
+                                    .toLowerCase()
+                                    .indexOf(target.value!.toLowerCase()) >=
+                                    0 && "active" in orgItem.status
+                              )
+                            );
+                          } else {
+                            setMessagingOrganizations(
+                              storage?.organizations.filter(
+                                (org) => "active" in org.status
+                              )
+                            );
+                          }
+                        }}
+                      ></IonSearchbar>
+                    </IonToolbar>
+                  </IonHeader>
+
+                  <IonContent color="light" class="ion-padding">
+                    <IonTextarea
+                      rows={4}
+                      labelPlacement="floating"
+                      color="primary"
+                      value={message}
+                      label="Message *"
+                      placeholder="Type here ..."
+                      maxlength={280}
+                      counter
+                      onIonChange={(str) => {
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setMessageIsValid(false);
+                        } else {
+                          setMessage(str.target.value as string);
+                          setMessageIsValid(true);
+                        }
+                      }}
+                      helperText="Enter a message"
+                      errorText="Message is required"
+                      className={`${messageIsValid && "ion-valid"} ${
+                        messageIsValid === false && "ion-invalid"
+                      } ${messageMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setMessageMarkTouched(true)}
+                    />
+
+                    <IonText>Select an organization *</IonText>
+                    <IonList id="modal-list" inset={true}>
+                      {messagingOrganizations &&
+                        messagingOrganizations.map((organization) => (
+                          <IonItem
+                            fill={
+                              messagingOrganization?.name === organization.name
+                                ? "outline"
+                                : undefined
+                            }
+                            onClick={() => {
+                              setMessagingOrganization(organization);
+                            }}
+                            lines="none"
+                            key={organization.name}
+                          >
+                            <IonTitle>{organization.name}</IonTitle>
+                            <IonText>
+                              <i>{organization.business}</i>
+                            </IonText>
+                            <IonThumbnail slot="start">
+                              <IonImg alt="." src={organization.logoUrl} />
+                            </IonThumbnail>
+                            <IonIcon
+                              size="small"
+                              slot="end"
+                              icon={ellipse}
+                              color={getStatusColor(organization)}
+                            />
+                          </IonItem>
+                        ))}
+                    </IonList>
                   </IonContent>
                 </IonModal>
 
