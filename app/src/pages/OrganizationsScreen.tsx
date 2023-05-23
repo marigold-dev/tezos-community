@@ -1,4 +1,3 @@
-import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
 import {
   IonButton,
   IonButtons,
@@ -27,6 +26,8 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
+import * as api from "@tzkt/sdk-api";
+import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import { addCircle, ellipse, mailOutline, peopleCircle } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
@@ -45,6 +46,8 @@ import { getStatusColor, getUserProfile } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
+  api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
+
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const location = useLocation();
@@ -131,26 +134,22 @@ export const OrganizationsScreen: React.FC = () => {
   const [isTezosOrganization, setIsTezosOrganization] =
     useState<boolean>(false);
 
-  const bigMapsService = new BigMapsService({
-    baseUrl: "https://api.ghostnet.tzkt.io",
-    version: "",
-    withCredentials: false,
-  });
-
   useEffect(() => {
     (async () => {
       if (storage && storage.organizations) {
         let orgMembers: Map<string, address[]> = new Map();
         await Promise.all(
-          storage.organizations.map(async (organization) => {
+          storage.organizations.map(async (organization: Organization) => {
             const membersBigMapId = (
               organization.members as unknown as { id: BigNumber }
             ).id.toNumber();
 
-            const keys: BigMapKey[] = await bigMapsService.getKeys({
-              id: membersBigMapId,
-              micheline: MichelineFormat.JSON,
-            });
+            const keys: BigMapKey[] = await api.bigMapsGetKeys(
+              membersBigMapId,
+              {
+                micheline: "Json",
+              }
+            );
 
             orgMembers.set(
               organization.name,
@@ -178,7 +177,7 @@ export const OrganizationsScreen: React.FC = () => {
         setOrgMembers(orgMembers); //refresh cache
 
         setMyOrganizations(
-          storage.organizations.filter((org) => {
+          storage.organizations.filter((org: Organization) => {
             const members = orgMembers.get(org.name);
 
             if (
@@ -221,14 +220,16 @@ export const OrganizationsScreen: React.FC = () => {
     () => {
       setJoiningOrganizations(
         storage?.organizations.filter(
-          (org) =>
+          (org: Organization) =>
             orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0 &&
             "active" in org.status
         )
       );
 
       setMessagingOrganizations(
-        storage?.organizations.filter((org) => "active" in org.status)
+        storage?.organizations.filter(
+          (org: Organization) => "active" in org.status
+        )
       );
     },
     [myOrganizations]
@@ -422,14 +423,14 @@ export const OrganizationsScreen: React.FC = () => {
                             setJoiningOrganizations(
                               storage?.organizations
                                 .filter(
-                                  (org) =>
+                                  (org: Organization) =>
                                     orgMembers
                                       .get(org.name)!
                                       ?.indexOf(userAddress as address) < 0 &&
                                     "active" in org.status
                                 )
                                 .filter(
-                                  (orgItem) =>
+                                  (orgItem: Organization) =>
                                     orgItem.name
                                       .toLowerCase()
                                       .indexOf(target.value!.toLowerCase()) >= 0
@@ -438,7 +439,7 @@ export const OrganizationsScreen: React.FC = () => {
                           } else {
                             setJoiningOrganizations(
                               storage?.organizations.filter(
-                                (org) =>
+                                (org: Organization) =>
                                   orgMembers
                                     .get(org.name)!
                                     ?.indexOf(userAddress as address) < 0 &&
@@ -747,7 +748,7 @@ export const OrganizationsScreen: React.FC = () => {
                           ) {
                             setMessagingOrganizations(
                               storage?.organizations.filter(
-                                (orgItem) =>
+                                (orgItem: Organization) =>
                                   orgItem.name
                                     .toLowerCase()
                                     .indexOf(target.value!.toLowerCase()) >=
@@ -757,7 +758,7 @@ export const OrganizationsScreen: React.FC = () => {
                           } else {
                             setMessagingOrganizations(
                               storage?.organizations.filter(
-                                (org) => "active" in org.status
+                                (org: Organization) => "active" in org.status
                               )
                             );
                           }

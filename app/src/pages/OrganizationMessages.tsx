@@ -1,12 +1,8 @@
-import {
-  IonContent,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
-  IonSkeletonText,
-  IonThumbnail,
-} from "@ionic/react";
+import { IonContent, IonItem, IonLabel, IonList } from "@ionic/react";
+import * as api from "@tzkt/sdk-api";
+import React, { useEffect, useState } from "react";
+import { UserContext, UserContextType } from "../App";
+import { UserProfileChip } from "../components/UserProfileChip";
 
 type OrganizationProps = {
   organizationName: string | undefined;
@@ -15,40 +11,56 @@ type OrganizationProps = {
 export const OrganizationMessages = ({
   organizationName,
 }: OrganizationProps): JSX.Element => {
+  api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
+
+  const {
+    Tezos,
+    wallet,
+    userAddress,
+    userBalance,
+    userProfiles,
+    storage,
+    mainWalletType,
+    setStorage,
+    setUserAddress,
+    setUserBalance,
+    setLoading,
+    loading,
+    refreshStorage,
+  } = React.useContext(UserContext) as UserContextType;
+
+  const [contractEvents, setcontractEvents] = useState<api.ContractEvent[]>([]);
+
+  const fetchMessages = async () => {
+    const contractEvents: api.ContractEvent[] =
+      await api.eventsGetContractEvents({
+        contract: { eq: process.env.REACT_APP_CONTRACT_ADDRESS! },
+        tag: { eq: "message" },
+        payload: { eq: { jsonValue: organizationName!, jsonPath: "string_0" } },
+      });
+    setcontractEvents(contractEvents);
+
+    console.log("Events", contractEvents);
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, [organizationName]);
+
   return (
     <IonContent className="ion-padding">
       <IonList>
-        <IonListHeader>
-          <IonSkeletonText
-            animated={true}
-            style={{ "width": "80px" }}
-          ></IonSkeletonText>
-        </IonListHeader>
-        <IonItem>
-          <IonThumbnail slot="start">
-            <IonSkeletonText animated={true}></IonSkeletonText>
-          </IonThumbnail>
-          <IonLabel>
-            <h3>
-              <IonSkeletonText
-                animated={true}
-                style={{ "width": "80%" }}
-              ></IonSkeletonText>
-            </h3>
-            <p>
-              <IonSkeletonText
-                animated={true}
-                style={{ "width": "60%" }}
-              ></IonSkeletonText>
-            </p>
-            <p>
-              <IonSkeletonText
-                animated={true}
-                style={{ "width": "30%" }}
-              ></IonSkeletonText>
-            </p>
-          </IonLabel>
-        </IonItem>
+        {contractEvents.map((ev) => (
+          <IonItem key={ev.id}>
+            <IonLabel>
+              <UserProfileChip
+                userProfiles={userProfiles}
+                address={ev.payload.address}
+              ></UserProfileChip>{" "}
+            </IonLabel>
+            <IonLabel>{ev.payload.string_1}</IonLabel>
+          </IonItem>
+        ))}
       </IonList>
     </IonContent>
   );

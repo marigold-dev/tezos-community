@@ -1,4 +1,6 @@
-import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
+import * as api from "@tzkt/sdk-api";
+import { BigMapKey } from "@tzkt/sdk-api";
+
 import {
   IonBadge,
   IonButton,
@@ -62,6 +64,9 @@ export const OrganizationScreen = ({
     userProfiles,
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
+
+  api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
+
   const [presentAlert] = useIonAlert();
 
   const [organization, setOrganization] = useState<Organization | undefined>(
@@ -75,12 +80,6 @@ export const OrganizationScreen = ({
   const modalTransfer = useRef<HTMLIonModalElement>(null);
   const [amount, setAmount] = useState<number>(0);
   const [amountIsValid, setAmountIsValid] = useState<boolean>(false);
-
-  const bigMapsService = new BigMapsService({
-    baseUrl: "https://api.ghostnet.tzkt.io",
-    version: "",
-    withCredentials: false,
-  });
 
   const transfer = async () => {
     console.log("transfer", Tezos);
@@ -115,16 +114,17 @@ export const OrganizationScreen = ({
   const refreshOrganization = async () => {
     if (organizationName) {
       const organization = !isTezosOrganization
-        ? storage?.organizations.find((org) => org.name === organizationName)
+        ? storage?.organizations.find(
+            (org: Organization) => org.name === organizationName
+          )
         : storage?.tezosOrganization;
 
       const membersBigMapId = (
         organization?.members as unknown as { id: BigNumber }
       ).id.toNumber();
 
-      const keys: BigMapKey[] = await bigMapsService.getKeys({
-        id: membersBigMapId,
-        micheline: MichelineFormat.JSON,
+      const keys: BigMapKey[] = await api.bigMapsGetKeys(membersBigMapId, {
+        micheline: "Json",
       });
 
       setMembers(

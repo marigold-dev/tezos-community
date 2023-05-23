@@ -19,7 +19,7 @@ taq install @taqueria/plugin-ligo@next
 Compile with last version
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.64.3 taq compile nft.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile nft.jsligo
 ```
 
 ### Registry
@@ -27,13 +27,13 @@ TAQ_LIGO_IMAGE=ligolang/ligo:0.64.3 taq compile nft.jsligo
 Compile with last version
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.64.3 taq compile main.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile main.jsligo
 ```
 
 Run test
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.64.3 taq test test.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq test test.jsligo
 ```
 
 ## Deploy
@@ -72,7 +72,7 @@ taq deploy nft.tz -e "testing"
 Compile again as you need to have the last nft deployment address to change the initial storage file, then deploy
 
 ```
-TAQ_LIGO_IMAGE=ligolang/ligo:0.64.3 taq compile main.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile main.jsligo
 taq deploy main.tz -e "testing" --storage main.storage.ghostnet.tz
 
 or
@@ -83,7 +83,7 @@ taq deploy main.tz -e "production" --storage main.storage.mainnet.tz
 # Mobile app
 
 ```
-taq install @taqueria/plugin-contract-types@next
+taq install @taqueria/plugin-contract-types
 taq generate types ./app/src
 cd app
 npm run postinstall

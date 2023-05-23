@@ -36,7 +36,12 @@ import {
   trashOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
-import { Organization, UserContext, UserContextType } from "../App";
+import {
+  MemberRequest,
+  Organization,
+  UserContext,
+  UserContextType,
+} from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
 import { UserProfileChip } from "../components/UserProfileChip";
@@ -291,12 +296,14 @@ export const OrganizationAdministration = ({
   const refreshOrganization = () => {
     if (organizationName) {
       const organization = !isTezosOrganization
-        ? storage?.organizations.find((org) => org.name === organizationName)
+        ? storage?.organizations.find(
+            (org: Organization) => org.name === organizationName
+          )
         : storage?.tezosOrganization;
 
       setMembersToApprove(
         organization?.memberRequests
-          ? organization?.memberRequests.map((mr) => mr.user)
+          ? organization?.memberRequests.map((mr: MemberRequest) => mr.user)
           : []
       );
       setMembersToDecline([]);
@@ -583,7 +590,7 @@ export const OrganizationAdministration = ({
                 </IonBadge>
               </IonTitle>
 
-              {storage?.organizations.map((org) => (
+              {storage?.organizations.map((org: Organization) => (
                 <IonItem key={org.name}>
                   {org.name}
                   <IonIcon

@@ -71,21 +71,23 @@ export type UserProfile = {
   verified: boolean;
 };
 
+export type MemberRequest = {
+  joinRequest: {
+    contactId: string;
+    contactIdProvider: string;
+    orgName: string;
+    reason: string;
+  };
+  user: address;
+};
+
 export type Organization = {
   admins: Array<address>;
   business: string;
   fundingAddress?: address;
   ipfsNftUrl: string;
   logoUrl: string;
-  memberRequests: Array<{
-    joinRequest: {
-      contactId: string;
-      contactIdProvider: string;
-      orgName: string;
-      reason: string;
-    };
-    user: address;
-  }>;
+  memberRequests: Array<MemberRequest>;
   members: BigMap<address, unit>;
   name: string;
   siteUrl: string;
@@ -281,7 +283,7 @@ const App: React.FC = () => {
 
           //only for organization administrators
           const myOrganizationsAsAdmin = storage?.organizations.filter(
-            (orgItem) =>
+            (orgItem: Organization) =>
               orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
           );
           console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
@@ -297,7 +299,7 @@ const App: React.FC = () => {
               if (
                 (!e.result.errors || e.result.errors.length === 0) &&
                 myOrganizationsAsAdmin.findIndex(
-                  (orgItem) => orgItem.name === orgname
+                  (orgItem: Organization) => orgItem.name === orgname
                 ) >= 0
               ) {
                 await LocalNotifications.schedule({
