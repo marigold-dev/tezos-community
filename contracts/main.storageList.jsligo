@@ -1,24 +1,54 @@
-#include "./main.jsligo" 
-
-const default_storage = {
-    memberProfileVerified : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
-    tezosOrganization : 
-    {
-      name : "TEZOS",
-      business : "Save the planet",
-      siteUrl : "https://tezos.com",
-      logoUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
-      ipfsNftUrl : "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
-      members : Big_map.empty as big_map<address,unit>,
-      admins : Set.literal(list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])) as set<address>,
-      status : ACTIVE(),
-      memberRequests : Set.empty as set<joinOrganizationRequest>,
-      verified : true
+#include "./main.jsligo"
+const default_storage =
+  {
+    memberProfileVerified: Set.literal(
+      list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])
+    ) as set<address>,
+    tezosOrganization: {
+      name: "TEZOS",
+      business: "Save the planet",
+      siteUrl: "https://tezos.com",
+      logoUrl: "https://bit.ly/TZIMAGE",
+      ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
+      members: Big_map.empty as big_map<address, unit>,
+      admins: Set.literal(
+        list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])
+      ) as set<address>,
+      status: Active(),
+      memberRequests: Set.empty as set<joinOrganizationRequest>,
+      verified: true,
+      fundingAddress: None() as option<address>
     },
-    organizations : list([]) as list<organization>,
-    organizationMax : 100 as nat,
-    adminsMax : 50 as nat,
-    nftAddress : "KT1D9hiv2vmqBDsdoa3tyervd5vAFZRBdNsr" as address
-};
+    organizations: list([]) as list<organization>,
+    organizationMax: 100 as nat,
+    adminsMax: 50 as nat,
+    nftAddress: "KT1D9hiv2vmqBDsdoa3tyervd5vAFZRBdNsr" as address
+  };
 
+const mainnet =
+  {
+    memberProfileVerified: Set.literal(
+      list(["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address])
+    ) as set<address>,
+    tezosOrganization: {
+      name: "TEZOS",
+      business: "Save the planet",
+      siteUrl: "https://tezos.com",
+      logoUrl: "https://bit.ly/TZIMAGE",
+      ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
+      members: Big_map.empty as big_map<address, unit>,
+      admins: Set.literal(
+        list(["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address])
+      ) as set<address>,
+      status: Active(),
+      memberRequests: Set.empty as set<joinOrganizationRequest>,
+      verified: true,
+      fundingAddress: None() as option<address>
+    },
+    organizations: list([]) as list<organization>,
+    organizationMax: 100 as nat,
+    adminsMax: 50 as nat,
+    nftAddress: "KT1D9hiv2vmqBDsdoa3tyervd5vAFZRBdNsr" as address
+  };
 
+const ghostnet = default_storage;

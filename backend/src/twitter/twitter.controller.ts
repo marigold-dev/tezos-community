@@ -1,86 +1,52 @@
 import {
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Response,
+  Query,
+  Req,
+  Res,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { log } from 'console';
 import * as express from 'express';
-import { SOCIAL_ACCOUNT_TYPE } from 'src/userprofiles/UserProfile';
-import { UserProfilesService } from '../userprofiles/userprofiles.service';
-import { TwitterService } from './twitter.service';
+import { EventsGateway } from 'src/EventsGateway';
+import { UserProfile } from 'src/userprofiles/UserProfile';
+import { UserProfilesService } from 'src/userprofiles/userprofiles.service';
 
 @Controller('twitter')
 export class TwitterController {
   constructor(
-    private twitterService: TwitterService,
-    private userProfileService: UserProfilesService,
+    private eg: EventsGateway,
+    private userProfilesService: UserProfilesService,
   ) {}
 
+  @UseGuards(AuthGuard('twitter'))
+  @Get()
+  async twitter() {}
+
+  @UseGuards(AuthGuard('twitter'))
   @Get('callback')
-  async callback(@Param('code') code: string, @Param('state') state: string) {
-    console.log('Calling Twitter callback', code, state);
-    try {
-      const socialAccountAlias = state;
-      const token = await this.twitterService.authClient.requestAccessToken(
-        code as string,
-      );
-      console.log('user token set', token);
-      this.twitterService.authClient.token = token.token;
-
-      const res = await this.twitterService.twitterClient.users.findMyUser();
-      if (res && res.data && !res.errors) {
-        console.log('res ', res);
-
-        if (res.data.username == socialAccountAlias) {
-          let up =
-            await this.userProfileService.getUserProfileFromSocialAccount(
-              SOCIAL_ACCOUNT_TYPE.TWITTER,
-              res.data.username,
-            );
-          if (up) {
-            up.verified = true;
-            await this.userProfileService.save(up);
-          } else {
-            throw new HttpException(
-              'Cannot find existing user from social type ' +
-                SOCIAL_ACCOUNT_TYPE.TWITTER +
-                ' and alias ' +
-                res.data.username,
-              HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-          }
-        } else {
-          throw new HttpException(
-            'Mismatch users : original call was : ' +
-              socialAccountAlias +
-              ' by callback response is for user ' +
-              res.data.username,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
-      } else {
-        throw new HttpException(
-          res.errors!.map((err) => err.title).join(', '),
-          HttpStatus.NOT_FOUND,
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  @Get('login/:socialAccountAlias')
-  async login(
-    @Response() response: express.Response,
-    @Param('socialAccountAlias') socialAccountAlias: string,
+  async twitterCallback(
+    @Req() req: any,
+    @Res() res: express.Response,
+    @Query('userAddress') userAddress: string,
+    @Session() session: Record<string, any>,
   ) {
-    console.log('Calling Twitter login and redirect user');
-    const authUrl = this.twitterService.authClient.generateAuthURL({
-      state: socialAccountAlias,
-      code_challenge_method: 's256',
-    });
-    response.redirect(authUrl);
+    log('*******Twitter callback received : ', req.user);
+
+    log('******* check now session', session);
+
+    const up = await this.userProfilesService.save(
+      new UserProfile(
+        session.userAddress,
+        req.user.displayName,
+        req.user.provider,
+        req.user?.username,
+        req.user?.photo.replace(/_normal/, ''),
+      ),
+    );
+    this.eg.server.emit('twitter', up);
+    res.end();
   }
 }

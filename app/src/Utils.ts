@@ -1,9 +1,9 @@
 import { Organization, UserProfile } from "./App";
 
 export const getStatusColor = (org: Organization): string => {
-  return "aCTIVE" in org.status
+  return "active" in org.status
     ? "success"
-    : "fROZEN" in org.status
+    : "frozen" in org.status
     ? "danger"
     : "warning";
 };

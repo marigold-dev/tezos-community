@@ -1,24 +1,36 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HealthcheckModule } from './healthcheck/healthcheck.module';
 import { TwitterModule } from './twitter/twitter.module';
 import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
+import { SiwtModule } from './siwt/siwt.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'mongodb',
-      url: 'mongodb+srv://admin:adminadmin@cluster0.rwypvvm.mongodb.net/?retryWrites=true&w=majority',
-      database: 'mongo',
-      useNewUrlParser: true,
-      synchronize: true,
-      logging: true,
-      entities: [UserProfile],
+    ConfigModule.forRoot({ envFilePath: `.env.${process.env.NODE_ENV}` }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mongodb',
+        url: `mongodb+srv://${configService.get(
+          'MONGO_USER',
+        )}:${configService.get('MONGO_PASSWORD')}@${configService.get(
+          'MONGO_HOST',
+        )}/?retryWrites=true&w=majority`,
+        database: configService.get('MONGO_DATABASE'),
+        useNewUrlParser: true,
+        synchronize: true,
+        logging: true,
+        entities: [UserProfile],
+      }),
+      inject: [ConfigService],
     }),
     UserProfilesModule,
     TwitterModule,
+    HealthcheckModule,
+    SiwtModule,
   ],
   controllers: [],
   providers: [],

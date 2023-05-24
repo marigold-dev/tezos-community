@@ -6,7 +6,7 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
-
+import { Socket, io } from "socket.io-client";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -67,29 +67,30 @@ export type UserProfile = {
   displayName: string;
   socialAccountType: SOCIAL_ACCOUNT_TYPE;
   socialAccountAlias: string;
-  proof: string;
-  proofDate: Date;
-  verified: boolean;
+  photo: string;
+};
+
+export type MemberRequest = {
+  joinRequest: {
+    contactId: string;
+    contactIdProvider: string;
+    orgName: string;
+    reason: string;
+  };
+  user: address;
 };
 
 export type Organization = {
   admins: Array<address>;
   business: string;
+  fundingAddress?: address;
   ipfsNftUrl: string;
   logoUrl: string;
-  memberRequests: Array<{
-    joinRequest: {
-      contactId: string;
-      contactIdProvider: string;
-      orgName: string;
-      reason: string;
-    };
-    user: address;
-  }>;
+  memberRequests: Array<MemberRequest>;
   members: BigMap<address, unit>;
   name: string;
   siteUrl: string;
-  status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+  status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
   verified: boolean;
 };
 
@@ -111,17 +112,26 @@ export type UserContextType = {
   setLoading: Dispatch<SetStateAction<boolean>>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
+  socket: Socket;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
+  const socket: Socket = io(process.env.REACT_APP_BACKEND_URL!);
+
   const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit("https://ghostnet.tezos.marigold.dev")
+    new TezosToolkit(
+      "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev"
+    )
   );
   const [wallet, setWallet] = useState<BeaconWallet>(
     new BeaconWallet({
       name: "TzCommunity",
-      preferredNetwork: NetworkType.GHOSTNET,
+      preferredNetwork: process.env.REACT_APP_NETWORK
+        ? NetworkType[
+            process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
+          ]
+        : NetworkType.GHOSTNET,
     })
   );
   const [userAddress, setUserAddress] = useState<string>("");
@@ -176,11 +186,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     Tezos.setWalletProvider(wallet);
+    setTezos(Tezos); //object changed and needs propagation
+
     (async () => {
       console.log("After wallet change I refresh storage");
       await refreshStorage();
     })();
-  }, [wallet]);
+  }, [userAddress]);
 
   //subscriptions
   useEffect(() => {
@@ -279,7 +291,7 @@ const App: React.FC = () => {
 
           //only for organization administrators
           const myOrganizationsAsAdmin = storage?.organizations.filter(
-            (orgItem) =>
+            (orgItem: Organization) =>
               orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
           );
           console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
@@ -295,9 +307,9 @@ const App: React.FC = () => {
               if (
                 (!e.result.errors || e.result.errors.length === 0) &&
                 myOrganizationsAsAdmin.findIndex(
-                  (orgItem) => orgItem.name === orgname
+                  (orgItem: Organization) => orgItem.name === orgname
                 ) >= 0
-              )
+              ) {
                 await LocalNotifications.schedule({
                   notifications: [
                     {
@@ -311,7 +323,9 @@ const App: React.FC = () => {
                     },
                   ],
                 });
-              else
+
+                await refreshStorage(); //we need to refresh automaticcaly to display new user requests
+              } else
                 console.log(
                   "Warning : here we ignore a failing transaction event"
                 );
@@ -426,10 +440,14 @@ const App: React.FC = () => {
 
         try {
           //always refresh userProfile
+
           const newUserProfile = await getUserProfile(userAddress);
           userProfiles.set(userAddress as address, newUserProfile);
           setUserProfiles(userProfiles);
-          console.log("userProfile refreshed for " + userAddress);
+          console.log(
+            "userProfile refreshed for " + userAddress,
+            newUserProfile
+          );
         } catch (error) {
           console.log("No user profile found..");
         }
@@ -495,6 +513,7 @@ const App: React.FC = () => {
           setLoading,
           refreshStorage,
           nftContratTokenMetadataMap,
+          socket,
         }}
       >
         <IonReactRouter>

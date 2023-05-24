@@ -1,0 +1,52 @@
+name: Docker builds
+
+on:
+  pull_request:
+  workflow_dispatch: # adding the workflow_dispatch so it can be triggered manually
+
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - run: echo "{}" > esy.json
+      - run: npm ci
+
+      - name: deploy main contract on ghostnet
+        uses: laucans/taqueria-github-action@main
+        with:
+            plugins: '@taqueria/plugin-contract-types@next, @taqueria/plugin-taquito, @taqueria/plugin-ligo, @taqueria/plugin-jest'
+            environment: testing
+            compile_contracts: main.jsligo
+            compile_plugin: ligo
+            taq_ligo_image: ligolang/ligo_ci:next
+            ligo_libraries: '@ligo/fa'
+            test_files: test.jsligo
+
+      - name: Build
+        uses: docker/build-push-action@v4
+        with:
+          file: ./app/Dockerfile.ghostnet
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./backend/Dockerfile.ghostnet
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+

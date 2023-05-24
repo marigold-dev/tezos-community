@@ -12,6 +12,7 @@ export type Storage = {
   organizations: Array<{
     admins: Array<address>;
     business: string;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -26,12 +27,13 @@ export type Storage = {
     members: BigMap<address, unit>;
     name: string;
     siteUrl: string;
-    status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+    status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
     verified: boolean;
   }>;
   tezosOrganization: {
     admins: Array<address>;
     business: string;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -46,26 +48,30 @@ export type Storage = {
     members: BigMap<address, unit>;
     name: string;
     siteUrl: string;
-    status: { aCTIVE: unit } | { fROZEN: unit } | { pENDING_APPROVAL: unit };
+    status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
     verified: boolean;
   };
 };
 
 type Methods = {
   activateOrganization: (param: string) => Promise<void>;
+  addAdmin: (admin: address, orgName: string) => Promise<void>;
   addOrganization: (
     business: string,
+    fundingAddress: address | null,
     ipfsNftUrl: string,
     logoUrl: string,
     name: string,
     siteUrl: string
   ) => Promise<void>;
+  addTezosAdmin: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
-  removeMember: (
-    member: address,
-    orgName: string,
-    lastAdmin?: address
+  removeAdmin: (
+    admin: address,
+    lastAdmin: address | null,
+    orgName: string
   ) => Promise<void>;
+  removeMember: (member: address, orgName: string) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
   requestToJoinOrganization: (
     contactId: string,
@@ -78,23 +84,28 @@ type Methods = {
     membersToDecline: Array<address>,
     orgName: string
   ) => Promise<void>;
+  sendMessage: (_0: string, _1: string) => Promise<void>;
 };
 
 type MethodsObject = {
   activateOrganization: (param: string) => Promise<void>;
+  addAdmin: (params: { admin: address; orgName: string }) => Promise<void>;
   addOrganization: (params: {
     business: string;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     name: string;
     siteUrl: string;
   }) => Promise<void>;
+  addTezosAdmin: (param: address) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
-  removeMember: (params: {
+  removeAdmin: (params: {
+    admin: address;
     lastAdmin?: address;
-    member: address;
     orgName: string;
   }) => Promise<void>;
+  removeMember: (params: { member: address; orgName: string }) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
   requestToJoinOrganization: (params: {
     contactId: string;
@@ -107,6 +118,7 @@ type MethodsObject = {
     membersToDecline: Array<address>;
     orgName: string;
   }) => Promise<void>;
+  sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
 };
 
 type contractTypes = {

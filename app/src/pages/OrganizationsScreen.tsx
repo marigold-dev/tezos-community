@@ -1,4 +1,3 @@
-import { BigMapKey, BigMapsService, MichelineFormat } from "@dipdup/tzkt-api";
 import {
   IonButton,
   IonButtons,
@@ -21,13 +20,16 @@ import {
   IonSpinner,
   IonSplitPane,
   IonText,
+  IonTextarea,
   IonThumbnail,
   IonTitle,
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
+import * as api from "@tzkt/sdk-api";
+import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
-import { addCircle, ellipse, peopleCircle } from "ionicons/icons";
+import { addCircle, ellipse, mailOutline, peopleCircle } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import {
@@ -44,6 +46,9 @@ import { getStatusColor, getUserProfile } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
+  api.defaults.baseUrl =
+    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+
   const [presentAlert] = useIonAlert();
   const history = useHistory();
   const location = useLocation();
@@ -85,6 +90,7 @@ export const OrganizationsScreen: React.FC = () => {
   const [ipfsNftUrl, setIpfsNftUrl] = useState<string>("");
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [siteUrl, setSiteUrl] = useState<string>("");
+  const [fundingAddress, setFundingAddress] = useState<address | null>(null);
 
   //modal JOIN
   const modalJoin = useRef<HTMLIonModalElement>(null);
@@ -108,36 +114,51 @@ export const OrganizationsScreen: React.FC = () => {
   >();
   const [joiningOrganizations, setJoiningOrganizations] =
     useState<Organization[]>();
-  //////////////
 
-  const [selectedOrganization, setSelectedOrganization] = useState<
+  //modal write
+  const modalWrite = useRef<HTMLIonModalElement>(null);
+  const [message, setMessage] = useState<string>("");
+  const [messageIsValid, setMessageIsValid] = useState<boolean>(false);
+  const [messageMarkTouched, setMessageMarkTouched] = useState<boolean>(false);
+
+  const [messagingOrganizations, setMessagingOrganizations] =
+    useState<Organization[]>();
+  const [messagingOrganization, setMessagingOrganization] = useState<
     Organization | undefined
   >();
 
-  const bigMapsService = new BigMapsService({
-    baseUrl: "https://api.ghostnet.tzkt.io",
-    version: "",
-    withCredentials: false,
-  });
+  //////////////
+
+  const [selectedOrganizationName, setSelectedOrganizationName] = useState<
+    string | undefined
+  >();
+  const [isTezosOrganization, setIsTezosOrganization] =
+    useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
       if (storage && storage.organizations) {
         let orgMembers: Map<string, address[]> = new Map();
         await Promise.all(
-          storage.organizations.map(async (organization) => {
+          storage.organizations.map(async (organization: Organization) => {
             const membersBigMapId = (
               organization.members as unknown as { id: BigNumber }
             ).id.toNumber();
 
-            const keys: BigMapKey[] = await bigMapsService.getKeys({
-              id: membersBigMapId,
-              micheline: MichelineFormat.JSON,
-            });
+            const keys: BigMapKey[] = await api.bigMapsGetKeys(
+              membersBigMapId,
+              {
+                micheline: "Json",
+              }
+            );
 
             orgMembers.set(
               organization.name,
-              Array.from(keys.map((key) => key.key))
+              Array.from(
+                keys
+                  .filter((key) => (key.active ? true : false)) // take only active ones
+                  .map((key) => key.key)
+              )
             );
 
             //cache userprofiles
@@ -157,7 +178,7 @@ export const OrganizationsScreen: React.FC = () => {
         setOrgMembers(orgMembers); //refresh cache
 
         setMyOrganizations(
-          storage.organizations.filter((org) => {
+          storage.organizations.filter((org: Organization) => {
             const members = orgMembers.get(org.name);
 
             if (
@@ -173,8 +194,10 @@ export const OrganizationsScreen: React.FC = () => {
           })
         );
 
-        if (myOrganizations.length > 0 && !selectedOrganization)
-          setSelectedOrganization(myOrganizations[0]);
+        if (myOrganizations.length > 0 && !selectedOrganizationName) {
+          setSelectedOrganizationName(myOrganizations[0].name); //init
+          setIsTezosOrganization(false);
+        }
         console.log("myOrganizations", myOrganizations);
       } else {
         console.log("storage is not ready yet");
@@ -182,13 +205,31 @@ export const OrganizationsScreen: React.FC = () => {
     })();
   }, [storage, userAddress]);
 
+  useEffect(() => {
+    if (
+      myOrganizations &&
+      myOrganizations.length > 0 &&
+      !selectedOrganizationName
+    ) {
+      setSelectedOrganizationName(myOrganizations[0].name); //init
+      setIsTezosOrganization(false);
+    }
+  }, []);
+
   useEffect(
     //default organization to join. I can join only organization I am not member of
     () => {
       setJoiningOrganizations(
         storage?.organizations.filter(
-          (org) =>
-            orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0
+          (org: Organization) =>
+            orgMembers.get(org.name)!?.indexOf(userAddress as address) < 0 &&
+            "active" in org.status
+        )
+      );
+
+      setMessagingOrganizations(
+        storage?.organizations.filter(
+          (org: Organization) => "active" in org.status
         )
       );
     },
@@ -245,13 +286,47 @@ export const OrganizationsScreen: React.FC = () => {
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .addOrganization(business, ipfsNftUrl, logoUrl, name, siteUrl)
+        .addOrganization(
+          business,
+          fundingAddress,
+          ipfsNftUrl,
+          logoUrl,
+          name,
+          siteUrl
+        )
         .send();
       await op?.confirmation();
       const newStorage = await mainWalletType!.storage();
       setStorage(newStorage);
       await modalAdd.current?.dismiss();
       history.replace(PAGES.ORGANIZATIONS);
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
+  const writeToOrganization = async () => {
+    console.log("writeToOrganization", Tezos);
+
+    try {
+      setLoading(true);
+
+      const op = await mainWalletType!.methods
+        .sendMessage(messagingOrganization!.name, message)
+        .send();
+
+      await op.confirmation();
+
+      await modalWrite.current?.dismiss();
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
       let tibe: TransactionInvalidBeaconError =
@@ -306,7 +381,12 @@ export const OrganizationsScreen: React.FC = () => {
                     Join an organization
                   </IonButton>
                 </IonItem>
-
+                <IonItem lines="none">
+                  <IonButton id="writeToOrganization" color="transparent">
+                    <IonIcon slot="start" icon={mailOutline}></IonIcon>
+                    Write to an organization
+                  </IonButton>
+                </IonItem>
                 <IonModal trigger="joinFromOrganizations" ref={modalJoin}>
                   <IonHeader>
                     <IonToolbar>
@@ -344,13 +424,14 @@ export const OrganizationsScreen: React.FC = () => {
                             setJoiningOrganizations(
                               storage?.organizations
                                 .filter(
-                                  (org) =>
+                                  (org: Organization) =>
                                     orgMembers
                                       .get(org.name)!
-                                      ?.indexOf(userAddress as address) < 0
+                                      ?.indexOf(userAddress as address) < 0 &&
+                                    "active" in org.status
                                 )
                                 .filter(
-                                  (orgItem) =>
+                                  (orgItem: Organization) =>
                                     orgItem.name
                                       .toLowerCase()
                                       .indexOf(target.value!.toLowerCase()) >= 0
@@ -359,10 +440,11 @@ export const OrganizationsScreen: React.FC = () => {
                           } else {
                             setJoiningOrganizations(
                               storage?.organizations.filter(
-                                (org) =>
+                                (org: Organization) =>
                                   orgMembers
                                     .get(org.name)!
-                                    ?.indexOf(userAddress as address) < 0
+                                    ?.indexOf(userAddress as address) < 0 &&
+                                  "active" in org.status
                               )
                             );
                           }
@@ -379,7 +461,7 @@ export const OrganizationsScreen: React.FC = () => {
                       label="Contact identifier/alias *"
                       placeholder="@twitterAlias"
                       type="text"
-                      maxlength={32}
+                      maxlength={36}
                       counter
                       onIonChange={(str) => {
                         if (
@@ -520,7 +602,7 @@ export const OrganizationsScreen: React.FC = () => {
                       label="Name *"
                       placeholder="my organization name"
                       type="text"
-                      maxlength={32}
+                      maxlength={36}
                       counter
                       onIonChange={(str) => {
                         if (
@@ -614,6 +696,140 @@ export const OrganizationsScreen: React.FC = () => {
                         setSiteUrl(str.target.value! as string);
                       }}
                     />
+
+                    <IonInput
+                      labelPlacement="floating"
+                      value={fundingAddress}
+                      label="Funding address"
+                      placeholder="tzxxxx or KT1xxxxx"
+                      type="text"
+                      maxlength={36}
+                      counter
+                      helperText="Enter your funding address (if you have)"
+                      onIonChange={(str) => {
+                        if (str.detail.value === undefined) return;
+                        setFundingAddress(
+                          str.target.value! as unknown as address
+                        );
+                      }}
+                    />
+                  </IonContent>
+                </IonModal>
+
+                <IonModal trigger="writeToOrganization" ref={modalWrite}>
+                  <IonHeader>
+                    <IonToolbar>
+                      <IonButtons slot="start">
+                        <IonButton
+                          onClick={() => modalWrite.current?.dismiss()}
+                        >
+                          Cancel
+                        </IonButton>
+                      </IonButtons>
+                      <IonTitle>Write message</IonTitle>
+                      <IonButtons slot="end">
+                        <IonButton
+                          onClick={writeToOrganization}
+                          disabled={!messageIsValid || !messagingOrganization}
+                        >
+                          Send
+                        </IonButton>
+                      </IonButtons>
+                    </IonToolbar>
+                    <IonToolbar>
+                      <IonSearchbar
+                        onIonInput={(ev) => {
+                          const target = ev.target as HTMLIonSearchbarElement;
+                          console.log("target.value", target.value);
+
+                          if (
+                            target &&
+                            target !== undefined &&
+                            target.value?.trim() !== ""
+                          ) {
+                            setMessagingOrganizations(
+                              storage?.organizations.filter(
+                                (orgItem: Organization) =>
+                                  orgItem.name
+                                    .toLowerCase()
+                                    .indexOf(target.value!.toLowerCase()) >=
+                                    0 && "active" in orgItem.status
+                              )
+                            );
+                          } else {
+                            setMessagingOrganizations(
+                              storage?.organizations.filter(
+                                (org: Organization) => "active" in org.status
+                              )
+                            );
+                          }
+                        }}
+                      ></IonSearchbar>
+                    </IonToolbar>
+                  </IonHeader>
+
+                  <IonContent color="light" class="ion-padding">
+                    <IonTextarea
+                      rows={4}
+                      labelPlacement="floating"
+                      color="primary"
+                      value={message}
+                      label="Message *"
+                      placeholder="Type here ..."
+                      maxlength={280}
+                      counter
+                      onIonChange={(str) => {
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setMessageIsValid(false);
+                        } else {
+                          setMessage(str.target.value as string);
+                          setMessageIsValid(true);
+                        }
+                      }}
+                      helperText="Enter a message"
+                      errorText="Message is required"
+                      className={`${messageIsValid && "ion-valid"} ${
+                        messageIsValid === false && "ion-invalid"
+                      } ${messageMarkTouched && "ion-touched"}`}
+                      onIonBlur={() => setMessageMarkTouched(true)}
+                    />
+
+                    <IonText>Select an organization *</IonText>
+                    <IonList id="modal-list" inset={true}>
+                      {messagingOrganizations &&
+                        messagingOrganizations.map((organization) => (
+                          <IonItem
+                            fill={
+                              messagingOrganization?.name === organization.name
+                                ? "outline"
+                                : undefined
+                            }
+                            onClick={() => {
+                              setMessagingOrganization(organization);
+                            }}
+                            lines="none"
+                            key={organization.name}
+                          >
+                            <IonTitle>{organization.name}</IonTitle>
+                            <IonText>
+                              <i>{organization.business}</i>
+                            </IonText>
+                            <IonThumbnail slot="start">
+                              <IonImg alt="." src={organization.logoUrl} />
+                            </IonThumbnail>
+                            <IonIcon
+                              size="small"
+                              slot="end"
+                              icon={ellipse}
+                              color={getStatusColor(organization)}
+                            />
+                          </IonItem>
+                        ))}
+                    </IonList>
                   </IonContent>
                 </IonModal>
 
@@ -623,14 +839,17 @@ export const OrganizationsScreen: React.FC = () => {
                 ) >= 0 ? (
                   <IonItem
                     fill={
-                      selectedOrganization?.name ===
+                      selectedOrganizationName ===
                       storage.tezosOrganization.name
                         ? "outline"
                         : undefined
                     }
-                    onClick={() =>
-                      setSelectedOrganization(storage.tezosOrganization)
-                    }
+                    onClick={() => {
+                      setSelectedOrganizationName(
+                        storage.tezosOrganization.name
+                      );
+                      setIsTezosOrganization(true);
+                    }}
                     lines="none"
                     key={storage.tezosOrganization.name}
                   >
@@ -656,12 +875,13 @@ export const OrganizationsScreen: React.FC = () => {
                 {myOrganizations?.map((organization) => (
                   <IonItem
                     fill={
-                      selectedOrganization?.name === organization.name
+                      selectedOrganizationName === organization.name
                         ? "outline"
                         : undefined
                     }
                     onClick={() => {
-                      setSelectedOrganization(organization);
+                      setSelectedOrganizationName(organization.name);
+                      setIsTezosOrganization(false);
                     }}
                     lines="none"
                     key={organization.name}
@@ -681,8 +901,8 @@ export const OrganizationsScreen: React.FC = () => {
               </IonContent>
             </IonMenu>
             <OrganizationScreen
-              setOrganization={setSelectedOrganization}
-              organization={selectedOrganization}
+              organizationName={selectedOrganizationName}
+              isTezosOrganization={isTezosOrganization}
             />
           </IonSplitPane>
         )}

@@ -1,211 +1,519 @@
-export type ORGANIZATION_STATUS = 
-| ["PENDING_APPROVAL"] 
-| ["ACTIVE"] 
-| ["FROZEN"] 
-;
+export type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
 
-export type removeMemberRequest = {
-    member : address, 
-    orgName : string,
-    lastAdmin : option<address>
+export type removeMemberParameters = { member: address, orgName: string };
+
+export type removeAdminParameters = {
+  admin: address,
+  orgName: string,
+  lastAdmin: option<address>
 };
+
+export type addAdminParameters = { admin: address, orgName: string };
 
 export type joinRequest = {
-    orgName : string,
-    contactId : string,
-    contactIdProvider : string,
-    reason : string
+  orgName: string,
+  contactId: string,
+  contactIdProvider: string,
+  reason: string
 };
 
-export type joinOrganizationRequest = {
-    user : address,
-    joinRequest : joinRequest
-};
+export type joinOrganizationRequest = { user: address, joinRequest };
 
 export type joinOrganizationResponse = {
-    membersToApprove : set<address>,
-    membersToDecline : set<address>, 
-    orgName : string
+  membersToApprove: set<address>,
+  membersToDecline: set<address>,
+  orgName: string
 };
 
 export type addOrganizationRequest = {
-    name : string,
-    business : string,
-    siteUrl : string,
-    logoUrl : string,
-    ipfsNftUrl : string,
+  name: string,
+  business: string,
+  siteUrl: string,
+  logoUrl: string,
+  ipfsNftUrl: string,
+  fundingAddress: option<address>
 };
 
 export type organization = {
-   name : string,
-   business : string,
-   siteUrl : string,
-   logoUrl : string,
-   ipfsNftUrl : string,
-   members : big_map<address,unit>,
-   admins : set<address>,
-   status : ORGANIZATION_STATUS,
-   memberRequests : set<joinOrganizationRequest>,
-   verified : bool
-}; 
+  name: string,
+  business: string,
+  siteUrl: string,
+  logoUrl: string,
+  ipfsNftUrl: string,
+  members: big_map<address, unit>,
+  admins: set<address>,
+  status: organizationStatus,
+  memberRequests: set<joinOrganizationRequest>,
+  verified: bool,
+  fundingAddress: option<address>
+};
 
 export type storage = {
-    memberProfileVerified : set<address>,
-    tezosOrganization : organization,
-    organizations : list<organization>,
-    organizationMax : nat,
-    adminsMax : nat,
-
-    nftAddress : address
+  memberProfileVerified: set<address>,
+  tezosOrganization: organization,
+  organizations: list<organization>,
+  organizationMax: nat,
+  adminsMax: nat,
+  nftAddress: address
 };
 
-export type _return = [list<operation>,storage];
+export type _return = [list<operation>, storage];
 
-////////////////////////// REGISTRY
-
-//@entry
-export const activateOrganization = (orgName : string, store : storage) : _return => {
-    return match(List.find_opt((org : organization)=> orgName == org.name, store.organizations),{
-        None : () => failwith("Cannot find an organization with the name passed as parameter"),
-        Some : (org) => Set.mem(Tezos.get_sender(),store.tezosOrganization.admins) ? 
-        [list([Tezos.emit("%organizationActivated",org.name)]),
-        {...store,
-        organizations: List.update_with((orgItem : organization)=>(orgName == orgItem.name),{...org,status : ACTIVE()},store.organizations)
-        }] 
-        : 
-        failwith("You need to be part of Tezos organization to activate an organization")
-        }
-    );
+export /* @entry */
+const activateOrganization = (orgName: string, store: storage): _return => {
+  return match(
+    List.find_opt(
+      (org: organization) => orgName == org.name,
+      store.organizations
+    ),
+    {
+      None: () =>
+        failwith(
+          "Cannot find an organization with the name passed as parameter"
+        ),
+      Some: (org) =>
+        Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
+            list([Tezos.emit("%organizationActivated", org.name)]),
+            {
+              ...store,
+              organizations: List.update_with(
+                (orgItem: organization) => (orgName == orgItem.name),
+                { ...org, status: Active() },
+                store.organizations
+              )
+            }
+          ] : failwith(
+            "You need to be part of Tezos organization to activate an organization"
+          )
+    }
+  )
 };
 
-//@entry
-export const freezeOrganization = (name : string, store : storage) : _return => {
-    return match(List.find_opt((org:organization)=>(org.name == name),store.organizations),{
-        None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => Set.mem(Tezos.get_sender(),store.tezosOrganization.admins) ? [list([Tezos.emit("%organizationFrozen",org.name)]),
-                        {...store,
-                        organizations : List.update_with((orgItem : organization)=>orgItem.name == name,
-                                                         {...org,status : FROZEN()},
-                                                         store.organizations)
-                        }] :failwith("You need to be part of Tezos organization to remove an organization");
-        }
-    );
+export /* @entry */
+const freezeOrganization = (name: string, store: storage): _return => {
+  return match(
+    List.find_opt(
+      (org: organization) => (org.name == name),
+      store.organizations
+    ),
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) =>
+        Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
+            list([Tezos.emit("%organizationFrozen", org.name)]),
+            {
+              ...store,
+              organizations: List.update_with(
+                (orgItem: organization) => orgItem.name == name,
+                { ...org, status: Frozen() },
+                store.organizations
+              )
+            }
+          ] : failwith(
+            "You need to be part of Tezos organization to remove an organization"
+          )
+    }
+  )
 };
 
-
-//@entry
-export const addOrganization = (org : addOrganizationRequest, store : storage) : _return => {
-    let newOrg : organization = {
-        name : org.name,
-        business: org.business,
-        siteUrl : org.siteUrl,
-        logoUrl : org.logoUrl,
-        ipfsNftUrl : org.ipfsNftUrl,
-        status : PENDING_APPROVAL(),
-        admins : Set.literal(list([Tezos.get_sender()])) as set<address>,
-        members : Big_map.empty as big_map<address,unit>,
-        memberRequests : Set.empty as set<joinOrganizationRequest>,
-        verified : false
+export /* @entry */
+const addOrganization = (org: addOrganizationRequest, store: storage): _return => {
+  let newOrg: organization =
+    {
+      name: org.name,
+      business: org.business,
+      siteUrl: org.siteUrl,
+      logoUrl: org.logoUrl,
+      ipfsNftUrl: org.ipfsNftUrl,
+      status: PendingApproval(),
+      admins: Set.literal(list([Tezos.get_sender()])) as set<address>,
+      members: Big_map.add(Tezos.get_sender(), unit, Big_map.empty) as
+        big_map<address, unit>,
+      memberRequests: Set.empty as set<joinOrganizationRequest>,
+      verified: false,
+      fundingAddress: org.fundingAddress
     };
-    
-    if(List.size(store.organizations) >= store.organizationMax) {
-        return failwith("Too many organization, please contact Tezos administrators to increase the limit");
+  if (List.size(store.organizations) >= store.organizationMax) {
+    return failwith(
+      "Too many organization, please contact Tezos administrators to increase the limit"
+    )
+  } else {
+    return match(
+      List.find_opt(
+        (orgItem: organization) => (org.name == orgItem.name),
+        store.organizations
+      ),
+      {
+        Some: (_org) =>
+          failwith("Organization name already exists and should be unique"),
+        None: () =>
+          [
+            list([Tezos.emit("%organizationAdded", org.name)]),
+            {
+              ...store,
+              organizations: Set.mem(
+                Tezos.get_sender(),
+                store.tezosOrganization.admins
+              ) ? list(
+                  [
+                    { ...newOrg, status: Active() } as organization,
+                    ...store.organizations
+                  ]
+                ) : list(
+                  [{ ...newOrg } as organization, ...store.organizations]
+                )
+            }
+          ]
+      }
+    )
+  }
+};
+
+export /* @entry */
+const removeOrganization = (name: string, store: storage): _return => {
+  return match(
+    List.find_opt(
+      (org: organization) => (org.name == name),
+      store.organizations
+    ),
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) =>
+        Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ||
+          Set.mem(Tezos.get_sender(), org.admins) ? [
+            list([]),
+            {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  (org.name == orgItem.name ? None() : Some(orgItem)),
+                store.organizations
+              )
+            }
+          ] : failwith(
+            "You need to be part of organization administrators or Tezos organization to remove an organization"
+          )
     }
-    else {
-        return match(List.find_opt((orgItem : organization)=>(org.name == orgItem.name),store.organizations), {
-            Some : (_org) => failwith("Organization name already exists and should be unique"),
-            None : () => [list([Tezos.emit("%organizationAdded",org.name)]),
-                        {...store,
-                        organizations: Set.mem(Tezos.get_sender(),store.tezosOrganization.admins) ? list([{...newOrg,status:ACTIVE()} as organization,...store.organizations]) : list([{...newOrg} as organization,...store.organizations]),                        
-                        }
-            ]
-        }); 
-    }
+  )
 };
 
-//@entry
-export const removeOrganization = (name : string, store : storage) : _return => {
-    return match(List.find_opt((org:organization)=>(org.name == name),store.organizations),{
-        None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => Set.mem(Tezos.get_sender(),store.tezosOrganization.admins) || Set.mem(Tezos.get_sender(),org.admins) ? 
-        [list([]), {...store,organizations : List.filter_map((orgItem:organization)=>(org.name == orgItem.name?None():Some(orgItem)),store.organizations)}]
-        :
-        failwith("You need to be part of organization administrators or Tezos organization to remove an organization");
-        }
-    );
-};
-
-
-const leaveOrganizationAsAdmin = (orgName : string, lastAdmin : option<address>, store : storage) : storage => {
-    return match(List.find_opt((org:organization)=>(org.name == orgName),store.organizations),{
-        None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => {if(!Set.mem(Tezos.get_sender(),org.admins)) return failwith("You need to be an admin to use this function");
-                        else if(Set.cardinal(org.admins) == (1 as nat) && Option.is_none(lastAdmin)) return failwith("You cannot leave an organization empty without naming another admin");
-                        else {
-                            let newAdmins = Set.remove(Tezos.get_sender(),org.admins);
-                            if(Set.cardinal(org.admins) == (1 as nat) && Option.is_some(lastAdmin)) newAdmins = Set.add(Option.unopt(lastAdmin),newAdmins);
-                            return {...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == orgName),{...org,admins:newAdmins},store.organizations)};
-                        }
-                        }
-        });
-};
-
-//@entry
-export const removeMember = (rmr : removeMemberRequest, store : storage) : _return => {
-    const orgOpt = List.find_opt((orgItem : organization)=>(orgItem.name == rmr.orgName),store.organizations);
-    return match(orgOpt, {
-        None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => {
-                if(Tezos.get_sender() == rmr.member && Set.mem(rmr.member,org.admins)) {
-                    return [list([]),leaveOrganizationAsAdmin(rmr.orgName,rmr.lastAdmin,store)];
+const leaveOrganizationAsAdmin = (
+  org: organization,
+  lastAdminOpt: option<address>,
+  store: storage
+): storage => {
+  if (!Set.mem(Tezos.get_sender(), org.admins)) return failwith(
+    "You need to be an admin to use this function"
+  ) else {
+    return match(
+      lastAdminOpt,
+      {
+        None: () => {
+          if (Set.cardinal(org.admins) == (1 as nat)) failwith(
+            "You cannot leave an organization empty without naming another admin from members"
+          ) else return {
+            ...store,
+            organizations: List.filter_map(
+              (orgItem: organization) =>
+                (orgItem.name == org.name) ? Some(
+                    {
+                      ...org,
+                      admins: Set.remove(Tezos.get_sender(), org.admins)
                     }
-                else if (Tezos.get_sender() == rmr.member && !Set.mem(rmr.member,org.admins)  ||  Tezos.get_sender() != rmr.member && Set.mem(Tezos.get_sender(),org.admins) ) {
-                    const newOrg = {...org,admins : Set.remove(rmr.member,org.admins)};
-                    return [list([]),{...store,organizations: List.update_with((orgItem : organization)=>(orgItem.name == newOrg.name),newOrg,store.organizations)}];
-                }
-                else {
-                    return failwith("You don't have the rights to remove a member from an organization");
-                }
+                  ) : None() as option<organization>,
+              store.organizations
+            )
+          }
+        },
+        Some: (lastAdmin) => {
+          if (Set.cardinal(org.admins) != (1 as nat)) return failwith(
+            "Don't name another admin to replace you if there are enough admins on the organization"
+          ) else if (
+            Set.cardinal(org.admins) == (1 as nat) &&
+              (
+                lastAdmin == Tezos.get_sender() ||
+                  !Big_map.mem(lastAdmin, org.members)
+              )
+          ) return failwith(
+            "You cannot leave an organization empty naming yourself or not a member"
+          ) else {
+            const newAdmins =
+              Set.cardinal(org.admins) == (1 as nat) ? Set.add(
+                  lastAdmin,
+                  org.admins
+                ) : org.admins;
+            return {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  (orgItem.name == org.name) ? Some(
+                      {
+                        ...org,
+                        admins: Set.remove(Tezos.get_sender(), newAdmins)
+                      }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          }
         }
-    });
+      }
+    )
+  }
 };
 
-//@entry
-export const requestToJoinOrganization = (jr : joinRequest, store : storage) : _return => {
-    const orgOpt = List.find_opt((orgItem : organization)=>(orgItem.name == jr.orgName),store.organizations);
-    return match(orgOpt, {
-        None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => {
-            if(org.status != ACTIVE()) return failwith("You cannot receive requests until your organization is activated");
-            else {            
-                const newOrg = {...org ,memberRequests :  Set.add({ user : Tezos.get_sender(), joinRequest : jr },org.memberRequests)};
-                return [list([Tezos.emit("%joinOrganizationRequest",org.name)]),{...store, organizations : List.update_with((orgItem : organization)=>(orgItem.name == org.name),newOrg,store.organizations)}];
+export /* @entry */
+const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
+  const orgOpt =
+    List.find_opt(
+      (orgItem: organization) => (orgItem.name == rmp.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (Set.mem(rmp.member, org.admins)) failwith(
+          "Cannot remove a member who is administrator, use removeAdmin endpoint instead"
+        ) else if (Set.mem(Tezos.get_sender(), org.admins)) {
+          return [
+            list([]),
+            {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  orgItem.name == org.name ? Some(
+                      {
+                        ...org,
+                        members: Big_map.remove(rmp.member, org.members)
+                      }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          ]
+        } else {
+          return failwith(
+            "You don't have the rights to remove a member from this organization"
+          )
+        }
+      }
+    }
+  )
+};
+
+export /* @entry */
+const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
+  const orgOpt =
+    List.find_opt(
+      (orgItem: organization) => (orgItem.name == rap.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (Tezos.get_sender() == rap.admin && Set.mem(rap.admin, org.admins)) {
+          return [list([]), leaveOrganizationAsAdmin(org, rap.lastAdmin, store)]
+        } else if (
+          Tezos.get_sender() != rap.admin && Set.mem(rap.admin, org.admins)
+        ) {
+          return [
+            list([]),
+            {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  orgItem.name == org.name ? Some(
+                      { ...org, admins: Set.remove(rap.admin, org.admins) }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          ]
+        } else {
+          return failwith(
+            "You don't have the rights to remove an administrator from this organization"
+          )
+        }
+      }
+    }
+  )
+};
+
+export /* @entry */
+const addAdmin = (aap: addAdminParameters, store: storage): _return => {
+  const orgOpt =
+    List.find_opt(
+      (orgItem: organization) => (orgItem.name == aap.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (Set.mem(Tezos.get_sender(), org.admins)) {
+          return [
+            list([]),
+            {
+              ...store,
+              organizations: List.filter_map(
+                (orgItem: organization) =>
+                  orgItem.name == org.name ? Some(
+                      {
+                        ...org,
+                        members: Big_map.add(aap.admin, unit, org.members),
+                        admins: Set.add(aap.admin, org.admins)
+                      }
+                    ) : None() as option<organization>,
+                store.organizations
+              )
+            }
+          ]
+        } else {
+          return failwith(
+            "You don't have the rights to add an administrator from this organization"
+          )
+        }
+      }
+    }
+  )
+};
+
+export /* @entry */
+const addTezosAdmin = (admin: address, store: storage): _return => {
+  if (Set.mem(Tezos.get_sender(), store.tezosOrganization.admins)) {
+    return [
+      list([]),
+      {
+        ...store,
+        tezosOrganization: {
+          ...store.tezosOrganization,
+          admins: Set.add(admin, store.tezosOrganization.admins)
+        }
+      }
+    ]
+  } else {
+    return failwith(
+      "You don't have the rights to add an administrator from this organization"
+    )
+  }
+};
+
+export /* @entry */
+const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => {
+  const orgOpt =
+    List.find_opt(
+      (orgItem: organization) => (orgItem.name == jr.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (org.status != Active()) return failwith(
+          "You cannot receive requests until your organization is activated"
+        ) else {
+          const newOrg =
+            {
+              ...org,
+              memberRequests: Set.add(
+                { user: Tezos.get_sender(), joinRequest: jr },
+                org.memberRequests
+              )
+            };
+          return [
+            list([Tezos.emit("%joinOrganizationRequest", org.name)]),
+            {
+              ...store,
+              organizations: List.update_with(
+                (orgItem: organization) => (orgItem.name == org.name),
+                newOrg,
+                store.organizations
+              )
+            }
+          ]
+        }
+      }
+    }
+  )
+};
+
+export /* @entry */
+const responseToJoinOrganization = (
+  jor: joinOrganizationResponse,
+  store: storage
+): _return => {
+  const orgOpt: option<organization> =
+    List.find_opt(
+      (org: organization) => (org.name == jor.orgName),
+      store.organizations
+    );
+  return match(
+    orgOpt,
+    {
+      None: () =>
+        failwith("Cannot find organization with name passed on parameter"),
+      Some: (org) => {
+        if (!Set.mem(Tezos.get_sender(), org.admins)) return failwith(
+          "You don't have the rights to approve/decline users from this organization"
+        ) else {
+          let newOrg = { ...org };
+          let newStore = { ...store };
+          for (const mr of org.memberRequests) {
+            if (Set.mem(mr.user, jor.membersToApprove)) {
+              newOrg =
+                {
+                  ...newOrg,
+                  members: Big_map.add(mr.user, unit, newOrg.members),
+                  memberRequests: Set.remove(mr, newOrg.memberRequests)
+                }
+            } else if (Set.mem(mr.user, jor.membersToDecline)) {
+              newOrg =
+                {
+                  ...newOrg,
+                  memberRequests: Set.remove(mr, newOrg.memberRequests)
                 }
             }
-    });    
-};
-
-
-//@entry
-export const responseToJoinOrganization = (jor : joinOrganizationResponse, store : storage) : _return => {
-    const orgOpt : option<organization> = List.find_opt((org:organization)=>(org.name == jor.orgName),store.organizations);
-    return match(orgOpt,{
-        None : () => failwith("Cannot find organization with name passed on parameter"),
-        Some : (org) => {
-            if(!Set.mem(Tezos.get_sender(),org.admins)) return failwith("You don't have the rights to approve/decline users from this organization"); 
-            else {
-                 let newOrg = {...org};
-                 let newStore = {...store};
-                 for (const mr of newOrg.memberRequests) {
-                     if(Set.mem(mr.user,jor.membersToApprove)) {
-                        newOrg = {...newOrg,members : Big_map.add(mr.user,unit,newOrg.members),memberRequests : Set.remove(mr,newOrg.memberRequests)};
-                     } else if(Set.mem(mr.user,jor.membersToDecline)){
-                        newOrg = {...newOrg,memberRequests : Set.remove(mr,newOrg.memberRequests)};
-                     }
-                 };                
-                return [list([Tezos.emit("%orgMemberRequestsUpdated",[jor.membersToApprove,jor.membersToDecline,org.name])  ]), {...newStore,organizations : List.update_with((orgItem : organization)=>(orgItem.name == jor.orgName),newOrg,newStore.organizations)}];
+          };
+          return [
+            list(
+              [
+                Tezos.emit(
+                  "%orgMemberRequestsUpdated",
+                  [jor.membersToApprove, jor.membersToDecline, org.name]
+                )
+              ]
+            ),
+            {
+              ...newStore,
+              organizations: List.update_with(
+                (orgItem: organization) => (orgItem.name == jor.orgName),
+                newOrg,
+                newStore.organizations
+              )
             }
+          ]
         }
-    });
+      }
+    }
+  )
 };
 
+export /* @entry */
+const sendMessage = ([to, message]: [string, string], store: storage): _return => {
+  return [
+    list([Tezos.emit("%message", [Tezos.get_source(), to, message])]),
+    store
+  ]
+};
