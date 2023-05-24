@@ -11,7 +11,8 @@ type OrganizationProps = {
 export const OrganizationMessages = ({
   organizationName,
 }: OrganizationProps): JSX.Element => {
-  api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
+  api.defaults.baseUrl =
+    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
 
   const {
     Tezos,

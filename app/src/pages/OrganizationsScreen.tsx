@@ -46,7 +46,8 @@ import { getStatusColor, getUserProfile } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
-  api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
+  api.defaults.baseUrl =
+    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
   const history = useHistory();

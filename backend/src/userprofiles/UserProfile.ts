@@ -15,36 +15,25 @@ export class UserProfile {
   socialAccountAlias: string;
 
   @Column()
-  proof: string;
-
-  @Column()
-  proofDate: Date;
-
-  @Column()
-  verified: boolean;
+  photo: string;
 
   constructor(
     address: string,
     displayName: string,
     socialAccountType: SOCIAL_ACCOUNT_TYPE,
     socialAccountAlias: string,
+    photo: string,
   ) {
     this._id = address;
     this.displayName = displayName;
-    this.verified = false;
-    this.proof = '';
+    this.photo = photo;
     this.socialAccountAlias = socialAccountAlias;
     this.socialAccountType = socialAccountType;
-    this.proofDate = new Date();
   }
 }
 
 export enum SOCIAL_ACCOUNT_TYPE {
-  GOOGLE = 'GOOGLE',
-  TWITTER = 'TWITTER',
-  WHATSAPP = 'WHATSAPP',
-  FACEBOOK = 'FACEBOOK',
-  DISCORD = 'DISCORD',
-  TELEGRAM = 'TELEGRAM',
-  SLACK = 'SLACK',
+  GOOGLE = 'google',
+  TWITTER = 'twitter',
+  FACEBOOK = 'facebook',
 }

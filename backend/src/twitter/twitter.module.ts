@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserProfile } from 'src/userprofiles/UserProfile';
-import { UserProfilesService } from 'src/userprofiles/userprofiles.service';
+import { EventsGateway } from 'src/EventsGateway';
+import { UserProfilesModule } from 'src/userprofiles/userprofiles.module';
 import { TwitterController } from './twitter.controller';
-import { TwitterService } from './twitter.service';
+import { TwitterOauthStrategy } from './twitter.strategy';
 
 @Module({
-  imports: [ConfigModule, TypeOrmModule.forFeature([UserProfile])],
-  providers: [TwitterService, UserProfilesService],
+  imports: [ConfigModule, UserProfilesModule],
+  providers: [TwitterOauthStrategy, EventsGateway],
   controllers: [TwitterController],
 })
 export class TwitterModule {}
