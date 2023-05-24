@@ -9,7 +9,8 @@ COPY --from=docker:dind /usr/local/bin/docker /bin/docker
 ADD https://github.com/ecadlabs/taqueria/releases/download/v0.28.4/taq-linux /bin/taq
 RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
 COPY . .
-
+RUN rm app/.env
+COPY app/.env.mainnet app/.env
 
 
 RUN npm ci && taq init
@@ -19,4 +20,4 @@ RUN cd app && npm ci && npm run postinstall
 
 WORKDIR /tezos-community/app
 
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["npm", "start:prod"]
