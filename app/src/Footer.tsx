@@ -37,7 +37,7 @@ import { OAuth } from "./OAuth";
 import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
 import { UserProfileChip } from "./components/UserProfileChip";
 import { address } from "./type-aliases";
-const providers = ["twitter", "google", "facebook", "github"];
+const providers = ["twitter"];
 
 export const Footer: React.FC = () => {
   const history = useHistory();
@@ -183,7 +183,7 @@ export const Footer: React.FC = () => {
               <IonIcon slot="icon-only" icon={home}></IonIcon>
             </IonButton>
 
-            <IonButton color="transparent" routerLink={PAGES.FUNDING}>
+            <IonButton disabled color="transparent" routerLink={PAGES.FUNDING}>
               <IonIcon slot="start" icon={cash}></IonIcon>
               Funding
             </IonButton>

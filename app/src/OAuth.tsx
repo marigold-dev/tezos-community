@@ -73,7 +73,9 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
         </div>
       ) : (
         <div>
-          <IonButton onClick={startAuth}>{provider}</IonButton>
+          <IonButton color="transparent" disabled onClick={startAuth}>
+            {provider}
+          </IonButton>
         </div>
       )}
     </div>
