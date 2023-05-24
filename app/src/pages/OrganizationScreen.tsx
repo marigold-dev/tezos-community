@@ -65,7 +65,8 @@ export const OrganizationScreen = ({
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
 
-  api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
+  api.defaults.baseUrl =
+    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
 

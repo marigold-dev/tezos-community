@@ -6,7 +6,7 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
-
+import { Socket, io } from "socket.io-client";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -40,6 +40,7 @@ import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
+
 setupIonicReact();
 
 export type TZIP21TokenMetadata = TokenMetadata & {
@@ -66,9 +67,7 @@ export type UserProfile = {
   displayName: string;
   socialAccountType: SOCIAL_ACCOUNT_TYPE;
   socialAccountAlias: string;
-  proof: string;
-  proofDate: Date;
-  verified: boolean;
+  photo: string;
 };
 
 export type MemberRequest = {
@@ -113,17 +112,26 @@ export type UserContextType = {
   setLoading: Dispatch<SetStateAction<boolean>>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
+  socket: Socket;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
+  const socket: Socket = io(process.env.REACT_APP_BACKEND_URL!);
+
   const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit("https://ghostnet.tezos.marigold.dev")
+    new TezosToolkit(
+      "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev"
+    )
   );
   const [wallet, setWallet] = useState<BeaconWallet>(
     new BeaconWallet({
       name: "TzCommunity",
-      preferredNetwork: NetworkType.GHOSTNET,
+      preferredNetwork: process.env.REACT_APP_NETWORK
+        ? NetworkType[
+            process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
+          ]
+        : NetworkType.GHOSTNET,
     })
   );
   const [userAddress, setUserAddress] = useState<string>("");
@@ -432,10 +440,14 @@ const App: React.FC = () => {
 
         try {
           //always refresh userProfile
+
           const newUserProfile = await getUserProfile(userAddress);
           userProfiles.set(userAddress as address, newUserProfile);
           setUserProfiles(userProfiles);
-          console.log("userProfile refreshed for " + userAddress);
+          console.log(
+            "userProfile refreshed for " + userAddress,
+            newUserProfile
+          );
         } catch (error) {
           console.log("No user profile found..");
         }
@@ -501,6 +513,7 @@ const App: React.FC = () => {
           setLoading,
           refreshStorage,
           nftContratTokenMetadataMap,
+          socket,
         }}
       >
         <IonReactRouter>

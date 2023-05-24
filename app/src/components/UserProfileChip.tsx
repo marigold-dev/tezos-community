@@ -12,8 +12,21 @@ export const UserProfileChip = ({
 }: UserProfileChipProps) => {
   return (
     <>
-      {userProfiles.get(address) && userProfiles.get(address)?.verified ? (
+      {userProfiles.get(address) ? (
         <IonChip>
+          <IonAvatar>
+            <IonImg
+              alt="o"
+              style={{ objectFit: "contain", padding: "0.2em" }}
+              src={userProfiles.get(address)?.photo}
+            />
+          </IonAvatar>
+          <IonLabel>
+            {userProfiles.get(address)?.displayName +
+              " (" +
+              userProfiles.get(address)?.socialAccountAlias +
+              ") "}
+          </IonLabel>
           <IonAvatar>
             <IonImg
               alt="social network"
@@ -26,12 +39,6 @@ export const UserProfileChip = ({
               }
             />
           </IonAvatar>
-          <IonLabel>
-            {userProfiles.get(address)?.displayName +
-              " (" +
-              userProfiles.get(address)?.socialAccountAlias +
-              ") "}
-          </IonLabel>
         </IonChip>
       ) : (
         address

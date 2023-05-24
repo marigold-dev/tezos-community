@@ -1,4 +1,5 @@
-import { NetworkType } from "@airgap/beacon-types";
+import { NetworkType, SigningType } from "@airgap/beacon-types";
+
 import { Clipboard } from "@capacitor/clipboard";
 import {
   IonButton,
@@ -18,10 +19,7 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
-import React, { useRef, useState } from "react";
-import { PAGES, UserContext, UserContextType } from "./App";
-
-import { Browser } from "@capacitor/browser";
+import { createMessagePayload, signIn } from "@siwt/sdk";
 import {
   arrowBackOutline,
   cardOutline,
@@ -31,10 +29,16 @@ import {
   personCircle,
   wallet as walletIcon,
 } from "ionicons/icons";
+import jwt_decode from "jwt-decode";
+import React, { useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { auth } from "twitter-api-sdk";
+import { PAGES, UserContext, UserContextType } from "./App";
+import { OAuth } from "./OAuth";
 import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
+import { UserProfileChip } from "./components/UserProfileChip";
 import { address } from "./type-aliases";
+const providers = ["twitter", "google", "facebook", "github"];
+
 export const Footer: React.FC = () => {
   const history = useHistory();
   const [presentAlert] = useIonAlert();
@@ -55,11 +59,10 @@ export const Footer: React.FC = () => {
     setLoading,
     refreshStorage,
     nftContratTokenMetadataMap,
+    socket,
   } = React.useContext(UserContext) as UserContextType;
 
   const modalProfile = useRef<HTMLIonModalElement>(null);
-
-  const [proofUrl, setProofUrl] = useState<string>("");
 
   const connectWallet = async (): Promise<void> => {
     try {
@@ -67,8 +70,13 @@ export const Footer: React.FC = () => {
 
       await wallet.requestPermissions({
         network: {
-          type: NetworkType.GHOSTNET,
-          rpcUrl: "https://ghostnet.tezos.marigold.dev",
+          type: process.env.REACT_APP_NETWORK
+            ? NetworkType[
+                process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
+              ]
+            : NetworkType.GHOSTNET,
+          rpcUrl:
+            "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev",
         },
       });
       console.log("after requestPermissions");
@@ -78,6 +86,37 @@ export const Footer: React.FC = () => {
       const balance = await Tezos.tz.getBalance(userAddress);
       setUserBalance(balance.toNumber());
       setUserAddress(userAddress);
+
+      console.log("****************** Connect to web2 backend now");
+
+      // create the message to be signed
+      const messagePayload = createMessagePayload({
+        dappUrl: "tzCommunity.marigold.dev",
+        pkh: userAddress,
+      });
+
+      // request the signature
+      const signedPayload = await wallet.client.requestSignPayload({
+        ...messagePayload,
+        signingType: SigningType.MICHELINE,
+      });
+
+      // sign in the user to our app
+      const { data } = await signIn("http://localhost:3001")({
+        pk: (await wallet.client.getActiveAccount())?.publicKey!,
+        pkh: userAddress,
+        message: messagePayload.payload,
+        signature: signedPayload.signature,
+      });
+
+      const { accessToken, idToken } = data;
+
+      console.log(
+        "*********************** accessToken, idToken",
+        accessToken,
+        jwt_decode(idToken)
+      );
+
       await refreshStorage();
 
       if (
@@ -101,82 +140,6 @@ export const Footer: React.FC = () => {
     history.replace(PAGES.ORGANIZATIONS);
   };
 
-  const login = async () => {
-    const authClient = new auth.OAuth2User({
-      client_id: process.env["REACT_APP_TWITTER_API_KEY"]!,
-      client_secret: process.env["REACT_APP_TWITTER_API_SECRET"]!,
-      callback: "http://localhost:3000",
-      scopes: ["tweet.read", "users.read", "offline.access"],
-    });
-
-    console.log("twitterClient initialized");
-    const authUrl = authClient.generateAuthURL({
-      state: userAddress,
-      code_challenge_method: "s256",
-    });
-    const POPUP_HEIGHT = 700;
-    const POPUP_WIDTH = 600;
-    await Browser.open({
-      url: authUrl,
-      height: POPUP_HEIGHT,
-      width: POPUP_WIDTH,
-      windowName: "Login",
-    });
-    /*
-    const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL +
-        "/user/" +
-        userAddress +
-        "/generateProof",
-      {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          displayName,
-          socialAccountAlias: contactId,
-          socialAccountType: contactIdProvider,
-        }),
-      }
-    );
-    const json: UserProfile = await response.json();
-    if (response.ok) {
-      console.log("User proof", json);
-      json.proofDate = new Date(json.proofDate);
-      setUserProfile(json);
-    } else {
-      console.log("ERROR : " + response.status);
-    }*/
-  };
-
-  /*
-  const verifyProof = async () => {
-    const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL +
-        "/user/" +
-        userAddress +
-        "/verifyProof",
-      {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ proofUrl }),
-      }
-    );
-    const json: UserProfile = await response.json();
-    if (response.ok) {
-      console.log("User is verified", json);
-      json.proofDate = new Date(json.proofDate);
-      setUserProfile(json);
-    } else {
-      console.log("ERROR : " + response.status);
-    }
-  };
-*/
   const claimNFT = async () => {
     console.log("claimNFT");
 
@@ -250,19 +213,16 @@ export const Footer: React.FC = () => {
                     <IonChip
                       id="verified"
                       color={
-                        userProfiles.get(userAddress as address) &&
-                        userProfiles.get(userAddress as address)!.verified
+                        userProfiles.get(userAddress as address)
                           ? "success"
                           : "warning"
                       }
                     >
-                      {userProfiles.get(userAddress as address) &&
-                      userProfiles.get(userAddress as address)!.verified
+                      {userProfiles.get(userAddress as address)
                         ? "Verified"
                         : "Unverified"}
                     </IonChip>
-                    {userProfiles.get(userAddress as address) &&
-                    userProfiles.get(userAddress as address)!.verified ? (
+                    {userProfiles.get(userAddress as address) ? (
                       ""
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
@@ -277,52 +237,22 @@ export const Footer: React.FC = () => {
                 </IonToolbar>
               </IonHeader>
               <IonContent color="light" class="ion-padding">
-                {userProfiles.get(userAddress as address) &&
-                userProfiles.get(userAddress as address)!.verified ? (
-                  <>
-                    <IonItem>
-                      <IonLabel>Display name : </IonLabel>
-                      {userProfiles.get(userAddress as address)!.displayName}
-                    </IonItem>
-                    <IonItem>
-                      <IonLabel>Social account type : </IonLabel>
-                      {
-                        userProfiles.get(userAddress as address)!
-                          .socialAccountType
-                      }
-                    </IonItem>
-                    <IonItem>
-                      <IonLabel>Social account alias : </IonLabel>
-                      {
-                        userProfiles.get(userAddress as address)!
-                          .socialAccountAlias
-                      }
-                    </IonItem>
-                    <IonItem>
-                      <IonLabel>Proof : </IonLabel>
-                      {userProfiles.get(userAddress as address)!.proof}
-                    </IonItem>
-                    <IonItem>
-                      <IonLabel>Proof date : </IonLabel>
-                      {userProfiles.get(userAddress as address)!.proofDate
-                        ? userProfiles
-                            .get(userAddress as address)!
-                            .proofDate?.toLocaleString()
-                        : ""}
-                    </IonItem>
-                    <IonItem>
-                      <IonLabel>Verified : </IonLabel>
-                      {userProfiles.get(userAddress as address)!.verified
-                        ? "true"
-                        : "false"}
-                    </IonItem>
-                  </>
+                {userProfiles.get(userAddress as address) ? (
+                  <UserProfileChip
+                    address={userAddress as address}
+                    userProfiles={userProfiles}
+                  />
                 ) : (
                   <>
                     <IonItem>
                       <IonLabel>Address : </IonLabel>
                       <IonText>{userAddress}</IonText>
                     </IonItem>
+                    <div>
+                      {providers.map((provider) => (
+                        <OAuth key={provider} provider={provider} />
+                      ))}
+                    </div>
                   </>
                 )}
 
