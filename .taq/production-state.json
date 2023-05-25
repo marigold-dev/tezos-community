@@ -42,6 +42,20 @@
                     "destination": "https://mainnet.api.tez.ie"
                 }
             ]
+        },
+        "@taqueria/plugin-taquito.deploy.1685022182268": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1685022182268,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT1UHmyHm3cBjv5m98yrPf1R6cVXt7BVRJRW",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
         }
     }
 }
