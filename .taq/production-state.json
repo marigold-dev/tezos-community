@@ -1,0 +1,47 @@
+{
+    "operations": {},
+    "tasks": {
+        "@taqueria/plugin-taquito.deploy.1684957646775": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1684957646775,
+            "output": [
+                {
+                    "contract": "nft.tz",
+                    "address": "KT1VeeSjhKRjr6qbFiGWjiuHXTxbfMqHiZR8",
+                    "alias": "nft",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1684957671959": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1684957671959,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT1AvuJp5onQMSWDsGmVWqkUgsYgKrGcBVWh",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1685017591586": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1685017591586,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT1RdGjfyy5TToJd4BnDzTMbYhkZofGjHwEA",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        }
+    }
+}
