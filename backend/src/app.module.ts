@@ -2,14 +2,19 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthcheckModule } from './healthcheck/healthcheck.module';
+import { SiwtModule } from './siwt/siwt.module';
 import { TwitterModule } from './twitter/twitter.module';
 import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
-import { SiwtModule } from './siwt/siwt.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: `.env.${process.env.NODE_ENV}` }),
+    ConfigModule.forRoot({
+      envFilePath:
+        process.env.NODE_ENV && process.env.NODE_ENV == 'dev'
+          ? `.env.dev`
+          : `.env`,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
