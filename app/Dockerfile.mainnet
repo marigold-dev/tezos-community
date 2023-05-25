@@ -20,4 +20,4 @@ RUN cd app && npm ci && npm run postinstall
 
 WORKDIR /tezos-community/app
 
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["npm", "start:prod"]
