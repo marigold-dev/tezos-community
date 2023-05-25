@@ -62,7 +62,7 @@ taq install @taqueria/plugin-taquito
 ## NFT (first)
 
 ```
-taq deploy nft.tz -e "testing"
+taq deploy main.tz -e "testing" --storage main.storage.ghostnet.tz
 ```
 
 > Important : Copy/paste the deployed address and change the nftAddress field on main.storageList.jsligo
