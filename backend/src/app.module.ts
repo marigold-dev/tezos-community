@@ -6,7 +6,6 @@ import { SiwtModule } from './siwt/siwt.module';
 import { TwitterModule } from './twitter/twitter.module';
 import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({

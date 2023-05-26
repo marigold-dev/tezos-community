@@ -29,8 +29,8 @@ export class TwitterOauthStrategy extends PassportStrategy(
   ) {
     const { id, provider, displayName, username, photos } = profile;
 
-    // Here a custom User object is returned. In the the repo I'm using a UsersService with repository pattern, learn more here: https://docs.nestjs.com/techniques/database
     return {
+      accessToken: _accessToken,
       provider: provider,
       providerId: id,
       name: displayName,

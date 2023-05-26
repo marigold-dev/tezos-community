@@ -29,6 +29,7 @@ import "./theme/variables.css";
 
 import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
 import { MichelineMichelsonV1Expression } from "@airgap/beacon-types/dist/esm/types/tezos/MichelineMichelsonV1Expression";
+import { Storage as LocalStorage } from "@ionic/storage";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
@@ -40,8 +41,9 @@ import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, unit } from "./type-aliases";
-
 setupIonicReact();
+
+const localStorage = new LocalStorage();
 
 export type TZIP21TokenMetadata = TokenMetadata & {
   artifactUri?: string; //A URI (as defined in the JSON Schema Specification) to the asset.
@@ -55,7 +57,7 @@ export type TZIP21TokenMetadata = TokenMetadata & {
 
 export enum SOCIAL_ACCOUNT_TYPE {
   // GOOGLE = "GOOGLE",
-  TWITTER = "TWITTER",
+  TWITTER = "twitter",
   /* WHATSAPP = "WHATSAPP",
   FACEBOOK = "FACEBOOK",
   DISCORD = "DISCORD",
@@ -102,6 +104,8 @@ export type UserContextType = {
   setUserAddress: Dispatch<SetStateAction<string>>;
   userProfiles: Map<address, UserProfile>;
   setUserProfiles: Dispatch<SetStateAction<Map<address, UserProfile>>>;
+  userProfile: UserProfile | null;
+  setUserProfile: Dispatch<SetStateAction<UserProfile | null>>;
   userBalance: number;
   setUserBalance: Dispatch<SetStateAction<number>>;
   Tezos: TezosToolkit;
@@ -113,6 +117,7 @@ export type UserContextType = {
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
   socket: Socket;
+  localStorage: LocalStorage;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
@@ -139,6 +144,7 @@ const App: React.FC = () => {
   const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
     new Map()
   );
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [storage, setStorage] = useState<Storage | null>(null);
   const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
     null
@@ -438,18 +444,21 @@ const App: React.FC = () => {
         const balance = await Tezos.tz.getBalance(userAddress);
         setUserBalance(balance.toNumber());
 
-        try {
-          //always refresh userProfile
-
-          const newUserProfile = await getUserProfile(userAddress);
-          userProfiles.set(userAddress as address, newUserProfile);
-          setUserProfiles(userProfiles);
-          console.log(
-            "userProfile refreshed for " + userAddress,
-            newUserProfile
+        //only refresh userProfile if there is SIWT
+        const access_token = await localStorage.get("access_token");
+        if (access_token) {
+          const newUserProfile = await getUserProfile(
+            userAddress,
+            access_token
           );
-        } catch (error) {
-          console.log("No user profile found..");
+          if (newUserProfile) {
+            userProfiles.set(userAddress as address, newUserProfile);
+            setUserProfiles(userProfiles);
+            console.log(
+              "userProfile refreshed for " + userAddress,
+              newUserProfile
+            );
+          }
         }
       }
 
@@ -492,6 +501,12 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
+  useEffect(() => {
+    (async () => {
+      await localStorage.create();
+    })();
+  }, []);
+
   return (
     <IonApp>
       <UserContext.Provider
@@ -500,6 +515,8 @@ const App: React.FC = () => {
           userBalance,
           userProfiles,
           setUserProfiles,
+          userProfile,
+          setUserProfile,
           Tezos,
           wallet,
           storage,
@@ -514,6 +531,7 @@ const App: React.FC = () => {
           refreshStorage,
           nftContratTokenMetadataMap,
           socket,
+          localStorage,
         }}
       >
         <IonReactRouter>

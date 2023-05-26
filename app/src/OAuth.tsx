@@ -1,7 +1,6 @@
 import { IonButton } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { UserContext, UserContextType } from "./App";
-import { UserProfileChip } from "./components/UserProfileChip";
 import { address } from "./type-aliases";
 
 type OAuthProps = {
@@ -9,17 +8,51 @@ type OAuthProps = {
 };
 
 export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
-  const { userAddress, userProfiles, setUserProfiles, refreshStorage, socket } =
-    React.useContext(UserContext) as UserContextType;
+  const {
+    userAddress,
+    setUserProfiles,
+    userProfiles,
+    setUserProfile,
+    socket,
+    localStorage,
+  } = React.useContext(UserContext) as UserContextType;
 
-  const [user, setUser] = useState<any>(null);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [popup, setPopup] = useState<any>();
 
   useEffect(() => {
-    socket.on(provider, (user) => {
-      //popup.close();
-      setUser(user);
+    socket.on(provider, async (providerTokenAccess) => {
+      console.log(
+        "on " +
+          provider +
+          " , user is connected via " +
+          providerTokenAccess +
+          " , let's claim it now"
+      );
+
+      const accessToken = (await localStorage.get("access_token"))!;
+
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "/" + provider + "/claim",
+        {
+          method: "POST",
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ providerAccessToken: providerTokenAccess }),
+        }
+      );
+      const up = await response.json();
+      if (response.ok) {
+        console.log("UserProfile registered on backend");
+        setUserProfile(up);
+        setUserProfiles(userProfiles.set(userAddress as address, up)); //update cache
+      } else {
+        console.log("ERROR : " + response.status);
+      }
+
+      //FIXME popup.close();
     });
   }, []);
 
@@ -56,28 +89,9 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
     }
   };
 
-  const closeCard = () => {
-    setUser(null);
-  };
-
   return (
-    <div>
-      {user ? (
-        <div>
-          <img src={user.photo} />
-          <IonButton onClick={closeCard}>Close card</IonButton>
-          <UserProfileChip
-            address={userAddress as address}
-            userProfiles={userProfiles}
-          ></UserProfileChip>
-        </div>
-      ) : (
-        <div>
-          <IonButton color="transparent" disabled onClick={startAuth}>
-            {provider}
-          </IonButton>
-        </div>
-      )}
-    </div>
+    <IonButton color="transparent" onClick={startAuth}>
+      {provider}
+    </IonButton>
   );
 };

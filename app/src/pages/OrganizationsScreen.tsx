@@ -69,6 +69,7 @@ export const OrganizationsScreen: React.FC = () => {
     setLoading,
     loading,
     refreshStorage,
+    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   const [myOrganizations, setMyOrganizations] = useState<Organization[]>([]);
@@ -139,6 +140,7 @@ export const OrganizationsScreen: React.FC = () => {
     (async () => {
       if (storage && storage.organizations) {
         let orgMembers: Map<string, address[]> = new Map();
+
         await Promise.all(
           storage.organizations.map(async (organization: Organization) => {
             const membersBigMapId = (
@@ -162,13 +164,14 @@ export const OrganizationsScreen: React.FC = () => {
             );
 
             //cache userprofiles
-
-            for (const key of keys) {
-              try {
-                userProfiles.set(key.key, await getUserProfile(key.key));
-                setUserProfiles(userProfiles);
-              } catch (error) {
-                console.log("Cannot get user profile", error);
+            const accessToken = await localStorage.get("access_token");
+            if (accessToken) {
+              for (const key of keys) {
+                const up = await getUserProfile(key.key, accessToken);
+                if (up) {
+                  userProfiles.set(key.key, up);
+                  setUserProfiles(userProfiles);
+                }
               }
             }
           })

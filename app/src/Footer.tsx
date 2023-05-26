@@ -35,6 +35,7 @@ import { useHistory } from "react-router-dom";
 import { PAGES, UserContext, UserContextType } from "./App";
 import { OAuth } from "./OAuth";
 import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
+import { getUserProfile } from "./Utils";
 import { UserProfileChip } from "./components/UserProfileChip";
 import { address } from "./type-aliases";
 const providers = ["twitter"];
@@ -49,6 +50,8 @@ export const Footer: React.FC = () => {
     userAddress,
     userProfiles,
     setUserProfiles,
+    userProfile,
+    setUserProfile,
     storage,
     storageNFT,
     mainWalletType,
@@ -59,7 +62,7 @@ export const Footer: React.FC = () => {
     setLoading,
     refreshStorage,
     nftContratTokenMetadataMap,
-    socket,
+    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   const modalProfile = useRef<HTMLIonModalElement>(null);
@@ -87,8 +90,6 @@ export const Footer: React.FC = () => {
       setUserBalance(balance.toNumber());
       setUserAddress(userAddress);
 
-      console.log("****************** Connect to web2 backend now");
-
       // create the message to be signed
       const messagePayload = createMessagePayload({
         dappUrl: "tzCommunity.marigold.dev",
@@ -109,15 +110,19 @@ export const Footer: React.FC = () => {
         signature: signedPayload.signature,
       });
 
-      const { accessToken, idToken } = data;
+      const { accessToken, idToken, refreshToken } = data;
 
-      console.log(
-        "*********************** accessToken, idToken",
-        accessToken,
-        jwt_decode(idToken)
-      );
+      console.log("SIWT Connected to web2 backend", jwt_decode(idToken));
 
-      await refreshStorage();
+      localStorage.set("access_token", accessToken);
+      localStorage.set("refresh_token", refreshToken);
+      localStorage.set("id_token", idToken);
+
+      const up = await getUserProfile(userAddress, accessToken);
+      if (up) {
+        setUserProfile(up);
+        setUserProfiles(userProfiles.set(userAddress as address, up)); //add to cache
+      }
 
       if (
         storageNFT &&
@@ -127,16 +132,17 @@ export const Footer: React.FC = () => {
       )
         modalProfile.current?.present();
     } catch (error) {
-      console.log("error connectWallet", error);
+      console.error("error connectWallet", error);
     }
   };
 
   const disconnectWallet = async (): Promise<void> => {
     setUserAddress("");
+    setUserProfile(null);
     setUserBalance(0);
     console.log("disconnecting wallet");
     await wallet.clearActiveAccount();
-
+    await localStorage.clear(); //remove SIWT tokens
     history.replace(PAGES.ORGANIZATIONS);
   };
 
@@ -237,7 +243,7 @@ export const Footer: React.FC = () => {
                 </IonToolbar>
               </IonHeader>
               <IonContent color="light" class="ion-padding">
-                {userProfiles.get(userAddress as address) ? (
+                {userProfile ? (
                   <UserProfileChip
                     address={userAddress as address}
                     userProfiles={userProfiles}
