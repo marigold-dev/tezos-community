@@ -38,11 +38,12 @@ import {
   SOCIAL_ACCOUNT_TYPE,
   UserContext,
   UserContextType,
+  getUserProfile,
 } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { getStatusColor, getUserProfile } from "../Utils";
+import { getStatusColor } from "../Utils";
 import { address } from "../type-aliases";
 import { OrganizationScreen } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
@@ -164,14 +165,11 @@ export const OrganizationsScreen: React.FC = () => {
             );
 
             //cache userprofiles
-            const accessToken = await localStorage.get("access_token");
-            if (accessToken) {
-              for (const key of keys) {
-                const up = await getUserProfile(key.key, accessToken);
-                if (up) {
-                  userProfiles.set(key.key, up);
-                  setUserProfiles(userProfiles);
-                }
+            for (const key of keys) {
+              const up = await getUserProfile(key.key);
+              if (up) {
+                userProfiles.set(key.key, up);
+                setUserProfiles(userProfiles);
               }
             }
           })

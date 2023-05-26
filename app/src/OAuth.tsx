@@ -1,8 +1,8 @@
+import { Browser } from "@capacitor/browser";
 import { IonButton } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { UserContext, UserContextType } from "./App";
 import { address } from "./type-aliases";
-
 type OAuthProps = {
   provider: string;
 };
@@ -17,9 +17,6 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
     localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
-  const [disabled, setDisabled] = useState<boolean>(false);
-  const [popup, setPopup] = useState<any>();
-
   useEffect(() => {
     socket.on(provider, async (providerTokenAccess) => {
       console.log(
@@ -30,7 +27,8 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
           " , let's claim it now"
       );
 
-      const accessToken = (await localStorage.get("access_token"))!;
+      const accessToken = await localStorage.get("access_token");
+      if (!accessToken) throw Error("You lost your SIWT accessToken");
 
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "/" + provider + "/claim",
@@ -52,45 +50,26 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
         console.log("ERROR : " + response.status);
       }
 
-      //FIXME popup.close();
+      await Browser.close();
     });
   }, []);
 
-  const checkPopup = () => {
-    const check = setInterval(() => {
-      if (!popup || popup.closed || popup.closed === undefined) {
-        clearInterval(check);
-        setDisabled(false);
-      }
-    }, 1000);
-  };
-
-  const openPopup = () => {
-    const width = 600,
-      height = 600;
-    const left = window.innerWidth / 2 - width / 2;
-    const top = window.innerHeight / 2 - height / 2;
+  const openPopup = async () => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/${provider}?socketId=${socket.id}`;
-
-    return window.open(
+    await Browser.open({
       url,
-      "",
-      `toolbar=no, location=no, directories=no, status=no, menubar=no, 
-      scrollbars=no, resizable=no, copyhistory=no, width=${width}, 
-      height=${height}, top=${top}, left=${left}`
-    );
-  };
-
-  const startAuth = () => {
-    if (!disabled) {
-      setPopup(openPopup());
-      checkPopup();
-      setDisabled(true);
-    }
+      windowName: provider,
+      presentationStyle: "fullscreen",
+    });
   };
 
   return (
-    <IonButton color="transparent" onClick={startAuth}>
+    <IonButton
+      id={"open-" + provider}
+      size="large"
+      color="warning"
+      onClick={openPopup}
+    >
       {provider}
     </IonButton>
   );

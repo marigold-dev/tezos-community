@@ -34,7 +34,6 @@ import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { getUserProfile } from "./Utils";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FundingScreen } from "./pages/FundingScreen";
@@ -44,6 +43,34 @@ import { BigMap, address, unit } from "./type-aliases";
 setupIonicReact();
 
 const localStorage = new LocalStorage();
+
+export const getUserProfile = async (
+  userAddress: string
+): Promise<UserProfile | null> => {
+  try {
+    const accessToken = await localStorage.get("access_token");
+    if (!accessToken) throw Error("you lost the SIWT accessToken ");
+
+    const response = await fetch(
+      process.env.REACT_APP_BACKEND_URL + "/user/" + userAddress,
+      {
+        method: "GET",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const json = await response.json();
+    if (response.ok) {
+      json.proofDate = new Date(json.proofDate); //convert dates
+      return new Promise((resolve, reject) => resolve(json));
+    } else {
+      return new Promise((resolve, reject) => resolve(null));
+    }
+  } catch (error) {
+    return new Promise((resolve, reject) => resolve(null));
+  }
+};
 
 export type TZIP21TokenMetadata = TokenMetadata & {
   artifactUri?: string; //A URI (as defined in the JSON Schema Specification) to the asset.
@@ -445,20 +472,15 @@ const App: React.FC = () => {
         setUserBalance(balance.toNumber());
 
         //only refresh userProfile if there is SIWT
-        const access_token = await localStorage.get("access_token");
-        if (access_token) {
-          const newUserProfile = await getUserProfile(
-            userAddress,
-            access_token
+
+        const newUserProfile = await getUserProfile(userAddress);
+        if (newUserProfile) {
+          userProfiles.set(userAddress as address, newUserProfile);
+          setUserProfiles(userProfiles);
+          console.log(
+            "userProfile refreshed for " + userAddress,
+            newUserProfile
           );
-          if (newUserProfile) {
-            userProfiles.set(userAddress as address, newUserProfile);
-            setUserProfiles(userProfiles);
-            console.log(
-              "userProfile refreshed for " + userAddress,
-              newUserProfile
-            );
-          }
         }
       }
 

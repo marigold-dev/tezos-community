@@ -32,10 +32,9 @@ import {
 import jwt_decode from "jwt-decode";
 import React, { useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { PAGES, UserContext, UserContextType } from "./App";
+import { PAGES, UserContext, UserContextType, getUserProfile } from "./App";
 import { OAuth } from "./OAuth";
 import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
-import { getUserProfile } from "./Utils";
 import { UserProfileChip } from "./components/UserProfileChip";
 import { address } from "./type-aliases";
 const providers = ["twitter"];
@@ -118,7 +117,7 @@ export const Footer: React.FC = () => {
       localStorage.set("refresh_token", refreshToken);
       localStorage.set("id_token", idToken);
 
-      const up = await getUserProfile(userAddress, accessToken);
+      const up = await getUserProfile(userAddress);
       if (up) {
         setUserProfile(up);
         setUserProfiles(userProfiles.set(userAddress as address, up)); //add to cache
@@ -218,17 +217,11 @@ export const Footer: React.FC = () => {
                     Profile
                     <IonChip
                       id="verified"
-                      color={
-                        userProfiles.get(userAddress as address)
-                          ? "success"
-                          : "warning"
-                      }
+                      color={userProfile ? "success" : "warning"}
                     >
-                      {userProfiles.get(userAddress as address)
-                        ? "Verified"
-                        : "Unverified"}
+                      {userProfile ? "Verified" : "Unverified"}
                     </IonChip>
-                    {userProfiles.get(userAddress as address) ? (
+                    {userProfile ? (
                       ""
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
@@ -244,21 +237,26 @@ export const Footer: React.FC = () => {
               </IonHeader>
               <IonContent color="light" class="ion-padding">
                 {userProfile ? (
-                  <UserProfileChip
-                    address={userAddress as address}
-                    userProfiles={userProfiles}
-                  />
+                  <IonItem>
+                    <UserProfileChip
+                      address={userAddress as address}
+                      userProfiles={userProfiles}
+                    />
+                  </IonItem>
                 ) : (
                   <>
                     <IonItem>
                       <IonLabel>Address : </IonLabel>
                       <IonText>{userAddress}</IonText>
                     </IonItem>
-                    <div>
+                    <IonItem>
+                      <IonLabel color="warning">
+                        Link your address to a social network
+                      </IonLabel>
                       {providers.map((provider) => (
                         <OAuth key={provider} provider={provider} />
                       ))}
-                    </div>
+                    </IonItem>
                   </>
                 )}
 
@@ -266,14 +264,16 @@ export const Footer: React.FC = () => {
                 storageNFT.owner_token_ids.findIndex(
                   (obj) => obj[0] === (userAddress as address)
                 ) >= 0 ? (
-                  <IonImg
-                    src={nftContratTokenMetadataMap
-                      .get(0)!
-                      .thumbnailUri?.replace(
-                        "ipfs://",
-                        "https://gateway.pinata.cloud/ipfs/"
-                      )}
-                  />
+                  <IonItem>
+                    <IonImg
+                      src={nftContratTokenMetadataMap
+                        .get(0)!
+                        .thumbnailUri?.replace(
+                          "ipfs://",
+                          "https://gateway.pinata.cloud/ipfs/"
+                        )}
+                    />
+                  </IonItem>
                 ) : (
                   <IonButton size="large" onClick={claimNFT} color="warning">
                     <IonIcon slot="start" icon={cardOutline}></IonIcon>
