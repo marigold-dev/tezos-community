@@ -8,17 +8,11 @@ export class TwitterOauthStrategy extends PassportStrategy(
   TwitterStrategy,
   'twitter',
 ) {
-  static getCallback = (provider: string) => {
-    return process.env.NODE_ENV === 'production'
-      ? `https://tzcommunity.marigold.dev/${provider}/callback`
-      : `http://localhost:3001/${provider}/callback`;
-  };
-
   constructor(configService: ConfigService) {
     super({
       consumerKey: configService.get('TWITTER_KEY'),
       consumerSecret: configService.get('TWITTER_SECRET'),
-      callbackURL: TwitterOauthStrategy.getCallback('twitter'),
+      callbackURL: process.env.SERVER_URL + `/twitter/callback`,
     });
   }
 

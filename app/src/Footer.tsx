@@ -117,9 +117,9 @@ export const Footer: React.FC = () => {
 
       console.log("SIWT Connected to web2 backend", jwt_decode(idToken));
 
-      localStorage.set("access_token", accessToken);
-      localStorage.set("refresh_token", refreshToken);
-      localStorage.set("id_token", idToken);
+      await localStorage.set("access_token", accessToken);
+      await localStorage.set("refresh_token", refreshToken);
+      await localStorage.set("id_token", idToken);
 
       const up = await getUserProfile(userAddress);
       if (up) {

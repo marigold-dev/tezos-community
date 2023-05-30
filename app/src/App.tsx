@@ -484,15 +484,16 @@ const App: React.FC = () => {
         setUserBalance(balance.toNumber());
 
         //only refresh userProfile if there is SIWT
-
-        const newUserProfile = await getUserProfile(userAddress);
-        if (newUserProfile) {
-          userProfiles.set(userAddress as address, newUserProfile);
-          setUserProfiles(userProfiles);
-          console.log(
-            "userProfile refreshed for " + userAddress,
-            newUserProfile
-          );
+        if (await localStorage.get("access_token")) {
+          const newUserProfile = await getUserProfile(userAddress);
+          if (newUserProfile) {
+            userProfiles.set(userAddress as address, newUserProfile);
+            setUserProfiles(userProfiles);
+            console.log(
+              "userProfile refreshed for " + userAddress,
+              newUserProfile
+            );
+          }
         }
       }
 
@@ -586,7 +587,7 @@ const App: React.FC = () => {
         }
         return await getUserProfile(whateverUserAddress);
       } else {
-        console.error("response ko", response);
+        console.warn("User Profile not found", response);
         return new Promise((resolve, reject) => resolve(null));
       }
     } catch (error) {

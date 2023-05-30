@@ -166,10 +166,12 @@ export const OrganizationsScreen: React.FC = () => {
 
             //cache userprofiles
             for (const key of keys) {
-              const up = await getUserProfile(key.key);
-              if (up) {
-                userProfiles.set(key.key, up);
-                setUserProfiles(userProfiles);
+              if (await localStorage.get("access_token")) {
+                const up = await getUserProfile(key.key);
+                if (up) {
+                  userProfiles.set(key.key, up);
+                  setUserProfiles(userProfiles);
+                }
               }
             }
           })
