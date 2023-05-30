@@ -28,6 +28,7 @@ export class SiwtGuard implements CanActivate {
       } else {
         Logger.debug(
           'Cannot find the user address inside the access_token claims',
+          'SiwtGuard',
         );
         throw new UnauthorizedException();
       }

@@ -3,11 +3,56 @@ import * as express from 'express';
 
 import { verifySignature as taquitoVerifySignature } from '@taquito/utils';
 import { SiwtService } from './siwt.service';
-@Controller('signin')
+@Controller('siwt')
 export class SiwtController {
   constructor(private siwtService: SiwtService) {}
 
-  @Post()
+  @Post('refreshToken')
+  async refreshToken(
+    @Body('refreshToken') refreshToken: string,
+    @Body('pkh') pkh: string,
+    @Res() res: express.Response,
+  ) {
+    Logger.debug('POST refreshToken', refreshToken);
+    try {
+      const isValidSignature =
+        this.siwtService.siwtClient.verifyRefreshToken(refreshToken);
+      if (isValidSignature) {
+        const newRefreshToken =
+          this.siwtService.siwtClient.generateRefreshToken({ pkh });
+
+        const claims = {
+          iss: 'marigold',
+        };
+
+        // the minimum we need to return is an access token that
+        // allows the user to access the API. The pkh is required,
+        // extra claims are optional.
+        const accessToken = this.siwtService.siwtClient.generateAccessToken({
+          pkh,
+          claims,
+        });
+
+        const idToken = this.siwtService.siwtClient.generateIdToken({
+          pkh,
+          claims,
+        });
+
+        return res.send({
+          accessToken,
+          newRefreshToken,
+          idToken,
+          tokenType: 'Bearer',
+        });
+      }
+      return res.status(403).send('Forbidden');
+    } catch (e) {
+      Logger.error(e);
+      return res.status(403).send('Forbidden');
+    }
+  }
+
+  @Post('signin')
   async signin(
     @Body('message') message: string,
     @Body('pk') pk: string,

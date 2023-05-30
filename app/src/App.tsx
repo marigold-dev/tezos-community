@@ -4,6 +4,8 @@ import {
   RefresherEventDetail,
   setupIonicReact,
 } from "@ionic/react";
+import { useHistory } from "react-router-dom";
+
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
@@ -25,6 +27,7 @@ import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
 import { LocalNotifications } from "@capacitor/local-notifications";
+import jwt_decode from "jwt-decode";
 import "./theme/variables.css";
 
 import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
@@ -44,30 +47,35 @@ setupIonicReact();
 
 const localStorage = new LocalStorage();
 
-export const getUserProfile = async (
-  userAddress: string
-): Promise<UserProfile | null> => {
+export const refreshToken = async (userAddress: string) => {
   try {
-    const accessToken = await localStorage.get("access_token");
-    if (!accessToken) throw Error("you lost the SIWT accessToken ");
-
     const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL + "/user/" + userAddress,
+      process.env.REACT_APP_BACKEND_URL + "/siwt/refreshToken",
       {
-        method: "GET",
+        method: "POST",
         headers: {
-          authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          refreshToken: await localStorage.get("refresh_token"),
+          pkh: userAddress,
+        }),
       }
     );
-    const json = await response.json();
+    const data = await response.json();
     if (response.ok) {
-      json.proofDate = new Date(json.proofDate); //convert dates
-      return new Promise((resolve, reject) => resolve(json));
+      const { accessToken, idToken, refreshToken } = data;
+      console.log("SIWT reconnected to web2 backend", jwt_decode(idToken));
+
+      localStorage.set("access_token", accessToken);
+      localStorage.set("refresh_token", refreshToken);
+      localStorage.set("id_token", idToken);
     } else {
+      console.error("error trying to refresh token", response);
       return new Promise((resolve, reject) => resolve(null));
     }
   } catch (error) {
+    console.error("error", error);
     return new Promise((resolve, reject) => resolve(null));
   }
 };
@@ -141,6 +149,8 @@ export type UserContextType = {
   nftWalletType: NftWalletType | null;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
+  disconnectWallet: () => Promise<void>;
+  getUserProfile: (whateverUserAddress: string) => Promise<UserProfile | null>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
   socket: Socket;
@@ -150,6 +160,8 @@ export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
   const socket: Socket = io(process.env.REACT_APP_BACKEND_URL!);
+
+  const history = useHistory();
 
   const [Tezos, setTezos] = useState<TezosToolkit>(
     new TezosToolkit(
@@ -529,6 +541,60 @@ const App: React.FC = () => {
     })();
   }, []);
 
+  const disconnectWallet = async (): Promise<void> => {
+    setUserAddress("");
+    setUserProfile(null);
+    setUserBalance(0);
+    console.log("disconnecting wallet");
+    await wallet.clearActiveAccount();
+    await localStorage.clear(); //remove SIWT tokens
+    history.replace(PAGES.ORGANIZATIONS);
+  };
+
+  const getUserProfile = async (
+    whateverUserAddress: string
+  ): Promise<UserProfile | null> => {
+    try {
+      const accessToken = await localStorage.get("access_token");
+      if (!accessToken) {
+        console.error("you lost the SIWT accessToken, disconnecting...");
+        disconnectWallet();
+        return null;
+      }
+
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "/user/" + whateverUserAddress,
+        {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const json = await response.json();
+      if (response.ok) {
+        json.proofDate = new Date(json.proofDate); //convert dates
+        return new Promise((resolve, reject) => resolve(json));
+      } else if (response.status === 401 || response.status === 403) {
+        console.warn("Silently refreshing token", response);
+        try {
+          await refreshToken(whateverUserAddress);
+        } catch (error) {
+          console.error("Cannot refresh token, disconnect");
+          disconnectWallet();
+          return null;
+        }
+        return await getUserProfile(whateverUserAddress);
+      } else {
+        console.error("response ko", response);
+        return new Promise((resolve, reject) => resolve(null));
+      }
+    } catch (error) {
+      console.error("error", error);
+      return new Promise((resolve, reject) => resolve(null));
+    }
+  };
+
   return (
     <IonApp>
       <UserContext.Provider
@@ -551,9 +617,11 @@ const App: React.FC = () => {
           loading,
           setLoading,
           refreshStorage,
+          getUserProfile,
           nftContratTokenMetadataMap,
           socket,
           localStorage,
+          disconnectWallet,
         }}
       >
         <IonReactRouter>

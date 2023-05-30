@@ -38,7 +38,6 @@ import {
   SOCIAL_ACCOUNT_TYPE,
   UserContext,
   UserContextType,
-  getUserProfile,
 } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
@@ -70,6 +69,7 @@ export const OrganizationsScreen: React.FC = () => {
     setLoading,
     loading,
     refreshStorage,
+    getUserProfile,
     localStorage,
   } = React.useContext(UserContext) as UserContextType;
 

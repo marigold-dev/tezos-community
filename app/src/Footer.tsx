@@ -32,7 +32,7 @@ import {
 import jwt_decode from "jwt-decode";
 import React, { useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { PAGES, UserContext, UserContextType, getUserProfile } from "./App";
+import { PAGES, UserContext, UserContextType } from "./App";
 import { OAuth } from "./OAuth";
 import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
 import { UserProfileChip } from "./components/UserProfileChip";
@@ -60,6 +60,8 @@ export const Footer: React.FC = () => {
     setUserBalance,
     setLoading,
     refreshStorage,
+    getUserProfile,
+    disconnectWallet,
     nftContratTokenMetadataMap,
     localStorage,
   } = React.useContext(UserContext) as UserContextType;
@@ -102,7 +104,9 @@ export const Footer: React.FC = () => {
       });
 
       // sign in the user to our app
-      const { data } = await signIn("http://localhost:3001")({
+      const { data } = await signIn(
+        process.env.REACT_APP_BACKEND_URL! + "/siwt"
+      )({
         pk: (await wallet.client.getActiveAccount())?.publicKey!,
         pkh: userAddress,
         message: messagePayload.payload,
@@ -133,16 +137,6 @@ export const Footer: React.FC = () => {
     } catch (error) {
       console.error("error connectWallet", error);
     }
-  };
-
-  const disconnectWallet = async (): Promise<void> => {
-    setUserAddress("");
-    setUserProfile(null);
-    setUserBalance(0);
-    console.log("disconnecting wallet");
-    await wallet.clearActiveAccount();
-    await localStorage.clear(); //remove SIWT tokens
-    history.replace(PAGES.ORGANIZATIONS);
   };
 
   const claimNFT = async () => {
