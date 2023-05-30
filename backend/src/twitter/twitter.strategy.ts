@@ -10,8 +10,8 @@ export class TwitterOauthStrategy extends PassportStrategy(
 ) {
   constructor(configService: ConfigService) {
     super({
-      consumerKey: configService.get('TWITTER_KEY'),
-      consumerSecret: configService.get('TWITTER_SECRET'),
+      consumerKey: process.env.TWITTER_KEY,
+      consumerSecret: process.env.TWITTER_SECRET,
       callbackURL: process.env.SERVER_URL + `/twitter/callback`,
     });
   }

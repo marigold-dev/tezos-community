@@ -8,12 +8,7 @@ import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath:
-        process.env.NODE_ENV && process.env.NODE_ENV == 'dev'
-          ? `.env.dev`
-          : `.env`,
-    }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
