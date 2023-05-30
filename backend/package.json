@@ -31,6 +31,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "@nestjs/websockets": "^9.4.2",
     "@siwt/core": "^0.0.3",
+    "@taquito/utils": "^16.2.0",
     "cache-manager": "^5.2.1",
     "cookie-parser": "^1.4.6",
     "crypto": "^1.0.1",
