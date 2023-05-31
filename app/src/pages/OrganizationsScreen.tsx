@@ -688,7 +688,7 @@ export const OrganizationsScreen: React.FC = () => {
                     <IonInput
                       labelPlacement="floating"
                       value={siteUrl}
-                      label="Site url goal"
+                      label="Website"
                       placeholder="https://"
                       type="text"
                       maxlength={255}

@@ -11,7 +11,7 @@ export type Storage = {
   organizations: Array<{
     admins: Array<address>;
     business: string;
-    fundingAddress?: address;
+    fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -31,7 +31,7 @@ export type Storage = {
   tezosOrganization: {
     admins: Array<address>;
     business: string;
-    fundingAddress?: address;
+    fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -82,6 +82,14 @@ type Methods = {
     orgName: string
   ) => Promise<void>;
   sendMessage: (_0: string, _1: string) => Promise<void>;
+  updateOrganization: (
+    business: string,
+    fundingAddress: address | null,
+    ipfsNftUrl: string,
+    logoUrl: string,
+    name: string,
+    siteUrl: string
+  ) => Promise<void>;
 };
 
 type MethodsObject = {
@@ -116,6 +124,14 @@ type MethodsObject = {
     orgName: string;
   }) => Promise<void>;
   sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
+  updateOrganization: (params: {
+    business: string;
+    fundingAddress?: address;
+    ipfsNftUrl: string;
+    logoUrl: string;
+    name: string;
+    siteUrl: string;
+  }) => Promise<void>;
 };
 
 type contractTypes = {

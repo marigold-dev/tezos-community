@@ -82,6 +82,40 @@ export const OrganizationScreen = ({
   const [amount, setAmount] = useState<number>(0);
   const [amountIsValid, setAmountIsValid] = useState<boolean>(false);
 
+  //update org
+  const [businessIsValid, setBusinessIsValid] = useState<boolean>(true);
+
+  const updateOrganization = async () => {
+    console.log("updateOrganization");
+
+    try {
+      setLoading(true);
+      const op = await mainWalletType!.methods
+        .updateOrganization(
+          organization!.business,
+          organization!.fundingAddress,
+          organization!.ipfsNftUrl,
+          organization!.logoUrl,
+          organization!.name,
+          organization!.siteUrl
+        )
+        .send();
+      await op?.confirmation();
+      await refreshOrganization();
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
   const transfer = async () => {
     console.log("transfer", Tezos);
 
@@ -195,44 +229,183 @@ export const OrganizationScreen = ({
                 <IonList lines="none">
                   <IonItem>
                     <IonInput
-                      readonly
+                      readonly={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? false
+                          : true
+                      }
+                      type="text"
+                      maxlength={255}
+                      counter={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? true
+                          : false
+                      }
                       label-placement="stacked"
-                      label="Website"
-                      value={organization.siteUrl}
-                    ></IonInput>
-                  </IonItem>
-                  <IonItem>
-                    <IonInput
-                      readonly
-                      label-placement="stacked"
-                      label="Logo"
-                      value={organization.logoUrl}
-                    ></IonInput>
-                  </IonItem>
-                  <IonItem>
-                    <IonInput
-                      readonly
-                      label-placement="stacked"
-                      label="IPFS membership card url"
-                      value={organization.ipfsNftUrl}
-                    ></IonInput>
-                  </IonItem>
-                  <IonItem>
-                    <IonInput
-                      readonly
-                      label-placement="stacked"
-                      label="Objective"
+                      label="Business"
                       value={organization.business}
+                      onIonChange={(str) => {
+                        if (
+                          str.detail.value === undefined ||
+                          !str.target.value ||
+                          str.target.value === ""
+                        ) {
+                          setBusinessIsValid(false);
+                        } else {
+                          organization.business = str.target.value as string;
+                          setOrganization(organization);
+                          setBusinessIsValid(true);
+                        }
+                      }}
+                      helperText={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "Enter a business, goal or objective"
+                          : ""
+                      }
+                      errorText="Business required"
+                      className={`${businessIsValid && "ion-valid"} ${
+                        businessIsValid === false && "ion-invalid"
+                      } `}
                     ></IonInput>
+                  </IonItem>
+                  <IonItem>
+                    <IonInput
+                      readonly={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? false
+                          : true
+                      }
+                      label-placement="stacked"
+                      value={organization.siteUrl}
+                      label="Website"
+                      placeholder={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "https://"
+                          : ""
+                      }
+                      type="text"
+                      maxlength={255}
+                      counter={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? true
+                          : false
+                      }
+                      helperText={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "Enter your website url"
+                          : ""
+                      }
+                      onIonChange={(str) => {
+                        if (str.detail.value === undefined) return;
+                        organization.siteUrl = str.target.value! as string;
+                        setOrganization(organization);
+                      }}
+                    />
+                  </IonItem>
+                  <IonItem>
+                    <IonInput
+                      readonly={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? false
+                          : true
+                      }
+                      counter={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? true
+                          : false
+                      }
+                      label-placement="stacked"
+                      value={organization.logoUrl}
+                      label="Logo url"
+                      placeholder={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "https://"
+                          : ""
+                      }
+                      type="text"
+                      maxlength={255}
+                      helperText={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "Enter logo image URL to display"
+                          : ""
+                      }
+                      onIonChange={(str) => {
+                        if (str.detail.value === undefined) return;
+                        organization.logoUrl = str.target.value! as string;
+                        setOrganization(organization);
+                      }}
+                    />
                   </IonItem>
 
                   <IonItem>
                     <IonInput
-                      readonly
+                      readonly={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? false
+                          : true
+                      }
                       label-placement="stacked"
-                      label="Funding address"
+                      value={organization.ipfsNftUrl}
+                      label="IPFS membership card url"
+                      placeholder={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "ipfs://"
+                          : ""
+                      }
+                      type="text"
+                      maxlength={255}
+                      counter={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? true
+                          : false
+                      }
+                      helperText={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "Enter ipfs URL to your member card"
+                          : ""
+                      }
+                      onIonChange={(str) => {
+                        if (str.detail.value === undefined) return;
+                        organization.ipfsNftUrl = str.target.value! as string;
+                        setOrganization(organization);
+                      }}
+                    />
+                  </IonItem>
+
+                  <IonItem>
+                    <IonInput
+                      label-placement="stacked"
                       value={organization.fundingAddress}
-                    ></IonInput>
+                      counter={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? true
+                          : false
+                      }
+                      readonly={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? false
+                          : true
+                      }
+                      label="Funding address"
+                      placeholder={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "tzxxxx or KT1xxxxx"
+                          : ""
+                      }
+                      type="text"
+                      maxlength={36}
+                      helperText={
+                        organization.admins.indexOf(userAddress as address) >= 0
+                          ? "Enter your funding address (if you have)"
+                          : ""
+                      }
+                      onIonChange={(str) => {
+                        if (str.detail.value === undefined) return;
+                        organization.fundingAddress = str.target
+                          .value! as unknown as address;
+                        setOrganization(organization);
+                      }}
+                    />
 
                     {organization.fundingAddress ? (
                       <>
@@ -341,6 +514,18 @@ export const OrganizationScreen = ({
                         </IonList>
                       </IonItem>
                     </>
+                  ) : (
+                    ""
+                  )}
+
+                  {organization.admins.indexOf(userAddress as address) >= 0 ? (
+                    <IonButton
+                      disabled={!businessIsValid}
+                      color="transparent"
+                      onClick={updateOrganization}
+                    >
+                      Update organization
+                    </IonButton>
                   ) : (
                     ""
                   )}

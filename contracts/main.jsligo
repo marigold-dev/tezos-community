@@ -8,6 +8,15 @@ export type removeAdminParameters = {
   lastAdmin: option<address>
 };
 
+export type updateOrganizationParameters = {
+  name: string,
+  business: string,
+  siteUrl: string,
+  logoUrl: string,
+  ipfsNftUrl: string,
+  fundingAddress: option<address>
+}
+
 export type addAdminParameters = { admin: address, orgName: string };
 
 export type joinRequest = {
@@ -57,7 +66,39 @@ export type storage = {
 
 export type _return = [list<operation>, storage];
 
-export /* @entry */
+@entry 
+export
+const updateOrganization = (orgToUpdate: updateOrganizationParameters, store: storage): _return => {
+  return match(
+    List.find_opt(
+      (org: organization) => org.name == orgToUpdate.name,
+      store.organizations
+    ),
+    {
+      None: () =>
+        failwith(
+          "Cannot find an organization with the one passed as parameter"
+        ),
+      Some: (org) =>
+        Set.mem(Tezos.get_sender(), org.admins) ? [
+            list([Tezos.emit("%organizationUpdated", org.name)]),
+            {
+              ...store,
+              organizations: List.update_with(
+                (orgItem: organization) => (org.name == orgItem.name),
+                { ...org, logoUrl : orgToUpdate.logoUrl, siteUrl : orgToUpdate.siteUrl, business : orgToUpdate.business , ipfsNftUrl : orgToUpdate.ipfsNftUrl , fundingAddress : orgToUpdate.fundingAddress },
+                store.organizations
+              )
+            }
+          ] : failwith(
+            "You need to be part of organization admins to update an organization"
+          )
+    }
+  )
+};
+
+@entry
+export 
 const activateOrganization = (orgName: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -87,7 +128,8 @@ const activateOrganization = (orgName: string, store: storage): _return => {
   )
 };
 
-export /* @entry */
+@entry 
+export 
 const freezeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -115,7 +157,8 @@ const freezeOrganization = (name: string, store: storage): _return => {
   )
 };
 
-export /* @entry */
+@entry
+export   
 const addOrganization = (org: addOrganizationRequest, store: storage): _return => {
   let newOrg: organization =
     {
@@ -167,8 +210,8 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
   }
 };
 
+ @entry 
 export
-/* @entry */
 const removeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -262,7 +305,8 @@ const leaveOrganizationAsAdmin = (
   }
 };
 
-export /* @entry */
+ @entry 
+export 
 const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -304,7 +348,8 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   )
 };
 
-export /* @entry */
+@entry 
+export 
 const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -345,7 +390,8 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
   )
 };
 
-export /* @entry */
+@entry
+export 
 const addAdmin = (aap: addAdminParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -385,7 +431,8 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
   )
 };
 
-export /* @entry */
+@entry 
+export  
 const addTezosAdmin = (admin: address, store: storage): _return => {
   if (Set.mem(Tezos.get_sender(), store.tezosOrganization.admins)) {
     return [
@@ -405,7 +452,8 @@ const addTezosAdmin = (admin: address, store: storage): _return => {
   }
 };
 
-export /* @entry */
+@entry 
+export  
 const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -446,7 +494,8 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
   )
 };
 
-export /* @entry */
+@entry
+export   
 const responseToJoinOrganization = (
   jor: joinOrganizationResponse,
   store: storage
@@ -507,7 +556,8 @@ const responseToJoinOrganization = (
   )
 };
 
-export /* @entry */
+@entry
+export   
 const sendMessage = ([to, message]: [string, string], store: storage): _return => {
   return [
     list([Tezos.emit("%message", [Tezos.get_source(), to, message])]),

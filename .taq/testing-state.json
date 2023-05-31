@@ -1,20 +1,6 @@
 {
     "operations": {},
     "tasks": {
-        "@taqueria/plugin-taquito.deploy.1683790894276": {
-            "task": "deploy",
-            "plugin": "@taqueria/plugin-taquito",
-            "time": 1683790894276,
-            "output": [
-                {
-                    "contract": "main.tz",
-                    "address": "KT1A85Vch6v4L4fpWMKSxQtJYPCRjkuYtGjs",
-                    "alias": "main",
-                    "balanceInMutez": "0",
-                    "destination": "https://ghostnet.tezos.marigold.dev"
-                }
-            ]
-        },
         "@taqueria/plugin-taquito.deploy.1684831805401": {
             "task": "deploy",
             "plugin": "@taqueria/plugin-taquito",
@@ -65,6 +51,20 @@
                 {
                     "contract": "main.tz",
                     "address": "KT1VXB64EspTN4cECFF7hibA4hFeQ2toQpw2",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://ghostnet.tezos.marigold.dev"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1685534956167": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1685534956167,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT19n9ARGLHjh6szBkP1REfBFJhfrDkp1UEw",
                     "alias": "main",
                     "balanceInMutez": "0",
                     "destination": "https://ghostnet.tezos.marigold.dev"

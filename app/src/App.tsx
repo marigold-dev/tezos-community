@@ -120,7 +120,7 @@ export type MemberRequest = {
 export type Organization = {
   admins: Array<address>;
   business: string;
-  fundingAddress?: address;
+  fundingAddress: address | null;
   ipfsNftUrl: string;
   logoUrl: string;
   memberRequests: Array<MemberRequest>;
