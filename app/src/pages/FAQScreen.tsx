@@ -185,6 +185,19 @@ export const FAQScreen: React.FC = () => {
               you.
             </div>
           </IonAccordion>
+
+          <IonAccordion>
+            <IonItem slot="header" color="light">
+              <IonLabel>Why the dapp is mobile oriented?</IonLabel>
+            </IonItem>
+            <div className="ion-padding ion-text-justify" slot="content">
+              The next effort will be on building this dapp for mobile and run
+              as background app. Except if you are organization active
+              administrator, this application is more oriented to be a
+              configuration and notification center tool like and a Tezos global
+              LDAP
+            </div>
+          </IonAccordion>
         </IonAccordionGroup>
       </IonContent>
       <Footer />
