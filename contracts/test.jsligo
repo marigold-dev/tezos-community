@@ -44,7 +44,6 @@ const tezosOrganization: CONTRACT.organization =
     ) as set<address>,
     status: Active(),
     memberRequests: Set.empty as set<CONTRACT.joinOrganizationRequest>,
-    verified: true,
     fundingAddress: None() as option<address>
   };
 
@@ -117,7 +116,6 @@ const contrNFT = Test.to_contract(taddrNFT);
 
 const initial_storage: CONTRACT.storage =
   {
-    memberProfileVerified: Set.empty as set<address>,
     tezosOrganization: tezosOrganization,
     organizations: list([]) as list<CONTRACT.organization>,
     organizationMax: 100 as nat,

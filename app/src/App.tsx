@@ -128,7 +128,6 @@ export type Organization = {
   name: string;
   siteUrl: string;
   status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
-  verified: boolean;
 };
 
 export type UserContextType = {

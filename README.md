@@ -27,13 +27,13 @@ TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile nft.jsligo
 Compile with last version
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile main.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.66.0 taq compile main.jsligo
 ```
 
 Run test
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq test test.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.66.0 taq test test.jsligo
 ```
 
 ## Deploy

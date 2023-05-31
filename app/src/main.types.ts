@@ -6,7 +6,6 @@ import {
 
 export type Storage = {
   adminsMax: nat;
-  memberProfileVerified: Array<address>;
   nftAddress: address;
   organizationMax: nat;
   organizations: Array<{
@@ -28,7 +27,6 @@ export type Storage = {
     name: string;
     siteUrl: string;
     status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
-    verified: boolean;
   }>;
   tezosOrganization: {
     admins: Array<address>;
@@ -49,7 +47,6 @@ export type Storage = {
     name: string;
     siteUrl: string;
     status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
-    verified: boolean;
   };
 };
 

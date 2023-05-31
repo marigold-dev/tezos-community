@@ -225,14 +225,6 @@ export const OrganizationScreen = ({
                       value={organization.business}
                     ></IonInput>
                   </IonItem>
-                  <IonItem>
-                    <IonInput
-                      readonly
-                      label-placement="stacked"
-                      label="Social account verified ?"
-                      value={organization.verified ? "true" : "false"}
-                    ></IonInput>
-                  </IonItem>
 
                   <IonItem>
                     <IonInput

@@ -44,12 +44,10 @@ export type organization = {
   admins: set<address>,
   status: organizationStatus,
   memberRequests: set<joinOrganizationRequest>,
-  verified: bool,
   fundingAddress: option<address>
 };
 
 export type storage = {
-  memberProfileVerified: set<address>,
   tezosOrganization: organization,
   organizations: list<organization>,
   organizationMax: nat,
@@ -131,7 +129,6 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
       members: Big_map.add(Tezos.get_sender(), unit, Big_map.empty) as
         big_map<address, unit>,
       memberRequests: Set.empty as set<joinOrganizationRequest>,
-      verified: false,
       fundingAddress: org.fundingAddress
     };
   if (List.size(store.organizations) >= store.organizationMax) {
@@ -170,7 +167,8 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
   }
 };
 
-export /* @entry */
+export
+/* @entry */
 const removeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(

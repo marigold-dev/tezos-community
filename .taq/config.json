@@ -39,8 +39,7 @@
     "environments": {
         "development": {
             "type": "flextesa",
-            "label": "Local Tezos Sandbox",
-            "rpcUrl": "https://ghostnet.tezos.marigold.dev"
+            "label": "Local Tezos Sandbox"
         },
         "testing": {
             "type": "simple",
