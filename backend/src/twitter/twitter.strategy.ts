@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy as TwitterStrategy } from 'passport-twitter';
@@ -14,9 +14,6 @@ export class TwitterOauthStrategy extends PassportStrategy(
       consumerSecret: process.env.TWITTER_SECRET,
       callbackURL: process.env.SERVER_URL + `/twitter/callback`,
     });
-    Logger.debug('TWITTER_KEY', process.env.TWITTER_KEY);
-    Logger.debug('TWITTER_SECRET', process.env.TWITTER_SECRET);
-    Logger.debug('SERVER_URL', process.env.SERVER_URL);
   }
 
   async validate(

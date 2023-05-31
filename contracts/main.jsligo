@@ -365,15 +365,14 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
             list([]),
             {
               ...store,
-              organizations: List.filter_map(
-                (orgItem: organization) =>
-                  orgItem.name == org.name ? Some(
-                      {
-                        ...org,
-                        members: Big_map.add(aap.admin, unit, org.members),
-                        admins: Set.add(aap.admin, org.admins)
-                      }
-                    ) : None() as option<organization>,
+              organizations: List.update_with(
+                (orgItem: organization) =>  orgItem.name == org.name,
+                {
+                  ...org,
+                  members: Big_map.add(aap.admin, unit, org.members),
+                  admins: Set.add(aap.admin, org.admins)
+                }
+                ,
                 store.organizations
               )
             }

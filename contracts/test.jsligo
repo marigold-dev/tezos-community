@@ -347,6 +347,38 @@ const _testRemoveMember = (
   return true;
 };
 
+
+const _testAddAdmin = (
+  sender: address,
+  addAdminParameters: CONTRACT.addAdminParameters,
+  adminCount: nat,
+  orgCount : nat
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, AddAdmin(addAdminParameters), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  const orgList: list<CONTRACT.organization> =
+    List.filter_map(
+      (orgItem: CONTRACT.organization) =>
+        orgItem.name == addAdminParameters.orgName ? Some(orgItem) : None(),
+      store.organizations
+    );
+ 
+  const orgOpt = List.head_opt(orgList);
+  Test.assert_with_error(
+    Option.is_some(orgOpt),
+    "Cannot extract the organization on the list"
+  );
+  const org = Option.unopt(orgOpt);
+  Test.assert_with_error( Set.cardinal(org.admins) == adminCount, "Problem on admin size");
+  Test.assert_with_error( List.size(store.organizations) == orgCount, "Problem on organization size");
+
+  return true;
+};
+
 // TEST SUITE
 
 //testClaimNFT
@@ -396,4 +428,33 @@ const userRemoveMemberRequest = {
   };
 const testRemoveMember =
   _testRemoveMember(user, userRemoveMemberRequest, false);
+
+
+
+//testAddOrganizationNotAdmin
+const newOrganization2: CONTRACT.addOrganizationRequest =
+  {
+    name: "NomadicLabs",
+    business: "Save nomades",
+    siteUrl: "https://",
+    logoUrl: "https://",
+    ipfsNftUrl: "https://",
+    fundingAddress : Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address)
+  };
+
+const testAddOrganizationNotAdmin2 =
+  _testAddOrganizationNotAdmin(user2, newOrganization2, 2 as nat, PendingApproval());
+
+
+//testActivateOrganization
+const testActivateOrganization2 =
+  _testActivateOrganization(tezosAdmin, newOrganization2.name, 2 as nat, Active());
+
+
+  //addAdmin user2 to org1
+  const addAdminParameters = { 
+    admin: user2, 
+    orgName: newOrganization.name
+    };
+  const testAddAdmin = _testAddAdmin(user, addAdminParameters, 2 as nat,2 as nat);
 
