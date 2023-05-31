@@ -24,6 +24,7 @@ import {
   arrowBackOutline,
   cardOutline,
   cash,
+  helpCircleOutline,
   home,
   logOut,
   personCircle,
@@ -185,6 +186,11 @@ export const Footer: React.FC = () => {
             <IonButton disabled color="transparent" routerLink={PAGES.FUNDING}>
               <IonIcon slot="start" icon={cash}></IonIcon>
               Funding
+            </IonButton>
+
+            <IonButton color="transparent" routerLink={PAGES.FAQ}>
+              <IonIcon slot="start" icon={helpCircleOutline}></IonIcon>
+              FAQ
             </IonButton>
 
             <IonButton id="profile" color="transparent">

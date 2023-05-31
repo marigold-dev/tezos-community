@@ -154,30 +154,32 @@ export const OrganizationScreen = ({
           )
         : storage?.tezosOrganization;
 
-      const membersBigMapId = (
-        organization?.members as unknown as { id: BigNumber }
-      ).id.toNumber();
+      if (organization) {
+        const membersBigMapId = (
+          organization?.members as unknown as { id: BigNumber }
+        ).id.toNumber();
 
-      const keys: BigMapKey[] = await api.bigMapsGetKeys(membersBigMapId, {
-        micheline: "Json",
-      });
+        const keys: BigMapKey[] = await api.bigMapsGetKeys(membersBigMapId, {
+          micheline: "Json",
+        });
 
-      setMembers(
-        Array.from(
+        setMembers(
+          Array.from(
+            keys
+              .filter((key) => (key.active ? true : false))
+              .map((key) => key.key as address)
+          )
+        ); //take only active keys
+
+        setOrganization(organization!);
+        console.log(
+          "refreshOrganization",
+          organization,
+          members,
+          membersBigMapId,
           keys
-            .filter((key) => (key.active ? true : false))
-            .map((key) => key.key as address)
-        )
-      ); //take only active keys
-
-      setOrganization(organization!);
-      console.log(
-        "refreshOrganization",
-        organization,
-        members,
-        membersBigMapId,
-        keys
-      );
+        );
+      }
     } else {
       console.log("organization fetch his not ready yet");
     }

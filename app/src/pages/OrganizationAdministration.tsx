@@ -403,6 +403,15 @@ export const OrganizationAdministration = ({
                   Pass the flag
                 </IonButton>
 
+                <IonButton
+                  color="danger"
+                  slot="end"
+                  onClick={(e) => removeOrganization(organization.name)}
+                >
+                  <IonIcon icon={trashOutline} />
+                  Delete organization
+                </IonButton>
+
                 <IonModal trigger="passFlag" ref={modalPassFlag}>
                   <IonHeader>
                     <IonToolbar>
