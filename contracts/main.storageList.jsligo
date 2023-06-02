@@ -1,10 +1,6 @@
 #include "./main.jsligo"
-
 const default_storage =
   {
-    memberProfileVerified: Set.literal(
-      list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])
-    ) as set<address>,
     tezosOrganization: {
       name: "TEZOS",
       business: "Save the planet",
@@ -17,20 +13,210 @@ const default_storage =
       ) as set<address>,
       status: Active(),
       memberRequests: Set.empty as set<joinOrganizationRequest>,
-      verified: true,
       fundingAddress: None() as option<address>
     },
-    organizations: list([]) as list<organization>,
-    organizationMax: 100 as nat,
-    adminsMax: 50 as nat,
+    organizations: list(
+      [
+        {
+          name: "StakeNow",
+          admins: Set.literal(
+            list(["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://avatars.githubusercontent.com/u/104824659?s=200&v=4",
+          members: Big_map.literal(
+            list([["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address, unit]])
+          ),
+          siteUrl: "https://vdl.digital/",
+          business: "vDL Digital Ventures GmbH",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Teia DAO LLC",
+          admins: Set.literal(
+            list(
+              [
+                "tz1STaURypfCdS7FRkK5csHhi8eqdSs8CcPt" as address,
+                "tz1XtjZTzEM6EQ3TnUPUQviCD6WfcsZRHXbj" as address,
+                "tz1g6JRCpsEnD2BLiAzPNK3GBD1fKicV9rCx" as address
+              ]
+            )
+          ),
+          status: Active(),
+          logoUrl: "https://ipfs.io/ipfs/QmdNYgc5crenyLGViykvcnW3sAfC8XE59fWyv7Q7mTTBGH",
+          members: Big_map.literal(
+            list(
+              [
+                ["tz1g6JRCpsEnD2BLiAzPNK3GBD1fKicV9rCx" as address, unit],
+                ["tz1STaURypfCdS7FRkK5csHhi8eqdSs8CcPt" as address, unit],
+                ["tz1XtjZTzEM6EQ3TnUPUQviCD6WfcsZRHXbj" as address, unit]
+              ]
+            )
+          ),
+          siteUrl: "https://teia.art",
+          business: "Community powered art platform on the Tezos Blockchain",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "KT1J9FYz29RBQi1oGLw8uXyACrzXzV1dHuvb" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Functori",
+          admins: Set.literal(
+            list(["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://www.functori.com/assets/img/brand/functori_logotype_square.svg",
+          members: Big_map.literal(
+            list([["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address, unit]])
+          ),
+          siteUrl: "https://www.functori.com/",
+          business: "Functori is a R&D company created by experienced engineers in programming languages (particularly OCaml and Rust), formal verification (automated reasoning, model checking), and blockchain technology (core, smart contracts and applications development).",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Marigold",
+          admins: Set.literal(
+            list(["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://bit.ly/MarigolddevLogo",
+          members: Big_map.literal(
+            list(
+              [
+                ["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address, unit],
+                ["tz1aH7Hj1s95wkPjCbMr2RMgTPq4RPHE1LLU" as address, unit],
+                ["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address, unit]
+              ]
+            )
+          ),
+          siteUrl: "https://www.marigold.dev/",
+          business: "Tezos core protocol and adoption",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Tezos France",
+          admins: Set.literal(
+            list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://pbs.twimg.com/profile_images/1567279396590870529/tS9DP6ax_400x400.jpg",
+          members: Big_map.literal(
+            list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
+          ),
+          siteUrl: "https://tezosfrance.substack.com",
+          business: "News, projects, artists and events ; the only online media to gather the French Tezos community",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Pyratz Labs",
+          admins: Set.literal(
+            list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://uploads-ssl.webflow.com/63808b3b41be273d52703f26/63808b3b41be27dd8e703f60_logo-piratz-lab.svg",
+          members: Big_map.literal(
+            list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
+          ),
+          siteUrl: "https://pyratzlabs.com",
+          business: "PyratzLabs is the first Startup Studio fully specialized in Web3. We take innovative ideas from concept all the way through to launch, using our expertise in market leading Technology, Funding & Advisory.",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "TZ INDIA PVT. LTD",
+          admins: Set.literal(
+            list(["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://images.yourstory.com/cs/images/companies/zN5FSNQj400x4001-1646805134262.jpg",
+          members: Big_map.literal(
+            list([["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address, unit]])
+          ),
+          siteUrl: "https://tezosindia.org.in/",
+          business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development. Advancing innovation in the Indian blockchain space is their goal.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Oxhead Alpha",
+          admins: Set.literal(
+            list(["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://www.oxheadalpha.com/images/oxheadalpha.svg",
+          members: Big_map.literal(
+            list([["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address, unit]])
+          ),
+          siteUrl: "https://www.oxheadalpha.com/",
+          business: "Research, development and key infrastructure support for the Tezos community.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "alterHEN",
+          admins: Set.literal(
+            list(["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://pbs.twimg.com/profile_images/1438787875169054725/nQW0PNQp.jpg",
+          members: Big_map.literal(
+            list([["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address, unit]])
+          ),
+          siteUrl: "https://alterhen.art/",
+          business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, art-focused and exciting opportunities that will benefit museums, curators, festivals and artists.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Tezos Commons",
+          admins: Set.literal(
+            list(["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://gateway.pinata.cloud/ipfs/QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
+          members: Big_map.literal(
+            list([["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address, unit]])
+          ),
+          siteUrl: "https://tezoscommons.org/",
+          business: "The Tezos Commons Foundation empowers the community to be the architects through bootstrapping local communities, communications, promotion, education, funding open source initiatives and advocacy.",
+          ipfsNftUrl: "ipfs://QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        }
+      ]
+    ),
+    limits: {
+      organizationMax: 1000 as nat,
+      adminsMax: 50 as nat,
+      memberRequestMax: 50 as nat
+    },
     nftAddress: "KT1D9hiv2vmqBDsdoa3tyervd5vAFZRBdNsr" as address
   };
 
 const mainnet =
   {
-    memberProfileVerified: Set.literal(
-      list(["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address])
-    ) as set<address>,
     tezosOrganization: {
       name: "TEZOS",
       business: "Save the planet",
@@ -43,12 +229,205 @@ const mainnet =
       ) as set<address>,
       status: Active(),
       memberRequests: Set.empty as set<joinOrganizationRequest>,
-      verified: true,
       fundingAddress: None() as option<address>
     },
-    organizations: list([]) as list<organization>,
-    organizationMax: 100 as nat,
-    adminsMax: 50 as nat,
+    organizations: list(
+      [
+        {
+          name: "StakeNow",
+          admins: Set.literal(
+            list(["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://avatars.githubusercontent.com/u/104824659?s=200&v=4",
+          members: Big_map.literal(
+            list([["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address, unit]])
+          ),
+          siteUrl: "https://vdl.digital/",
+          business: "vDL Digital Ventures GmbH",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Teia DAO LLC",
+          admins: Set.literal(
+            list(
+              [
+                "tz1STaURypfCdS7FRkK5csHhi8eqdSs8CcPt" as address,
+                "tz1XtjZTzEM6EQ3TnUPUQviCD6WfcsZRHXbj" as address,
+                "tz1g6JRCpsEnD2BLiAzPNK3GBD1fKicV9rCx" as address
+              ]
+            )
+          ),
+          status: Active(),
+          logoUrl: "https://ipfs.io/ipfs/QmdNYgc5crenyLGViykvcnW3sAfC8XE59fWyv7Q7mTTBGH",
+          members: Big_map.literal(
+            list(
+              [
+                ["tz1g6JRCpsEnD2BLiAzPNK3GBD1fKicV9rCx" as address, unit],
+                ["tz1STaURypfCdS7FRkK5csHhi8eqdSs8CcPt" as address, unit],
+                ["tz1XtjZTzEM6EQ3TnUPUQviCD6WfcsZRHXbj" as address, unit]
+              ]
+            )
+          ),
+          siteUrl: "https://teia.art",
+          business: "Community powered art platform on the Tezos Blockchain",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "KT1J9FYz29RBQi1oGLw8uXyACrzXzV1dHuvb" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Functori",
+          admins: Set.literal(
+            list(["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://www.functori.com/assets/img/brand/functori_logotype_square.svg",
+          members: Big_map.literal(
+            list([["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address, unit]])
+          ),
+          siteUrl: "https://www.functori.com/",
+          business: "Functori is a R&D company created by experienced engineers in programming languages (particularly OCaml and Rust), formal verification (automated reasoning, model checking), and blockchain technology (core, smart contracts and applications development).",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Marigold",
+          admins: Set.literal(
+            list(["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://bit.ly/MarigolddevLogo",
+          members: Big_map.literal(
+            list(
+              [
+                ["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address, unit],
+                ["tz1aH7Hj1s95wkPjCbMr2RMgTPq4RPHE1LLU" as address, unit],
+                ["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address, unit]
+              ]
+            )
+          ),
+          siteUrl: "https://www.marigold.dev/",
+          business: "Tezos core protocol and adoption",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Tezos France",
+          admins: Set.literal(
+            list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://pbs.twimg.com/profile_images/1567279396590870529/tS9DP6ax_400x400.jpg",
+          members: Big_map.literal(
+            list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
+          ),
+          siteUrl: "https://tezosfrance.substack.com",
+          business: "News, projects, artists and events ; the only online media to gather the French Tezos community",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Pyratz Labs",
+          admins: Set.literal(
+            list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://uploads-ssl.webflow.com/63808b3b41be273d52703f26/63808b3b41be27dd8e703f60_logo-piratz-lab.svg",
+          members: Big_map.literal(
+            list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
+          ),
+          siteUrl: "https://pyratzlabs.com",
+          business: "PyratzLabs is the first Startup Studio fully specialized in Web3. We take innovative ideas from concept all the way through to launch, using our expertise in market leading Technology, Funding & Advisory.",
+          ipfsNftUrl: "",
+          fundingAddress: Some(
+            "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
+          ),
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "TZ INDIA PVT. LTD",
+          admins: Set.literal(
+            list(["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://images.yourstory.com/cs/images/companies/zN5FSNQj400x4001-1646805134262.jpg",
+          members: Big_map.literal(
+            list([["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address, unit]])
+          ),
+          siteUrl: "https://tezosindia.org.in/",
+          business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development. Advancing innovation in the Indian blockchain space is their goal.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Oxhead Alpha",
+          admins: Set.literal(
+            list(["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://www.oxheadalpha.com/images/oxheadalpha.svg",
+          members: Big_map.literal(
+            list([["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address, unit]])
+          ),
+          siteUrl: "https://www.oxheadalpha.com/",
+          business: "Research, development and key infrastructure support for the Tezos community.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "alterHEN",
+          admins: Set.literal(
+            list(["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://pbs.twimg.com/profile_images/1438787875169054725/nQW0PNQp.jpg",
+          members: Big_map.literal(
+            list([["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address, unit]])
+          ),
+          siteUrl: "https://alterhen.art/",
+          business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, art-focused and exciting opportunities that will benefit museums, curators, festivals and artists.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Tezos Commons",
+          admins: Set.literal(
+            list(["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://gateway.pinata.cloud/ipfs/QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
+          members: Big_map.literal(
+            list([["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address, unit]])
+          ),
+          siteUrl: "https://tezoscommons.org/",
+          business: "The Tezos Commons Foundation empowers the community to be the architects through bootstrapping local communities, communications, promotion, education, funding open source initiatives and advocacy.",
+          ipfsNftUrl: "ipfs://QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        }
+      ]
+    ),
+    limits: {
+      organizationMax: 1000 as nat,
+      adminsMax: 50 as nat,
+      memberRequestMax: 50 as nat
+    },
     nftAddress: "KT1VeeSjhKRjr6qbFiGWjiuHXTxbfMqHiZR8" as address
   };
 

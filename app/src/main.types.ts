@@ -5,14 +5,16 @@ import {
 } from "./type-utils";
 
 export type Storage = {
-  adminsMax: nat;
-  memberProfileVerified: Array<address>;
+  limits: {
+    adminsMax: nat;
+    memberRequestMax: nat;
+    organizationMax: nat;
+  };
   nftAddress: address;
-  organizationMax: nat;
   organizations: Array<{
     admins: Array<address>;
     business: string;
-    fundingAddress?: address;
+    fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -28,12 +30,11 @@ export type Storage = {
     name: string;
     siteUrl: string;
     status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
-    verified: boolean;
   }>;
   tezosOrganization: {
     admins: Array<address>;
     business: string;
-    fundingAddress?: address;
+    fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
@@ -49,7 +50,6 @@ export type Storage = {
     name: string;
     siteUrl: string;
     status: { active: unit } | { frozen: unit } | { pendingApproval: unit };
-    verified: boolean;
   };
 };
 
@@ -65,6 +65,11 @@ type Methods = {
     siteUrl: string
   ) => Promise<void>;
   addTezosAdmin: (param: address) => Promise<void>;
+  changeLimits: (
+    adminsMax: nat,
+    memberRequestMax: nat,
+    organizationMax: nat
+  ) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (
     admin: address,
@@ -85,6 +90,14 @@ type Methods = {
     orgName: string
   ) => Promise<void>;
   sendMessage: (_0: string, _1: string) => Promise<void>;
+  updateOrganization: (
+    business: string,
+    fundingAddress: address | null,
+    ipfsNftUrl: string,
+    logoUrl: string,
+    name: string,
+    siteUrl: string
+  ) => Promise<void>;
 };
 
 type MethodsObject = {
@@ -99,6 +112,11 @@ type MethodsObject = {
     siteUrl: string;
   }) => Promise<void>;
   addTezosAdmin: (param: address) => Promise<void>;
+  changeLimits: (params: {
+    adminsMax: nat;
+    memberRequestMax: nat;
+    organizationMax: nat;
+  }) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (params: {
     admin: address;
@@ -119,6 +137,14 @@ type MethodsObject = {
     orgName: string;
   }) => Promise<void>;
   sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
+  updateOrganization: (params: {
+    business: string;
+    fundingAddress?: address;
+    ipfsNftUrl: string;
+    logoUrl: string;
+    name: string;
+    siteUrl: string;
+  }) => Promise<void>;
 };
 
 type contractTypes = {

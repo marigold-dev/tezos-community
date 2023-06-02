@@ -24,6 +24,7 @@ import {
   arrowBackOutline,
   cardOutline,
   cash,
+  helpCircleOutline,
   home,
   logOut,
   personCircle,
@@ -49,6 +50,8 @@ export const Footer: React.FC = () => {
     userAddress,
     userProfiles,
     setUserProfiles,
+    userProfile,
+    setUserProfile,
     storage,
     storageNFT,
     mainWalletType,
@@ -58,8 +61,10 @@ export const Footer: React.FC = () => {
     setUserBalance,
     setLoading,
     refreshStorage,
+    getUserProfile,
+    disconnectWallet,
     nftContratTokenMetadataMap,
-    socket,
+    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   const modalProfile = useRef<HTMLIonModalElement>(null);
@@ -87,8 +92,6 @@ export const Footer: React.FC = () => {
       setUserBalance(balance.toNumber());
       setUserAddress(userAddress);
 
-      console.log("****************** Connect to web2 backend now");
-
       // create the message to be signed
       const messagePayload = createMessagePayload({
         dappUrl: "tzCommunity.marigold.dev",
@@ -102,22 +105,28 @@ export const Footer: React.FC = () => {
       });
 
       // sign in the user to our app
-      const { data } = await signIn("http://localhost:3001")({
+      const { data } = await signIn(
+        process.env.REACT_APP_BACKEND_URL! + "/siwt"
+      )({
         pk: (await wallet.client.getActiveAccount())?.publicKey!,
         pkh: userAddress,
         message: messagePayload.payload,
         signature: signedPayload.signature,
       });
 
-      const { accessToken, idToken } = data;
+      const { accessToken, idToken, refreshToken } = data;
 
-      console.log(
-        "*********************** accessToken, idToken",
-        accessToken,
-        jwt_decode(idToken)
-      );
+      console.log("SIWT Connected to web2 backend", jwt_decode(idToken));
 
-      await refreshStorage();
+      await localStorage.set("access_token", accessToken);
+      await localStorage.set("refresh_token", refreshToken);
+      await localStorage.set("id_token", idToken);
+
+      const up = await getUserProfile(userAddress);
+      if (up) {
+        setUserProfile(up);
+        setUserProfiles(userProfiles.set(userAddress as address, up)); //add to cache
+      }
 
       if (
         storageNFT &&
@@ -127,17 +136,8 @@ export const Footer: React.FC = () => {
       )
         modalProfile.current?.present();
     } catch (error) {
-      console.log("error connectWallet", error);
+      console.error("error connectWallet", error);
     }
-  };
-
-  const disconnectWallet = async (): Promise<void> => {
-    setUserAddress("");
-    setUserBalance(0);
-    console.log("disconnecting wallet");
-    await wallet.clearActiveAccount();
-
-    history.replace(PAGES.ORGANIZATIONS);
   };
 
   const claimNFT = async () => {
@@ -179,16 +179,21 @@ export const Footer: React.FC = () => {
       <IonToolbar>
         {userAddress ? (
           <>
-            <IonButton color="transparent" routerLink={PAGES.ORGANIZATIONS}>
+            <IonButton color="dark" routerLink={PAGES.ORGANIZATIONS}>
               <IonIcon slot="icon-only" icon={home}></IonIcon>
             </IonButton>
 
-            <IonButton disabled color="transparent" routerLink={PAGES.FUNDING}>
+            <IonButton disabled color="dark" routerLink={PAGES.FUNDING}>
               <IonIcon slot="start" icon={cash}></IonIcon>
               Funding
             </IonButton>
 
-            <IonButton id="profile" color="transparent">
+            <IonButton color="dark" routerLink={PAGES.FAQ}>
+              <IonIcon slot="start" icon={helpCircleOutline}></IonIcon>
+              FAQ
+            </IonButton>
+
+            <IonButton id="profile" color="dark">
               <IonIcon slot="start" icon={personCircle}></IonIcon>
               Profile
             </IonButton>
@@ -212,17 +217,11 @@ export const Footer: React.FC = () => {
                     Profile
                     <IonChip
                       id="verified"
-                      color={
-                        userProfiles.get(userAddress as address)
-                          ? "success"
-                          : "warning"
-                      }
+                      color={userProfile ? "success" : "warning"}
                     >
-                      {userProfiles.get(userAddress as address)
-                        ? "Verified"
-                        : "Unverified"}
+                      {userProfile ? "Verified" : "Unverified"}
                     </IonChip>
-                    {userProfiles.get(userAddress as address) ? (
+                    {userProfile ? (
                       ""
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
@@ -237,22 +236,27 @@ export const Footer: React.FC = () => {
                 </IonToolbar>
               </IonHeader>
               <IonContent color="light" class="ion-padding">
-                {userProfiles.get(userAddress as address) ? (
-                  <UserProfileChip
-                    address={userAddress as address}
-                    userProfiles={userProfiles}
-                  />
+                {userProfile ? (
+                  <IonItem>
+                    <UserProfileChip
+                      address={userAddress as address}
+                      userProfiles={userProfiles}
+                    />
+                  </IonItem>
                 ) : (
                   <>
                     <IonItem>
                       <IonLabel>Address : </IonLabel>
                       <IonText>{userAddress}</IonText>
                     </IonItem>
-                    <div>
+                    <IonItem>
+                      <IonLabel color="warning">
+                        Link your address to a social network
+                      </IonLabel>
                       {providers.map((provider) => (
                         <OAuth key={provider} provider={provider} />
                       ))}
-                    </div>
+                    </IonItem>
                   </>
                 )}
 
@@ -260,14 +264,16 @@ export const Footer: React.FC = () => {
                 storageNFT.owner_token_ids.findIndex(
                   (obj) => obj[0] === (userAddress as address)
                 ) >= 0 ? (
-                  <IonImg
-                    src={nftContratTokenMetadataMap
-                      .get(0)!
-                      .thumbnailUri?.replace(
-                        "ipfs://",
-                        "https://gateway.pinata.cloud/ipfs/"
-                      )}
-                  />
+                  <IonItem>
+                    <IonImg
+                      src={nftContratTokenMetadataMap
+                        .get(0)!
+                        .thumbnailUri?.replace(
+                          "ipfs://",
+                          "https://gateway.pinata.cloud/ipfs/"
+                        )}
+                    />
+                  </IonItem>
                 ) : (
                   <IonButton size="large" onClick={claimNFT} color="warning">
                     <IonIcon slot="start" icon={cardOutline}></IonIcon>
@@ -278,7 +284,7 @@ export const Footer: React.FC = () => {
             </IonModal>
           </>
         ) : (
-          <IonButton color="transparent" onClick={connectWallet}>
+          <IonButton color="dark" onClick={connectWallet}>
             <IonIcon slot="start" icon={walletIcon}></IonIcon>
             Connect your wallet
           </IonButton>

@@ -1,29 +1,66 @@
-import { Body, Controller, Post, Res, Session } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
 import * as express from 'express';
 
-import { siwt } from '@siwt/core';
 import { verifySignature as taquitoVerifySignature } from '@taquito/utils';
-@Controller('signin')
+import { SiwtService } from './siwt.service';
+@Controller('siwt')
 export class SiwtController {
-  siwtClient = siwt({
-    accessTokenSecret: 'MY_SUPER ACCESS TOKEN SECRET',
-    refreshTokenSecret: 'MY_SUPER REFRESH TOKEN SECRET',
-    idTokenSecret: 'MY_SUPER  ID TOKEN SECRET',
-    accessTokenExpiration: 900, // Seconds. Optional, Default 15 mins
-    refreshTokenExpiration: 36000, // Seconds. Optional, Default 1 month
-    idTokenExpiration: 2592000, // Seconds. Optional, Default 10 hrs
-  });
+  constructor(private siwtService: SiwtService) {}
 
-  @Post()
+  @Post('refreshToken')
+  async refreshToken(
+    @Body('refreshToken') refreshToken: string,
+    @Body('pkh') pkh: string,
+    @Res() res: express.Response,
+  ) {
+    Logger.debug('POST refreshToken', refreshToken);
+    try {
+      const isValidSignature =
+        this.siwtService.siwtClient.verifyRefreshToken(refreshToken);
+      if (isValidSignature) {
+        const newRefreshToken =
+          this.siwtService.siwtClient.generateRefreshToken({ pkh });
+
+        const claims = {
+          iss: 'marigold',
+        };
+
+        // the minimum we need to return is an access token that
+        // allows the user to access the API. The pkh is required,
+        // extra claims are optional.
+        const accessToken = this.siwtService.siwtClient.generateAccessToken({
+          pkh,
+          claims,
+        });
+
+        const idToken = this.siwtService.siwtClient.generateIdToken({
+          pkh,
+          claims,
+        });
+
+        return res.send({
+          accessToken,
+          newRefreshToken,
+          idToken,
+          tokenType: 'Bearer',
+        });
+      }
+      return res.status(403).send('Forbidden');
+    } catch (e) {
+      Logger.error(e);
+      return res.status(403).send('Forbidden');
+    }
+  }
+
+  @Post('signin')
   async signin(
     @Body('message') message: string,
     @Body('pk') pk: string,
     @Body('pkh') pkh: string,
     @Body('signature') signature: string,
     @Res() res: express.Response,
-    @Session() session: Record<string, any>,
   ) {
-    console.log('*************** POST signin', message, pk, pkh, signature);
+    Logger.debug('POST signin', pkh);
     try {
       const isValidSignature = taquitoVerifySignature(message, pk, signature);
       if (isValidSignature) {
@@ -32,43 +69,26 @@ export class SiwtController {
 
         // the usage of claims is supported but not required.
         const claims = {
-          iss: 'https://api.siwtdemo.stakenow.fi',
-          aud: 'https://siwtdemo.stakenow.fi',
-          azp: 'https://siwtdemo.stakenow.fi',
+          iss: 'marigold',
         };
 
         // the minimum we need to return is an access token that
         // allows the user to access the API. The pkh is required,
         // extra claims are optional.
-        const accessToken = this.siwtClient.generateAccessToken({
+        const accessToken = this.siwtService.siwtClient.generateAccessToken({
           pkh,
           claims,
         });
 
         // we can use a refresh token to allow the access token to
         // be refreshed without the user needing to log in again.
-        const refreshToken = this.siwtClient.generateRefreshToken({ pkh });
-
-        // we can use a long-lived ID token to return some personal
-        // information about the user to the UI.
-        /*
-        const access = queryAccessControl({
-          contractAddress: 'KT1',
-          parameters: {
-            pkh,
-          },
-          test: {
-            comparator: '>=',
-            value: 1,
-          },
+        const refreshToken = this.siwtService.siwtClient.generateRefreshToken({
+          pkh,
         });
-*/
-        const idToken = this.siwtClient.generateIdToken({
+
+        const idToken = this.siwtService.siwtClient.generateIdToken({
           pkh,
           claims,
-          /* userInfo: {
-            ...access,
-          },*/
         });
 
         return res.send({
@@ -80,7 +100,7 @@ export class SiwtController {
       }
       return res.status(403).send('Forbidden');
     } catch (e) {
-      console.log(e);
+      Logger.error(e);
       return res.status(403).send('Forbidden');
     }
   }
