@@ -70,11 +70,7 @@ export class TwitterController {
   async twitterCallback(@Req() req: any, @Res() res: express.Response) {
     const twitterAccessToken = req.user.accessToken;
 
-    Logger.debug(
-      'Twitter callback received user with twitterAccessToken : ',
-      req.user,
-      twitterAccessToken,
-    );
+    Logger.debug('Twitter callback received user with twitterAccessToken');
 
     this.siwtService.twitterPending.set(
       twitterAccessToken,
