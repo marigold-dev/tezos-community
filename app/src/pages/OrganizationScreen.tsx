@@ -237,14 +237,9 @@ export const OrganizationScreen = ({
   }, []);
 
   return (
-    <IonContent
-      className="ion-page"
-      id="main"
-      style={{ height: "calc(100% - 56px - 56px)" }}
-      scrollY
-    >
+    <IonContent className="ion-page" id="main">
       {organization ? (
-        <IonContent className="ion-padding">
+        <IonContent style={{ height: "calc(100% - 56px - 56px)" }}>
           <IonToolbar>
             <IonSegment
               onIonChange={(e) =>

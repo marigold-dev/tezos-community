@@ -364,7 +364,10 @@ export const OrganizationAdministration = ({
   }, []);
 
   return (
-    <IonContent className="ion-padding">
+    <IonContent
+      className="ion-padding"
+      style={{ height: "calc(100%  - 56px)" }}
+    >
       <IonList>
         {/* Administrators */}
         <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
