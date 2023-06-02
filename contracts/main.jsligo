@@ -1,40 +1,40 @@
-export type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
+ type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
 
-export type removeMemberParameters = { member: address, orgName: string };
+type removeMemberParameters = { member: address, orgName: string };
 
-export type removeAdminParameters = {
+type removeAdminParameters = {
   admin: address,
   orgName: string,
   lastAdmin: option<address>
 };
 
-export type updateOrganizationParameters = {
+type updateOrganizationParameters = {
   name: string,
   business: string,
   siteUrl: string,
   logoUrl: string,
   ipfsNftUrl: string,
   fundingAddress: option<address>
-}
+};
 
-export type addAdminParameters = { admin: address, orgName: string };
+type addAdminParameters = { admin: address, orgName: string };
 
-export type joinRequest = {
+type joinRequest = {
   orgName: string,
   contactId: string,
   contactIdProvider: string,
   reason: string
 };
 
-export type joinOrganizationRequest = { user: address, joinRequest };
+type joinOrganizationRequest = { user: address, joinRequest };
 
-export type joinOrganizationResponse = {
+type joinOrganizationResponse = {
   membersToApprove: set<address>,
   membersToDecline: set<address>,
   orgName: string
 };
 
-export type addOrganizationRequest = {
+type addOrganizationRequest = {
   name: string,
   business: string,
   siteUrl: string,
@@ -43,7 +43,7 @@ export type addOrganizationRequest = {
   fundingAddress: option<address>
 };
 
-export type organization = {
+type organization = {
   name: string,
   business: string,
   siteUrl: string,
@@ -56,19 +56,30 @@ export type organization = {
   fundingAddress: option<address>
 };
 
-export type storage = {
+type limits = { organizationMax: nat, adminsMax: nat, memberRequestMax: nat };
+
+type storage = {
   tezosOrganization: organization,
   organizations: list<organization>,
-  organizationMax: nat,
-  adminsMax: nat,
-  nftAddress: address
+  nftAddress: address,
+  limits
 };
 
-export type _return = [list<operation>, storage];
+type _return = [list<operation>, storage];
 
-@entry 
-export
-const updateOrganization = (orgToUpdate: updateOrganizationParameters, store: storage): _return => {
+// @entry
+const changeLimits = (limits: limits, store: storage): _return => {
+  return Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
+      list([]),
+      { ...store, limits: limits }
+    ] : failwith("you need to be super-administrator to change limits")
+};
+
+// @entry
+const updateOrganization = (
+  orgToUpdate: updateOrganizationParameters,
+  store: storage
+): _return => {
   return match(
     List.find_opt(
       (org: organization) => org.name == orgToUpdate.name,
@@ -76,9 +87,7 @@ const updateOrganization = (orgToUpdate: updateOrganizationParameters, store: st
     ),
     {
       None: () =>
-        failwith(
-          "Cannot find an organization with the one passed as parameter"
-        ),
+        failwith("Cannot find an organization with the one passed as parameter"),
       Some: (org) =>
         Set.mem(Tezos.get_sender(), org.admins) ? [
             list([Tezos.emit("%organizationUpdated", org.name)]),
@@ -86,7 +95,14 @@ const updateOrganization = (orgToUpdate: updateOrganizationParameters, store: st
               ...store,
               organizations: List.update_with(
                 (orgItem: organization) => (org.name == orgItem.name),
-                { ...org, logoUrl : orgToUpdate.logoUrl, siteUrl : orgToUpdate.siteUrl, business : orgToUpdate.business , ipfsNftUrl : orgToUpdate.ipfsNftUrl , fundingAddress : orgToUpdate.fundingAddress },
+                {
+                  ...org,
+                  logoUrl: orgToUpdate.logoUrl,
+                  siteUrl: orgToUpdate.siteUrl,
+                  business: orgToUpdate.business,
+                  ipfsNftUrl: orgToUpdate.ipfsNftUrl,
+                  fundingAddress: orgToUpdate.fundingAddress
+                },
                 store.organizations
               )
             }
@@ -97,8 +113,7 @@ const updateOrganization = (orgToUpdate: updateOrganizationParameters, store: st
   )
 };
 
-@entry
-export 
+// @entry
 const activateOrganization = (orgName: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -128,8 +143,7 @@ const activateOrganization = (orgName: string, store: storage): _return => {
   )
 };
 
-@entry 
-export 
+// @entry
 const freezeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -157,8 +171,7 @@ const freezeOrganization = (name: string, store: storage): _return => {
   )
 };
 
-@entry
-export   
+// @entry
 const addOrganization = (org: addOrganizationRequest, store: storage): _return => {
   let newOrg: organization =
     {
@@ -174,7 +187,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
       memberRequests: Set.empty as set<joinOrganizationRequest>,
       fundingAddress: org.fundingAddress
     };
-  if (List.size(store.organizations) >= store.organizationMax) {
+  if (List.size(store.organizations) >= store.limits.organizationMax) {
     return failwith(
       "Too many organization, please contact Tezos administrators to increase the limit"
     )
@@ -210,8 +223,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
   }
 };
 
- @entry 
-export
+// @entry
 const removeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -305,8 +317,7 @@ const leaveOrganizationAsAdmin = (
   }
 };
 
- @entry 
-export 
+// @entry
 const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -321,19 +332,19 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
       Some: (org) => {
         if (Set.mem(rmp.member, org.admins)) failwith(
           "Cannot remove a member who is administrator, use removeAdmin endpoint instead"
-        ) else if (Set.mem(Tezos.get_sender(), org.admins)) {
+        ) else if (Set.mem(Tezos.get_sender(), org.admins) || Tezos.get_sender() == rmp.member) {
           return [
             list([]),
             {
               ...store,
-              organizations: List.filter_map(
+              organizations: List.update_with(
                 (orgItem: organization) =>
-                  orgItem.name == org.name ? Some(
+                  orgItem.name == org.name , 
                       {
                         ...org,
                         members: Big_map.remove(rmp.member, org.members)
                       }
-                    ) : None() as option<organization>,
+                    ,
                 store.organizations
               )
             }
@@ -348,8 +359,7 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   )
 };
 
-@entry 
-export 
+// @entry
 const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -365,7 +375,8 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
         if (Tezos.get_sender() == rap.admin && Set.mem(rap.admin, org.admins)) {
           return [list([]), leaveOrganizationAsAdmin(org, rap.lastAdmin, store)]
         } else if (
-          Tezos.get_sender() != rap.admin && Set.mem(rap.admin, org.admins)
+          Tezos.get_sender() != rap.admin && Set.mem(rap.admin, org.admins) &&
+            Set.mem(Tezos.get_sender(), org.admins)
         ) {
           return [
             list([]),
@@ -390,8 +401,7 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
   )
 };
 
-@entry
-export 
+// @entry
 const addAdmin = (aap: addAdminParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -404,19 +414,21 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
       None: () =>
         failwith("Cannot find organization with name passed on parameter"),
       Some: (org) => {
+        if (Set.cardinal(org.admins) == store.limits.adminsMax) failwith(
+          "We have reached admin size limit"
+        );
         if (Set.mem(Tezos.get_sender(), org.admins)) {
           return [
             list([]),
             {
               ...store,
               organizations: List.update_with(
-                (orgItem: organization) =>  orgItem.name == org.name,
+                (orgItem: organization) => orgItem.name == org.name,
                 {
                   ...org,
                   members: Big_map.add(aap.admin, unit, org.members),
                   admins: Set.add(aap.admin, org.admins)
-                }
-                ,
+                },
                 store.organizations
               )
             }
@@ -431,9 +443,11 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
   )
 };
 
-@entry 
-export  
+// @entry
 const addTezosAdmin = (admin: address, store: storage): _return => {
+  if (Set.cardinal(store.tezosOrganization.admins) == store.limits.adminsMax) failwith(
+          "We have reached admin size limit"
+        );
   if (Set.mem(Tezos.get_sender(), store.tezosOrganization.admins)) {
     return [
       list([]),
@@ -452,8 +466,7 @@ const addTezosAdmin = (admin: address, store: storage): _return => {
   }
 };
 
-@entry 
-export  
+// @entry
 const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -468,7 +481,10 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
       Some: (org) => {
         if (org.status != Active()) return failwith(
           "You cannot receive requests until your organization is activated"
-        ) else {
+        ) else if (Set.cardinal(org.memberRequests) == store.limits.memberRequestMax)  return failwith(
+          "We have reached member request size limit"
+        )
+        else {
           const newOrg =
             {
               ...org,
@@ -494,8 +510,7 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
   )
 };
 
-@entry
-export   
+// @entry
 const responseToJoinOrganization = (
   jor: joinOrganizationResponse,
   store: storage
@@ -556,8 +571,7 @@ const responseToJoinOrganization = (
   )
 };
 
-@entry
-export   
+// @entry
 const sendMessage = ([to, message]: [string, string], store: storage): _return => {
   return [
     list([Tezos.emit("%message", [Tezos.get_source(), to, message])]),

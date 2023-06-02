@@ -5,9 +5,12 @@ import {
 } from "./type-utils";
 
 export type Storage = {
-  adminsMax: nat;
+  limits: {
+    adminsMax: nat;
+    memberRequestMax: nat;
+    organizationMax: nat;
+  };
   nftAddress: address;
-  organizationMax: nat;
   organizations: Array<{
     admins: Array<address>;
     business: string;
@@ -62,6 +65,11 @@ type Methods = {
     siteUrl: string
   ) => Promise<void>;
   addTezosAdmin: (param: address) => Promise<void>;
+  changeLimits: (
+    adminsMax: nat,
+    memberRequestMax: nat,
+    organizationMax: nat
+  ) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (
     admin: address,
@@ -97,17 +105,22 @@ type MethodsObject = {
   addAdmin: (params: { admin: address; orgName: string }) => Promise<void>;
   addOrganization: (params: {
     business: string;
-    fundingAddress?: address;
+    fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     name: string;
     siteUrl: string;
   }) => Promise<void>;
   addTezosAdmin: (param: address) => Promise<void>;
+  changeLimits: (params: {
+    adminsMax: nat;
+    memberRequestMax: nat;
+    organizationMax: nat;
+  }) => Promise<void>;
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (params: {
     admin: address;
-    lastAdmin?: address;
+    lastAdmin: address | null;
     orgName: string;
   }) => Promise<void>;
   removeMember: (params: { member: address; orgName: string }) => Promise<void>;
@@ -126,7 +139,7 @@ type MethodsObject = {
   sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
   updateOrganization: (params: {
     business: string;
-    fundingAddress?: address;
+    fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     name: string;

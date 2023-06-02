@@ -137,71 +137,77 @@ export const OrganizationsScreen: React.FC = () => {
   const [isTezosOrganization, setIsTezosOrganization] =
     useState<boolean>(false);
 
+  const refreshMyOrganizations = async () => {
+    if (storage) {
+      let orgMembers: Map<string, address[]> = new Map();
+
+      await Promise.all(
+        storage.organizations.map(async (organization: Organization) => {
+          const membersBigMapId = (
+            organization.members as unknown as { id: BigNumber }
+          ).id.toNumber();
+
+          const keys: BigMapKey[] = await api.bigMapsGetKeys(membersBigMapId, {
+            micheline: "Json",
+          });
+
+          orgMembers.set(
+            organization.name,
+            Array.from(
+              keys
+                .filter((key) => (key.active ? true : false)) // take only active ones
+                .map((key) => key.key)
+            )
+          );
+
+          //cache userprofiles
+          for (const key of keys) {
+            if (await localStorage.get("access_token")) {
+              const up = await getUserProfile(key.key);
+              if (up) {
+                userProfiles.set(key.key, up);
+                setUserProfiles(userProfiles);
+              }
+            }
+          }
+        })
+      );
+
+      //set on a page cache
+      setOrgMembers(orgMembers); //refresh cache
+
+      setMyOrganizations(
+        storage.organizations.filter((org: Organization) => {
+          //console.log("org", org);
+
+          const members = orgMembers.get(org.name);
+
+          if (
+            members!.indexOf(userAddress as address) >= 0 ||
+            org.admins.indexOf(userAddress as address) >= 0 ||
+            storage.tezosOrganization.admins.indexOf(userAddress as address) >=
+              0
+          ) {
+            return org;
+          } else {
+          }
+        })
+      );
+
+      if (myOrganizations.length > 0 && !selectedOrganizationName) {
+        setSelectedOrganizationName(myOrganizations[0].name); //init
+        setIsTezosOrganization(false);
+      }
+      console.log("myOrganizations", myOrganizations);
+    } else {
+      //storage not ready yet
+    }
+  };
+
   useEffect(() => {
     (async () => {
       if (storage && storage.organizations) {
-        let orgMembers: Map<string, address[]> = new Map();
-
-        await Promise.all(
-          storage.organizations.map(async (organization: Organization) => {
-            const membersBigMapId = (
-              organization.members as unknown as { id: BigNumber }
-            ).id.toNumber();
-
-            const keys: BigMapKey[] = await api.bigMapsGetKeys(
-              membersBigMapId,
-              {
-                micheline: "Json",
-              }
-            );
-
-            orgMembers.set(
-              organization.name,
-              Array.from(
-                keys
-                  .filter((key) => (key.active ? true : false)) // take only active ones
-                  .map((key) => key.key)
-              )
-            );
-
-            //cache userprofiles
-            for (const key of keys) {
-              if (await localStorage.get("access_token")) {
-                const up = await getUserProfile(key.key);
-                if (up) {
-                  userProfiles.set(key.key, up);
-                  setUserProfiles(userProfiles);
-                }
-              }
-            }
-          })
-        );
-
-        //set on a page cache
-        setOrgMembers(orgMembers); //refresh cache
-
-        setMyOrganizations(
-          storage.organizations.filter((org: Organization) => {
-            const members = orgMembers.get(org.name);
-
-            if (
-              members!.indexOf(userAddress as address) >= 0 ||
-              org.admins.indexOf(userAddress as address) >= 0 ||
-              storage.tezosOrganization.admins.indexOf(
-                userAddress as address
-              ) >= 0
-            ) {
-              return org;
-            } else {
-            }
-          })
-        );
-
-        if (myOrganizations.length > 0 && !selectedOrganizationName) {
-          setSelectedOrganizationName(myOrganizations[0].name); //init
-          setIsTezosOrganization(false);
-        }
-        console.log("myOrganizations", myOrganizations);
+        await refreshMyOrganizations();
       } else {
         console.log("storage is not ready yet");
       }
@@ -906,6 +912,8 @@ export const OrganizationsScreen: React.FC = () => {
             <OrganizationScreen
               organizationName={selectedOrganizationName}
               isTezosOrganization={isTezosOrganization}
+              refreshMyOrganizations={refreshMyOrganizations}
+              setSelectedOrganizationName={setSelectedOrganizationName}
             />
           </IonSplitPane>
         )}

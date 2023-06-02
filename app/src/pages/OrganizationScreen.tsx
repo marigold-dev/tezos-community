@@ -5,10 +5,6 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonContent,
   IonHeader,
   IonIcon,
@@ -25,8 +21,20 @@ import {
   useIonAlert,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
-import { arrowBackOutline, cashOutline, sendOutline } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import {
+  arrowBackOutline,
+  cashOutline,
+  sendOutline,
+  trashOutline,
+} from "ionicons/icons";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useHistory } from "react-router";
 import { Organization, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { UserProfileChip } from "../components/UserProfileChip";
@@ -37,6 +45,8 @@ import { OrganizationMessages } from "./OrganizationMessages";
 type OrganizationProps = {
   organizationName: string | undefined;
   isTezosOrganization: boolean;
+  refreshMyOrganizations: () => Promise<void>;
+  setSelectedOrganizationName: Dispatch<SetStateAction<string | undefined>>;
 };
 
 enum TABS {
@@ -48,7 +58,11 @@ enum TABS {
 export const OrganizationScreen = ({
   organizationName,
   isTezosOrganization,
+  refreshMyOrganizations,
+  setSelectedOrganizationName,
 }: OrganizationProps): JSX.Element => {
+  const history = useHistory();
+
   const {
     Tezos,
     wallet,
@@ -102,6 +116,34 @@ export const OrganizationScreen = ({
         .send();
       await op?.confirmation();
       await refreshOrganization();
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
+  const removeMember = async (member: address) => {
+    console.log("removeMember", member, organization!.name);
+
+    try {
+      setLoading(true);
+      const op = await mainWalletType!.methods
+        .removeMember(member, organization!.name)
+        .send();
+      await op?.confirmation();
+
+      await refreshStorage(); //need to refresh it
+      await refreshMyOrganizations(); //need to refresh it too
+      setSelectedOrganizationName(undefined);
+      setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
       let tibe: TransactionInvalidBeaconError =
@@ -222,318 +264,316 @@ export const OrganizationScreen = ({
           </IonToolbar>
 
           {selectedTab == TABS.DESCRIPTION ? (
-            <IonCard>
-              <IonCardHeader>
-                <IonCardTitle>{organization.name}</IonCardTitle>
-              </IonCardHeader>
+            <IonContent scrollY>
+              <IonTitle>{organization.name}</IonTitle>
 
-              <IonCardContent>
-                <IonList lines="none">
-                  <IonItem>
-                    <IonInput
-                      readonly={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? false
-                          : true
-                      }
-                      type="text"
-                      maxlength={255}
-                      counter={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? true
-                          : false
-                      }
-                      label-placement="stacked"
-                      label="Business"
-                      value={organization.business}
-                      onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
-                          setBusinessIsValid(false);
-                        } else {
-                          organization.business = str.target.value as string;
-                          setOrganization(organization);
-                          setBusinessIsValid(true);
-                        }
-                      }}
-                      helperText={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "Enter a business, goal or objective"
-                          : ""
-                      }
-                      errorText="Business required"
-                      className={`${businessIsValid && "ion-valid"} ${
-                        businessIsValid === false && "ion-invalid"
-                      } `}
-                    ></IonInput>
-                  </IonItem>
-                  <IonItem>
-                    <IonInput
-                      readonly={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? false
-                          : true
-                      }
-                      label-placement="stacked"
-                      value={organization.siteUrl}
-                      label="Website"
-                      placeholder={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "https://"
-                          : ""
-                      }
-                      type="text"
-                      maxlength={255}
-                      counter={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? true
-                          : false
-                      }
-                      helperText={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "Enter your website url"
-                          : ""
-                      }
-                      onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        organization.siteUrl = str.target.value! as string;
+              <IonList lines="none">
+                <IonItem>
+                  <IonInput
+                    readonly={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    type="text"
+                    maxlength={255}
+                    counter={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? true
+                        : false
+                    }
+                    label-placement="stacked"
+                    label="Business"
+                    value={organization.business}
+                    onIonChange={(str) => {
+                      if (
+                        str.detail.value === undefined ||
+                        !str.target.value ||
+                        str.target.value === ""
+                      ) {
+                        setBusinessIsValid(false);
+                      } else {
+                        organization.business = str.target.value as string;
                         setOrganization(organization);
-                      }}
-                    />
-                  </IonItem>
-                  <IonItem>
-                    <IonInput
-                      readonly={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? false
-                          : true
+                        setBusinessIsValid(true);
                       }
-                      counter={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? true
-                          : false
-                      }
-                      label-placement="stacked"
-                      value={organization.logoUrl}
-                      label="Logo url"
-                      placeholder={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "https://"
-                          : ""
-                      }
-                      type="text"
-                      maxlength={255}
-                      helperText={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "Enter logo image URL to display"
-                          : ""
-                      }
-                      onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        organization.logoUrl = str.target.value! as string;
-                        setOrganization(organization);
-                      }}
-                    />
-                  </IonItem>
+                    }}
+                    helperText={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "Enter a business, goal or objective"
+                        : ""
+                    }
+                    errorText="Business required"
+                    className={`${businessIsValid && "ion-valid"} ${
+                      businessIsValid === false && "ion-invalid"
+                    } `}
+                  ></IonInput>
+                </IonItem>
+                <IonItem>
+                  <IonInput
+                    readonly={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    label-placement="stacked"
+                    value={organization.siteUrl}
+                    label="Website"
+                    placeholder={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "https://"
+                        : ""
+                    }
+                    type="text"
+                    maxlength={255}
+                    counter={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "Enter your website url"
+                        : ""
+                    }
+                    onIonChange={(str) => {
+                      if (str.detail.value === undefined) return;
+                      organization.siteUrl = str.target.value! as string;
+                      setOrganization(organization);
+                    }}
+                  />
+                </IonItem>
+                <IonItem>
+                  <IonInput
+                    readonly={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    counter={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? true
+                        : false
+                    }
+                    label-placement="stacked"
+                    value={organization.logoUrl}
+                    label="Logo url"
+                    placeholder={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "https://"
+                        : ""
+                    }
+                    type="text"
+                    maxlength={255}
+                    helperText={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "Enter logo image URL to display"
+                        : ""
+                    }
+                    onIonChange={(str) => {
+                      if (str.detail.value === undefined) return;
+                      organization.logoUrl = str.target.value! as string;
+                      setOrganization(organization);
+                    }}
+                  />
+                </IonItem>
 
-                  <IonItem>
-                    <IonInput
-                      readonly={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? false
-                          : true
-                      }
-                      label-placement="stacked"
-                      value={organization.ipfsNftUrl}
-                      label="IPFS membership card url"
-                      placeholder={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "ipfs://"
-                          : ""
-                      }
-                      type="text"
-                      maxlength={255}
-                      counter={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? true
-                          : false
-                      }
-                      helperText={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "Enter ipfs URL to your member card"
-                          : ""
-                      }
-                      onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        organization.ipfsNftUrl = str.target.value! as string;
-                        setOrganization(organization);
-                      }}
-                    />
-                  </IonItem>
+                <IonItem>
+                  <IonInput
+                    readonly={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    label-placement="stacked"
+                    value={organization.ipfsNftUrl}
+                    label="IPFS membership card url"
+                    placeholder={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "ipfs://"
+                        : ""
+                    }
+                    type="text"
+                    maxlength={255}
+                    counter={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "Enter ipfs URL to your member card"
+                        : ""
+                    }
+                    onIonChange={(str) => {
+                      if (str.detail.value === undefined) return;
+                      organization.ipfsNftUrl = str.target.value! as string;
+                      setOrganization(organization);
+                    }}
+                  />
+                </IonItem>
 
-                  <IonItem>
-                    <IonInput
-                      label-placement="stacked"
-                      value={organization.fundingAddress}
-                      counter={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? true
-                          : false
-                      }
-                      readonly={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? false
-                          : true
-                      }
-                      label="Funding address"
-                      placeholder={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "tzxxxx or KT1xxxxx"
-                          : ""
-                      }
-                      type="text"
-                      maxlength={36}
-                      helperText={
-                        organization.admins.indexOf(userAddress as address) >= 0
-                          ? "Enter your funding address (if you have)"
-                          : ""
-                      }
-                      onIonChange={(str) => {
-                        if (str.detail.value === undefined) return;
-                        organization.fundingAddress = str.target
-                          .value! as unknown as address;
-                        setOrganization(organization);
-                      }}
-                    />
+                <IonItem>
+                  <IonInput
+                    label-placement="stacked"
+                    value={organization.fundingAddress}
+                    counter={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? true
+                        : false
+                    }
+                    readonly={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    label="Funding address"
+                    placeholder={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "tzxxxx or KT1xxxxx"
+                        : ""
+                    }
+                    type="text"
+                    maxlength={36}
+                    helperText={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "Enter your funding address (if you have)"
+                        : ""
+                    }
+                    onIonChange={(str) => {
+                      if (str.detail.value === undefined) return;
+                      organization.fundingAddress = str.target
+                        .value! as unknown as address;
+                      setOrganization(organization);
+                    }}
+                  />
 
-                    {organization.fundingAddress ? (
-                      <>
-                        <IonButton id="openTransfer">
-                          <IonIcon
-                            slot="end"
-                            color="white"
-                            icon={cashOutline}
-                          />
-                          Send funds
-                        </IonButton>
-                        <IonModal trigger="openTransfer" ref={modalTransfer}>
-                          <IonHeader>
-                            <IonToolbar>
-                              <IonButtons slot="start">
-                                <IonButton
-                                  onClick={() =>
-                                    modalTransfer.current?.dismiss()
-                                  }
-                                >
-                                  <IonIcon
-                                    slot="start"
-                                    icon={arrowBackOutline}
-                                  ></IonIcon>
-                                  BACK
-                                </IonButton>
-                              </IonButtons>
-                              <IonButtons slot="end">
-                                <IonButton
-                                  disabled={!amountIsValid}
-                                  onClick={transfer}
-                                >
-                                  <IonIcon
-                                    slot="start"
-                                    icon={sendOutline}
-                                  ></IonIcon>
-                                  Send
-                                </IonButton>
-                              </IonButtons>
-                              <IonTitle>Send funds</IonTitle>
-                            </IonToolbar>
-                          </IonHeader>
-                          <IonContent color="light" class="ion-padding">
-                            <IonInput
-                              labelPlacement="floating"
-                              color="primary"
-                              value={amount}
-                              label="Amount *"
-                              type="number"
-                              min={0.000001}
-                              onIonChange={(str) => {
-                                if (
-                                  str.detail.value === undefined ||
-                                  !str.target.value ||
-                                  str.target.value === "" ||
-                                  (str.target.value as string).match(
-                                    "/[0-9]+/g"
-                                  ) ||
-                                  (str.target.value as number) <
-                                    Math.pow(10, -6)
-                                ) {
-                                  setAmountIsValid(false);
-                                  setAmount(Number(str.target.value as string));
-                                } else {
-                                  const rounded = Number(
-                                    str.target.value as string
-                                  ).toFixed(6);
-                                  setAmount(Number(rounded));
-                                  str.target.value = rounded;
-                                  setAmountIsValid(true);
-                                }
-                              }}
-                              helperText="Enter some tez to send"
-                              errorText="Amount is required and should be valid"
-                              className={`${amountIsValid && "ion-valid"} ${
-                                amountIsValid === false && "ion-invalid"
-                              } ion-touched `}
-                            />
-                          </IonContent>
-                        </IonModal>
-                      </>
-                    ) : (
-                      ""
-                    )}
-                  </IonItem>
-
-                  {!isTezosOrganization ? (
+                  {organization.fundingAddress ? (
                     <>
-                      <IonItem lines="none">
-                        <IonLabel>Members </IonLabel>
-                        <IonBadge>{members ? members.length : 0}</IonBadge>
-                      </IonItem>
-                      <IonItem lines="none">
-                        <IonList>
-                          {members
-                            ? members.map((member) => (
-                                <IonItem key={member}>
-                                  {" "}
-                                  <UserProfileChip
-                                    address={member}
-                                    userProfiles={userProfiles}
-                                  />
-                                </IonItem>
-                              ))
-                            : ""}
-                        </IonList>
-                      </IonItem>
+                      <IonButton id="openTransfer">
+                        <IonIcon slot="end" color="white" icon={cashOutline} />
+                        Send funds
+                      </IonButton>
+                      <IonModal trigger="openTransfer" ref={modalTransfer}>
+                        <IonHeader>
+                          <IonToolbar>
+                            <IonButtons slot="start">
+                              <IonButton
+                                onClick={() => modalTransfer.current?.dismiss()}
+                              >
+                                <IonIcon
+                                  slot="start"
+                                  icon={arrowBackOutline}
+                                ></IonIcon>
+                                BACK
+                              </IonButton>
+                            </IonButtons>
+                            <IonButtons slot="end">
+                              <IonButton
+                                disabled={!amountIsValid}
+                                onClick={transfer}
+                              >
+                                <IonIcon
+                                  slot="start"
+                                  icon={sendOutline}
+                                ></IonIcon>
+                                Send
+                              </IonButton>
+                            </IonButtons>
+                            <IonTitle>Send funds</IonTitle>
+                          </IonToolbar>
+                        </IonHeader>
+                        <IonContent color="light" class="ion-padding">
+                          <IonInput
+                            labelPlacement="floating"
+                            color="primary"
+                            value={amount}
+                            label="Amount *"
+                            type="number"
+                            min={0.000001}
+                            onIonChange={(str) => {
+                              if (
+                                str.detail.value === undefined ||
+                                !str.target.value ||
+                                str.target.value === "" ||
+                                (str.target.value as string).match(
+                                  "/[0-9]+/g"
+                                ) ||
+                                (str.target.value as number) < Math.pow(10, -6)
+                              ) {
+                                setAmountIsValid(false);
+                                setAmount(Number(str.target.value as string));
+                              } else {
+                                const rounded = Number(
+                                  str.target.value as string
+                                ).toFixed(6);
+                                setAmount(Number(rounded));
+                                str.target.value = rounded;
+                                setAmountIsValid(true);
+                              }
+                            }}
+                            helperText="Enter some tez to send"
+                            errorText="Amount is required and should be valid"
+                            className={`${amountIsValid && "ion-valid"} ${
+                              amountIsValid === false && "ion-invalid"
+                            } ion-touched `}
+                          />
+                        </IonContent>
+                      </IonModal>
                     </>
                   ) : (
                     ""
                   )}
+                </IonItem>
 
-                  {organization.admins.indexOf(userAddress as address) >= 0 ? (
-                    <IonButton
-                      disabled={!businessIsValid}
-                      color="transparent"
-                      onClick={updateOrganization}
-                    >
-                      Update organization
-                    </IonButton>
-                  ) : (
-                    ""
-                  )}
-                </IonList>
-              </IonCardContent>
-            </IonCard>
+                {!isTezosOrganization ? (
+                  <>
+                    <IonItem lines="none">
+                      <IonLabel>Members </IonLabel>
+                      <IonBadge>{members ? members.length : 0}</IonBadge>
+                    </IonItem>
+                    <IonItem lines="none">
+                      <IonList>
+                        {members
+                          ? members.map((member) => (
+                              <IonItem key={member}>
+                                {" "}
+                                <UserProfileChip
+                                  address={member}
+                                  userProfiles={userProfiles}
+                                />
+                              </IonItem>
+                            ))
+                          : ""}
+                      </IonList>
+                    </IonItem>
+                  </>
+                ) : (
+                  ""
+                )}
+
+                {organization.admins.indexOf(userAddress as address) >= 0 ? (
+                  <IonButton
+                    disabled={!businessIsValid}
+                    color="transparent"
+                    onClick={updateOrganization}
+                  >
+                    Update organization
+                  </IonButton>
+                ) : members.indexOf(userAddress as address) >= 0 ? (
+                  <IonButton
+                    color="danger"
+                    slot="end"
+                    onClick={(e) => removeMember(userAddress as address)}
+                  >
+                    <IonIcon icon={trashOutline} />
+                    Leave organization
+                  </IonButton>
+                ) : (
+                  ""
+                )}
+              </IonList>
+            </IonContent>
           ) : selectedTab == TABS.MESSAGES ? (
             <OrganizationMessages organizationName={organizationName} />
           ) : (
