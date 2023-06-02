@@ -15,7 +15,7 @@ export const UserProfileChip = ({
       {userProfiles.get(address) ? (
         <IonChip>
           <IonAvatar>
-            <IonImg
+            <img
               alt="o"
               style={{ objectFit: "contain", padding: "0.2em" }}
               src={userProfiles.get(address)?.photo}
