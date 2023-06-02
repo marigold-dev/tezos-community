@@ -105,7 +105,7 @@ type MethodsObject = {
   addAdmin: (params: { admin: address; orgName: string }) => Promise<void>;
   addOrganization: (params: {
     business: string;
-    fundingAddress: address | null;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     name: string;
@@ -120,7 +120,7 @@ type MethodsObject = {
   freezeOrganization: (param: string) => Promise<void>;
   removeAdmin: (params: {
     admin: address;
-    lastAdmin: address | null;
+    lastAdmin?: address;
     orgName: string;
   }) => Promise<void>;
   removeMember: (params: { member: address; orgName: string }) => Promise<void>;
@@ -139,7 +139,7 @@ type MethodsObject = {
   sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
   updateOrganization: (params: {
     business: string;
-    fundingAddress: address | null;
+    fundingAddress?: address;
     ipfsNftUrl: string;
     logoUrl: string;
     name: string;

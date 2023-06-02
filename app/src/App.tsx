@@ -43,7 +43,7 @@ import { FAQScreen } from "./pages/FAQScreen";
 import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
-import { BigMap, address, unit } from "./type-aliases";
+import { BigMap, address, nat, unit } from "./type-aliases";
 setupIonicReact();
 
 const localStorage = new LocalStorage();
@@ -118,13 +118,27 @@ export type MemberRequest = {
   user: address;
 };
 
+export type Limits = {
+  adminsMax: nat;
+  memberRequestMax: nat;
+  organizationMax: nat;
+};
+
 export type Organization = {
   admins: Array<address>;
   business: string;
   fundingAddress: address | null;
   ipfsNftUrl: string;
   logoUrl: string;
-  memberRequests: Array<MemberRequest>;
+  memberRequests: Array<{
+    joinRequest: {
+      contactId: string;
+      contactIdProvider: string;
+      orgName: string;
+      reason: string;
+    };
+    user: address;
+  }>;
   members: BigMap<address, unit>;
   name: string;
   siteUrl: string;

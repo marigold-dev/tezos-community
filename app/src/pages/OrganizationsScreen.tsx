@@ -376,22 +376,25 @@ export const OrganizationsScreen: React.FC = () => {
           </>
         ) : (
           <IonSplitPane when="xs" contentId="main">
-            <IonMenu contentId="main">
+            <IonMenu
+              contentId="main"
+              style={{ height: "calc(100% - 56px - 56px)" }}
+            >
               <IonContent className="ion-padding">
                 <IonItem lines="none">
-                  <IonButton id="addFromOrganizations" color="transparent">
+                  <IonButton id="addFromOrganizations" color="dark">
                     <IonIcon slot="start" icon={addCircle}></IonIcon>
                     Create an organization
                   </IonButton>
                 </IonItem>
                 <IonItem>
-                  <IonButton id="joinFromOrganizations" color="transparent">
+                  <IonButton id="joinFromOrganizations" color="dark">
                     <IonIcon slot="start" icon={peopleCircle}></IonIcon>
                     Join an organization
                   </IonButton>
                 </IonItem>
                 <IonItem lines="none">
-                  <IonButton id="writeToOrganization" color="transparent">
+                  <IonButton id="writeToOrganization" color="dark">
                     <IonIcon slot="start" icon={mailOutline}></IonIcon>
                     Write to an organization
                   </IonButton>

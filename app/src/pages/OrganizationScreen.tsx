@@ -16,6 +16,7 @@ import {
   IonSegment,
   IonSegmentButton,
   IonText,
+  IonTextarea,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -236,7 +237,12 @@ export const OrganizationScreen = ({
   }, []);
 
   return (
-    <div className="ion-page" id="main">
+    <IonContent
+      className="ion-page"
+      id="main"
+      style={{ height: "calc(100% - 56px - 56px)" }}
+      scrollY
+    >
       {organization ? (
         <IonContent className="ion-padding">
           <IonToolbar>
@@ -264,18 +270,18 @@ export const OrganizationScreen = ({
           </IonToolbar>
 
           {selectedTab == TABS.DESCRIPTION ? (
-            <IonContent scrollY>
+            <IonContent>
               <IonTitle>{organization.name}</IonTitle>
 
               <IonList lines="none">
                 <IonItem>
-                  <IonInput
+                  <IonTextarea
+                    rows={4}
                     readonly={
                       organization.admins.indexOf(userAddress as address) >= 0
                         ? false
                         : true
                     }
-                    type="text"
                     maxlength={255}
                     counter={
                       organization.admins.indexOf(userAddress as address) >= 0
@@ -307,7 +313,7 @@ export const OrganizationScreen = ({
                     className={`${businessIsValid && "ion-valid"} ${
                       businessIsValid === false && "ion-invalid"
                     } `}
-                  ></IonInput>
+                  ></IonTextarea>
                 </IonItem>
                 <IonItem>
                   <IonInput
@@ -496,9 +502,9 @@ export const OrganizationScreen = ({
                                 str.detail.value === undefined ||
                                 !str.target.value ||
                                 str.target.value === "" ||
-                                (str.target.value as string).match(
-                                  "/[0-9]+/g"
-                                ) ||
+                                str.target.value
+                                  .toString()
+                                  .match("/[0-9]+/g") ||
                                 (str.target.value as number) < Math.pow(10, -6)
                               ) {
                                 setAmountIsValid(false);
@@ -555,7 +561,7 @@ export const OrganizationScreen = ({
                 {organization.admins.indexOf(userAddress as address) >= 0 ? (
                   <IonButton
                     disabled={!businessIsValid}
-                    color="transparent"
+                    color="dark"
                     onClick={updateOrganization}
                   >
                     Update organization
@@ -592,6 +598,6 @@ export const OrganizationScreen = ({
           </IonText>
         </>
       )}
-    </div>
+    </IonContent>
   );
 };

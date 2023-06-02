@@ -179,21 +179,21 @@ export const Footer: React.FC = () => {
       <IonToolbar>
         {userAddress ? (
           <>
-            <IonButton color="transparent" routerLink={PAGES.ORGANIZATIONS}>
+            <IonButton color="dark" routerLink={PAGES.ORGANIZATIONS}>
               <IonIcon slot="icon-only" icon={home}></IonIcon>
             </IonButton>
 
-            <IonButton disabled color="transparent" routerLink={PAGES.FUNDING}>
+            <IonButton disabled color="dark" routerLink={PAGES.FUNDING}>
               <IonIcon slot="start" icon={cash}></IonIcon>
               Funding
             </IonButton>
 
-            <IonButton color="transparent" routerLink={PAGES.FAQ}>
+            <IonButton color="dark" routerLink={PAGES.FAQ}>
               <IonIcon slot="start" icon={helpCircleOutline}></IonIcon>
               FAQ
             </IonButton>
 
-            <IonButton id="profile" color="transparent">
+            <IonButton id="profile" color="dark">
               <IonIcon slot="start" icon={personCircle}></IonIcon>
               Profile
             </IonButton>
@@ -284,7 +284,7 @@ export const Footer: React.FC = () => {
             </IonModal>
           </>
         ) : (
-          <IonButton color="transparent" onClick={connectWallet}>
+          <IonButton color="dark" onClick={connectWallet}>
             <IonIcon slot="start" icon={walletIcon}></IonIcon>
             Connect your wallet
           </IonButton>
