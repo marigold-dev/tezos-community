@@ -2,5 +2,5 @@
 artifacts/*.tz
 .taq/*-state.json
 .taq/config.local.*.json
-.taq/config.json
+./.taq/config.json
 node_modules/
