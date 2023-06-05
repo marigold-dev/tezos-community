@@ -173,6 +173,23 @@ const freezeOrganization = (name: string, store: storage): _return => {
 
 // @entry
 const addOrganization = (org: addOrganizationRequest, store: storage): _return => {
+  //check no one can take TEZOS name
+
+  if (String.length(org.name) == (5 as nat)) {
+    let isTezosName: bool = true;
+    const tezosUpper = "TEZOS";
+    const tezosLower = "tezos";
+    for (let i = (0 as nat);i < (5 as nat);i = i + (1 as nat)) {
+      const letter = String.sub(i, 1 as nat, org.name);
+      if (
+        letter != String.sub(i, (1 as nat), tezosUpper) &&
+          letter != String.sub(i, (1 as nat), tezosLower)
+      ) isTezosName = false
+    };
+    if (isTezosName == true) return failwith(
+      "Tezos name for an organization is forbidden"
+    )
+  };
   let newOrg: organization =
     {
       name: org.name,
@@ -332,19 +349,17 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
       Some: (org) => {
         if (Set.mem(rmp.member, org.admins)) failwith(
           "Cannot remove a member who is administrator, use removeAdmin endpoint instead"
-        ) else if (Set.mem(Tezos.get_sender(), org.admins) || Tezos.get_sender() == rmp.member) {
+        ) else if (
+          Set.mem(Tezos.get_sender(), org.admins) ||
+            Tezos.get_sender() == rmp.member
+        ) {
           return [
             list([]),
             {
               ...store,
               organizations: List.update_with(
-                (orgItem: organization) =>
-                  orgItem.name == org.name , 
-                      {
-                        ...org,
-                        members: Big_map.remove(rmp.member, org.members)
-                      }
-                    ,
+                (orgItem: organization) => orgItem.name == org.name,
+                { ...org, members: Big_map.remove(rmp.member, org.members) },
                 store.organizations
               )
             }
@@ -446,8 +461,8 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
 // @entry
 const addTezosAdmin = (admin: address, store: storage): _return => {
   if (Set.cardinal(store.tezosOrganization.admins) == store.limits.adminsMax) failwith(
-          "We have reached admin size limit"
-        );
+    "We have reached admin size limit"
+  );
   if (Set.mem(Tezos.get_sender(), store.tezosOrganization.admins)) {
     return [
       list([]),
@@ -481,10 +496,9 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
       Some: (org) => {
         if (org.status != Active()) return failwith(
           "You cannot receive requests until your organization is activated"
-        ) else if (Set.cardinal(org.memberRequests) == store.limits.memberRequestMax)  return failwith(
-          "We have reached member request size limit"
-        )
-        else {
+        ) else if (
+          Set.cardinal(org.memberRequests) == store.limits.memberRequestMax
+        ) return failwith("We have reached member request size limit") else {
           const newOrg =
             {
               ...org,

@@ -33,7 +33,7 @@ TAQ_LIGO_IMAGE=ligolang/ligo:0.66.0 taq compile main.jsligo
 Run test
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:next taq test test.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.66.0 taq test test.jsligo
 ```
 
 ## Deploy

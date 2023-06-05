@@ -108,7 +108,11 @@ const initial_storage: CONTRACT.storage =
   {
     tezosOrganization: tezosOrganization,
     organizations: list([]) as list<CONTRACT.organization>,
-    limits : { organizationMax: 1000 as nat, adminsMax: 50 as nat, memberRequestMax: 50 as nat },
+    limits: {
+      organizationMax: 1000 as nat,
+      adminsMax: 50 as nat,
+      memberRequestMax: 50 as nat
+    },
     nftAddress: Tezos.address(contrNFT)
   };
 
