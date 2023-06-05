@@ -65,17 +65,17 @@ export const OrganizationMessages = ({
           <IonItem key={ev.id}>
             <IonGrid fixed>
               <IonRow>
-                <IonChip>
-                  <IonIcon icon={timeOutline} style={{ margin: 0 }}></IonIcon>
-                  {new Date(ev.timestamp!).toLocaleString()}
-                </IonChip>
                 <UserProfileChip
                   userProfiles={userProfiles}
                   address={ev.payload.address}
                 ></UserProfileChip>
+                <IonChip>
+                  <IonIcon icon={timeOutline} style={{ margin: 0 }}></IonIcon>
+                  {new Date(ev.timestamp!).toLocaleString()}
+                </IonChip>
               </IonRow>
               <IonRow>
-                <IonTextarea>{ev.payload.string_1}</IonTextarea>
+                <IonTextarea readonly>{ev.payload.string_1}</IonTextarea>
               </IonRow>
             </IonGrid>
           </IonItem>
