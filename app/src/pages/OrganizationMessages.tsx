@@ -1,5 +1,15 @@
-import { IonContent, IonItem, IonLabel, IonList } from "@ionic/react";
+import {
+  IonChip,
+  IonContent,
+  IonGrid,
+  IonIcon,
+  IonItem,
+  IonList,
+  IonRow,
+  IonTextarea,
+} from "@ionic/react";
 import * as api from "@tzkt/sdk-api";
+import { timeOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { UserContext, UserContextType } from "../App";
 import { UserProfileChip } from "../components/UserProfileChip";
@@ -53,13 +63,21 @@ export const OrganizationMessages = ({
       <IonList>
         {contractEvents.map((ev) => (
           <IonItem key={ev.id}>
-            <IonLabel>
-              <UserProfileChip
-                userProfiles={userProfiles}
-                address={ev.payload.address}
-              ></UserProfileChip>{" "}
-            </IonLabel>
-            <IonLabel>{ev.payload.string_1}</IonLabel>
+            <IonGrid fixed>
+              <IonRow>
+                <IonChip>
+                  <IonIcon icon={timeOutline} style={{ margin: 0 }}></IonIcon>
+                  {new Date(ev.timestamp!).toLocaleString()}
+                </IonChip>
+                <UserProfileChip
+                  userProfiles={userProfiles}
+                  address={ev.payload.address}
+                ></UserProfileChip>
+              </IonRow>
+              <IonRow>
+                <IonTextarea>{ev.payload.string_1}</IonTextarea>
+              </IonRow>
+            </IonGrid>
           </IonItem>
         ))}
       </IonList>
