@@ -1,4 +1,8 @@
- type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
+const tezosUpper = "TEZOS";
+
+const tezosLower = "tezos";
+
+type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
 
 type removeMemberParameters = { member: address, orgName: string };
 
@@ -80,37 +84,58 @@ const updateOrganization = (
   orgToUpdate: updateOrganizationParameters,
   store: storage
 ): _return => {
-  return match(
-    List.find_opt(
-      (org: organization) => org.name == orgToUpdate.name,
-      store.organizations
-    ),
-    {
-      None: () =>
-        failwith("Cannot find an organization with the one passed as parameter"),
-      Some: (org) =>
-        Set.mem(Tezos.get_sender(), org.admins) ? [
-            list([Tezos.emit("%organizationUpdated", org.name)]),
-            {
-              ...store,
-              organizations: List.update_with(
-                (orgItem: organization) => (org.name == orgItem.name),
-                {
-                  ...org,
-                  logoUrl: orgToUpdate.logoUrl,
-                  siteUrl: orgToUpdate.siteUrl,
-                  business: orgToUpdate.business,
-                  ipfsNftUrl: orgToUpdate.ipfsNftUrl,
-                  fundingAddress: orgToUpdate.fundingAddress
-                },
-                store.organizations
-              )
-            }
-          ] : failwith(
-            "You need to be part of organization admins to update an organization"
-          )
-    }
-  )
+  if (orgToUpdate.name == tezosUpper) {
+    return Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
+        list([Tezos.emit("%organizationUpdated", store.tezosOrganization.name)]),
+        {
+          ...store,
+          tezosOrganization: {
+            ...store.tezosOrganization,
+            logoUrl: orgToUpdate.logoUrl,
+            siteUrl: orgToUpdate.siteUrl,
+            business: orgToUpdate.business,
+            ipfsNftUrl: orgToUpdate.ipfsNftUrl,
+            fundingAddress: orgToUpdate.fundingAddress
+          }
+        }
+      ] : failwith(
+        "You need to be part of tezos organization admins to update it"
+      )
+  } else {
+    return match(
+      List.find_opt(
+        (org: organization) => org.name == orgToUpdate.name,
+        store.organizations
+      ),
+      {
+        None: () =>
+          failwith(
+            "Cannot find an organization with the one passed as parameter"
+          ),
+        Some: (org) =>
+          Set.mem(Tezos.get_sender(), org.admins) ? [
+              list([Tezos.emit("%organizationUpdated", org.name)]),
+              {
+                ...store,
+                organizations: List.update_with(
+                  (orgItem: organization) => (org.name == orgItem.name),
+                  {
+                    ...org,
+                    logoUrl: orgToUpdate.logoUrl,
+                    siteUrl: orgToUpdate.siteUrl,
+                    business: orgToUpdate.business,
+                    ipfsNftUrl: orgToUpdate.ipfsNftUrl,
+                    fundingAddress: orgToUpdate.fundingAddress
+                  },
+                  store.organizations
+                )
+              }
+            ] : failwith(
+              "You need to be part of organization admins to update an organization"
+            )
+      }
+    )
+  }
 };
 
 // @entry
@@ -177,8 +202,6 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
 
   if (String.length(org.name) == (5 as nat)) {
     let isTezosName: bool = true;
-    const tezosUpper = "TEZOS";
-    const tezosLower = "tezos";
     for (let i = (0 as nat);i < (5 as nat);i = i + (1 as nat)) {
       const letter = String.sub(i, 1 as nat, org.name);
       if (
