@@ -204,6 +204,38 @@ const default_storage =
           ipfsNftUrl: "ipfs://QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Bloometa",
+          admins: Set.literal(
+            list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://media.licdn.com/dms/image/C4E0BAQGwd4e4j4OPyg/company-logo_200_200/0/1651337929335?e=1694044800&v=beta&t=Dfa5FBWnf9S39gQARtyMKnXdXh0HvxhGHtIgExcxyyU",
+          members: Big_map.literal(
+            list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
+          ),
+          siteUrl: "https://bloometa.com/",
+          business: "The first multi-chain platform for Web3 gamers & GameFi projects - NFT Marketplace - GameFi Launchpad - OTC In-Game Asset Trading - Web3 Gaming Analytics",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Baking Bad",
+          admins: Set.literal(
+            list(["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://pbs.twimg.com/profile_images/1487132747214864385/E1plRzJm_400x400.jpg",
+          members: Big_map.literal(
+            list([["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address, unit]])
+          ),
+          siteUrl: "https://bakingbad.dev/",
+          business: "Software Development",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
         }
       ]
     ),
@@ -418,6 +450,38 @@ const mainnet =
           siteUrl: "https://tezoscommons.org/",
           business: "The Tezos Commons Foundation empowers the community to be the architects through bootstrapping local communities, communications, promotion, education, funding open source initiatives and advocacy.",
           ipfsNftUrl: "ipfs://QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Bloometa",
+          admins: Set.literal(
+            list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://media.licdn.com/dms/image/C4E0BAQGwd4e4j4OPyg/company-logo_200_200/0/1651337929335?e=1694044800&v=beta&t=Dfa5FBWnf9S39gQARtyMKnXdXh0HvxhGHtIgExcxyyU",
+          members: Big_map.literal(
+            list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
+          ),
+          siteUrl: "https://bloometa.com/",
+          business: "The first multi-chain platform for Web3 gamers & GameFi projects - NFT Marketplace - GameFi Launchpad - OTC In-Game Asset Trading - Web3 Gaming Analytics",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "Baking Bad",
+          admins: Set.literal(
+            list(["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://pbs.twimg.com/profile_images/1487132747214864385/E1plRzJm_400x400.jpg",
+          members: Big_map.literal(
+            list([["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address, unit]])
+          ),
+          siteUrl: "https://bakingbad.dev/",
+          business: "Software Development",
+          ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
         }

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { SOCIAL_ACCOUNT_TYPE, UserProfile } from './UserProfile';
 
 @Injectable()
@@ -22,6 +22,14 @@ export class UserProfilesService {
       socialAccountAlias: socialAccountAlias,
       socialAccountType: socialAccountType,
     });
+  }
+
+  async remove(address: string): Promise<void> {
+    const dr: DeleteResult = await this.userProfileRepository.delete({
+      _id: address,
+    });
+    Logger.debug('Deleted ' + dr.affected + ' on ' + address);
+    return;
   }
 
   async save(up: UserProfile): Promise<UserProfile> {

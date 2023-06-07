@@ -108,7 +108,11 @@ const initial_storage: CONTRACT.storage =
   {
     tezosOrganization: tezosOrganization,
     organizations: list([]) as list<CONTRACT.organization>,
-    limits : { organizationMax: 1000 as nat, adminsMax: 50 as nat, memberRequestMax: 50 as nat },
+    limits: {
+      organizationMax: 1000 as nat,
+      adminsMax: 50 as nat,
+      memberRequestMax: 50 as nat
+    },
     nftAddress: Tezos.address(contrNFT)
   };
 
@@ -187,6 +191,64 @@ const _testAddOrganizationNotAdmin = (
     "Event is different"
   );
   return true
+};
+
+const _testUpdateOrganization = (
+  sender: address,
+  or: CONTRACT.updateOrganizationParameters,
+  orgSize: nat,
+  status: CONTRACT.organizationStatus
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, UpdateOrganization(or), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  Test.assert_with_error(
+    List.size(store.organizations) == orgSize,
+    "Wrong size on organization list"
+  );
+  const orgList: list<CONTRACT.organization> =
+    List.filter_map(
+      (orgItem: CONTRACT.organization) =>
+        orgItem.name == or.name ? Some(orgItem) : None(),
+      store.organizations
+    );
+  Test.assert_with_error(
+    List.size(orgList) == (1 as nat),
+    "Cannot find the organization on the list"
+  );
+  const orgOpt = List.head_opt(orgList);
+  Test.assert_with_error(
+    Option.is_some(orgOpt),
+    "Cannot extract the organization on the list"
+  );
+  const org = Option.unopt(orgOpt);
+  Test.assert_with_error(org.name == or.name, "organization name is different");
+  Test.assert_with_error(
+    org.status == status,
+    "organization status is different"
+  );
+  return true
+};
+
+const _testUpdateTezosOrganizationToFail = (
+  sender: address,
+  or: CONTRACT.updateOrganizationParameters,
+  orgSize: nat,
+  status: CONTRACT.organizationStatus
+): bool => {
+  Test.set_source(sender);
+  const transferStatus =
+    Test.transfer_to_contract(contr, UpdateOrganization(or), 0 as mutez);
+  const _ = Test.log(["transferStatus", transferStatus]);
+  let store: CONTRACT.storage = Test.get_storage(taddr);
+  Test.log(store);
+  return match(
+    transferStatus,
+    { Fail: (_: test_exec_error) => true, Success: (_: nat) => false }
+  )
 };
 
 const _testActivateOrganization = (
@@ -309,9 +371,14 @@ const _testResponseToJoinOrganization = (
   const org = Option.unopt(orgOpt);
   Test.log(Set.cardinal(org.memberRequests));
   Test.log(memberRequestsSize);
-  //FIXME Test.assert_with_error(Set.cardinal(org.memberRequests) == memberRequestsSize, "memberRequests size is different");
-  //FIXME Test.assert_with_error( Big_map.mem(member,org.members) == shouldFindMember, "Problem finding member or not on the list");
-
+  Test.assert_with_error(
+    Set.cardinal(org.memberRequests) == memberRequestsSize,
+    "memberRequests size is different"
+  );
+  Test.assert_with_error(
+    Big_map.mem(member, org.members) == shouldFindMember,
+    "Problem finding member or not on the list"
+  );
   return true
 };
 
@@ -405,6 +472,24 @@ const testAddOrganizationNotAdmin =
     PendingApproval()
   );
 
+// test update organization
+
+const testUpdateOrganization =
+  _testUpdateOrganization(
+    user,
+    { ...newOrganization, business: "Save Tezos twice" },
+    1 as nat,
+    PendingApproval()
+  );
+
+const testUpdateTezosOrganizationToFail =
+  _testUpdateTezosOrganizationToFail(
+    user,
+    { ...newOrganization, name: CONTRACT.tezosUpper },
+    1 as nat,
+    PendingApproval()
+  );
+
 //testActivateOrganization
 
 const testActivateOrganization =
@@ -487,4 +572,5 @@ const testActivateOrganization2 =
 const addAdminParameters = { admin: user2, orgName: newOrganization.name };
 
 const testAddAdmin = _testAddAdmin(user, addAdminParameters, 2 as nat, 2 as nat);
+
 
