@@ -28,6 +28,7 @@ import {
   home,
   logOut,
   personCircle,
+  unlinkOutline,
   wallet as walletIcon,
 } from "ionicons/icons";
 import jwt_decode from "jwt-decode";
@@ -163,6 +164,30 @@ export const Footer: React.FC = () => {
     setLoading(false);
   };
 
+  const unlinkSocialAccount = async () => {
+    const accessToken = await localStorage.get("access_token");
+    if (!accessToken) throw Error("You lost your SIWT accessToken");
+
+    const response = await fetch(
+      process.env.REACT_APP_BACKEND_URL + "/user" + "/unlink",
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (response.ok) {
+      console.log("UserProfile unlinked on backend");
+      setUserProfile(null);
+      userProfiles.delete(userAddress as address);
+      setUserProfiles(userProfiles); //update cache
+    } else {
+      console.log("ERROR : " + response.status);
+    }
+  };
+
   const writeToClipboard = async (content: string) => {
     console.log("writeToClipboard", content);
 
@@ -226,9 +251,10 @@ export const Footer: React.FC = () => {
                     ) : (
                       <IonPopover trigger="verified" triggerAction="hover">
                         <IonContent class="ion-padding">
-                          Soon, you will be required to verify your social
-                          account in order to create/join an organization and
-                          receive urgent/important messages
+                          Optionally, you can link with your preferred social
+                          account to be able to receive urgent/important
+                          messages and also display a human-readable alias
+                          instead of tz1xxx
                         </IonContent>
                       </IonPopover>
                     )}
@@ -242,6 +268,14 @@ export const Footer: React.FC = () => {
                       address={userAddress as address}
                       userProfiles={userProfiles}
                     />
+                    <IonButton
+                      color="danger"
+                      slot="end"
+                      onClick={(e) => unlinkSocialAccount()}
+                    >
+                      <IonIcon icon={unlinkOutline} />
+                      Unlink social account
+                    </IonButton>
                   </IonItem>
                 ) : (
                   <>
