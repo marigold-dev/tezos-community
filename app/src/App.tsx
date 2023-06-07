@@ -502,7 +502,8 @@ const App: React.FC = () => {
           const newUserProfile = await getUserProfile(userAddress);
           if (newUserProfile) {
             userProfiles.set(userAddress as address, newUserProfile);
-            setUserProfiles(userProfiles);
+            setUserProfiles(userProfiles); //cache
+            setUserProfile(newUserProfile); //cache
             console.log(
               "userProfile refreshed for " + userAddress,
               newUserProfile
