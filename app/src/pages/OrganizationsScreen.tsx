@@ -1,7 +1,9 @@
 import {
   IonButton,
   IonButtons,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
@@ -14,6 +16,7 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  IonRow,
   IonSearchbar,
   IonSelect,
   IonSelectOption,
@@ -552,6 +555,7 @@ export const OrganizationsScreen: React.FC = () => {
                     />
 
                     <IonText>Select an organization *</IonText>
+
                     <IonList id="modal-list" inset={true}>
                       {joiningOrganizations &&
                         joiningOrganizations.map((organization) => (
@@ -567,19 +571,24 @@ export const OrganizationsScreen: React.FC = () => {
                             lines="none"
                             key={organization.name}
                           >
-                            <IonTitle>{organization.name}</IonTitle>
-                            <IonText>
-                              <i>{organization.business}</i>
-                            </IonText>
-                            <IonThumbnail slot="start">
-                              <IonImg alt="." src={organization.logoUrl} />
-                            </IonThumbnail>
-                            <IonIcon
-                              size="small"
-                              slot="end"
-                              icon={ellipse}
-                              color={getStatusColor(organization)}
-                            />
+                            <IonGrid>
+                              <IonRow style={{ height: "4em" }}>
+                                <IonCol size="auto">
+                                  <IonThumbnail>
+                                    <IonImg
+                                      alt="."
+                                      src={organization.logoUrl}
+                                    />
+                                  </IonThumbnail>
+                                </IonCol>
+                                <IonCol size="3">{organization.name}</IonCol>
+                                <IonCol>
+                                  <IonContent color="transparent" scrollY>
+                                    {organization.business}
+                                  </IonContent>
+                                </IonCol>
+                              </IonRow>
+                            </IonGrid>
                           </IonItem>
                         ))}
                     </IonList>
@@ -788,7 +797,7 @@ export const OrganizationsScreen: React.FC = () => {
                       value={message}
                       label="Message *"
                       placeholder="Type here ..."
-                      maxlength={280}
+                      maxlength={250}
                       counter
                       onIonChange={(str) => {
                         if (
@@ -826,19 +835,24 @@ export const OrganizationsScreen: React.FC = () => {
                             lines="none"
                             key={organization.name}
                           >
-                            <IonTitle>{organization.name}</IonTitle>
-                            <IonText>
-                              <i>{organization.business}</i>
-                            </IonText>
-                            <IonThumbnail slot="start">
-                              <IonImg alt="." src={organization.logoUrl} />
-                            </IonThumbnail>
-                            <IonIcon
-                              size="small"
-                              slot="end"
-                              icon={ellipse}
-                              color={getStatusColor(organization)}
-                            />
+                            <IonGrid>
+                              <IonRow style={{ height: "4em" }}>
+                                <IonCol size="auto">
+                                  <IonThumbnail>
+                                    <IonImg
+                                      alt="."
+                                      src={organization.logoUrl}
+                                    />
+                                  </IonThumbnail>
+                                </IonCol>
+                                <IonCol size="3">{organization.name}</IonCol>
+                                <IonCol>
+                                  <IonContent color="transparent" scrollY>
+                                    {organization.business}
+                                  </IonContent>
+                                </IonCol>
+                              </IonRow>
+                            </IonGrid>
                           </IonItem>
                         ))}
                     </IonList>

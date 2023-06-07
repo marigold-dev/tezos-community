@@ -16,6 +16,7 @@ import {
   IonItem,
   IonList,
   IonModal,
+  IonPopover,
   IonRow,
   IonSelect,
   IonSelectOption,
@@ -28,10 +29,13 @@ import { BigNumber } from "bignumber.js";
 import {
   addCircleOutline,
   arrowBackOutline,
+  checkmarkCircleOutline,
   checkmarkDoneCircleOutline,
   ellipse,
   flagOutline,
+  informationCircleOutline,
   playCircleOutline,
+  removeCircleOutline,
   stopCircleOutline,
   trashBinOutline,
   trashOutline,
@@ -583,19 +587,42 @@ export const OrganizationAdministration = ({
 
                     {organization?.memberRequests &&
                     organization?.memberRequests.length > 0 ? (
-                      <IonCol>
-                        {" "}
-                        <IonButton
-                          color="dark"
-                          onClick={responseToJoinOrganization}
-                        >
+                      <>
+                        <IonCol>
+                          <IonButton
+                            color="dark"
+                            onClick={responseToJoinOrganization}
+                          >
+                            <IonIcon
+                              icon={checkmarkDoneCircleOutline}
+                              slot="end"
+                            />
+                            Apply all
+                          </IonButton>
+
                           <IonIcon
-                            icon={checkmarkDoneCircleOutline}
-                            slot="end"
+                            id="hover-trigger"
+                            icon={informationCircleOutline}
                           />
-                          Apply all requests
-                        </IonButton>{" "}
-                      </IonCol>
+                          <IonPopover
+                            trigger="hover-trigger"
+                            triggerAction="hover"
+                          >
+                            <IonContent class="ion-padding">
+                              Accept <IonIcon icon={checkmarkCircleOutline} />{" "}
+                              or Decline <IonIcon icon={removeCircleOutline} />{" "}
+                              below each requests and then click{" "}
+                              <b>
+                                Apply all{" "}
+                                <IonIcon
+                                  icon={checkmarkDoneCircleOutline}
+                                  slot="end"
+                                />
+                              </b>
+                            </IonContent>
+                          </IonPopover>
+                        </IonCol>
+                      </>
                     ) : (
                       ""
                     )}
@@ -613,6 +640,7 @@ export const OrganizationAdministration = ({
                         memberRequest.joinRequest.contactId}
                     </IonCardSubtitle>
                     <IonToggle
+                      enableOnOffLabels={true}
                       labelPlacement="end"
                       checked={
                         membersToApprove.indexOf(memberRequest.user) >= 0
@@ -636,7 +664,7 @@ export const OrganizationAdministration = ({
                           setMembersToApprove(newMembersToApprove);
                         }
                       }}
-                    />
+                    ></IonToggle>
                   </IonCardHeader>
                   <IonCardContent>
                     {memberRequest.joinRequest.reason}

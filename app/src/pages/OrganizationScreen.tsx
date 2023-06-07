@@ -265,13 +265,13 @@ export const OrganizationScreen = ({
           </IonToolbar>
 
           {selectedTab == TABS.DESCRIPTION ? (
-            <IonContent>
+            <IonContent className="ion-padding">
               <IonTitle>{organization.name}</IonTitle>
 
               <IonList lines="none">
                 <IonItem>
                   <IonTextarea
-                    rows={4}
+                    autoGrow
                     readonly={
                       organization.admins.indexOf(userAddress as address) >= 0
                         ? false
@@ -529,6 +529,11 @@ export const OrganizationScreen = ({
 
                 {!isTezosOrganization ? (
                   <>
+                    <hr
+                      color="danger"
+                      style={{ borderWidth: "1px", height: "0" }}
+                    />
+
                     <IonItem lines="none">
                       <IonLabel>Members </IonLabel>
                       <IonBadge>{members ? members.length : 0}</IonBadge>
