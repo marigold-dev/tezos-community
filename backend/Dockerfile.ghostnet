@@ -2,6 +2,8 @@ ARG RUNNER_IMAGE="node:latest"
 
 FROM ${RUNNER_IMAGE}
 
+COPY .taq .
+
 WORKDIR /tezos-community
 
 COPY ./backend .
