@@ -1,5 +1,7 @@
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthcheckModule } from './healthcheck/healthcheck.module';
 import { SiwtModule } from './siwt/siwt.module';
@@ -8,6 +10,10 @@ import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 15000,
+      max: 100,
+    }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -32,6 +38,11 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
     SiwtModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class AppModule {}
