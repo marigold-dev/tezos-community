@@ -4,7 +4,7 @@ FROM ${RUNNER_IMAGE}
 
 RUN apt-get update && apt-get install -y jq
 
-COPY .taq .
+COPY .taq .taq
 
 WORKDIR /tezos-community
 
