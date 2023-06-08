@@ -45,6 +45,7 @@ export class SiwtController {
           tokenType: 'Bearer',
         });
       }
+
       return res.status(403).send('Forbidden');
     } catch (e) {
       Logger.error(e);

@@ -85,6 +85,7 @@ taq deploy main.tz -e "production" --storage main.storage.mainnet.tz
 ```
 taq install @taqueria/plugin-contract-types
 taq generate types ./app/src
+taq generate types ./backend/src
 cd app
 npm run postinstall
 npm run start

@@ -502,7 +502,8 @@ const App: React.FC = () => {
           const newUserProfile = await getUserProfile(userAddress);
           if (newUserProfile) {
             userProfiles.set(userAddress as address, newUserProfile);
-            setUserProfiles(userProfiles);
+            setUserProfiles(userProfiles); //cache
+            setUserProfile(newUserProfile); //cache
             console.log(
               "userProfile refreshed for " + userAddress,
               newUserProfile
@@ -586,9 +587,10 @@ const App: React.FC = () => {
           },
         }
       );
+
       const json = await response.json();
+
       if (response.ok) {
-        json.proofDate = new Date(json.proofDate); //convert dates
         return new Promise((resolve, reject) => resolve(json));
       } else if (response.status === 401 || response.status === 403) {
         console.warn("Silently refreshing token", response);
