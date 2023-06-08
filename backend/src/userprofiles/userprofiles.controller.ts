@@ -5,7 +5,6 @@ import {
   HttpException,
   HttpStatus,
   Inject,
-  Logger,
   Param,
   Post,
   Req,
@@ -82,8 +81,6 @@ export class UserProfilesController {
         // to always get the base url of the incoming get request url.
 
         cachedRoutes.set(key + pkh, up);
-
-        Logger.debug('************* IN CACHE !!!!!!!!!!!!!!!!! ', key);
 
         return up;
       } else
