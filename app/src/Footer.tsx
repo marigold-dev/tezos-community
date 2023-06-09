@@ -34,7 +34,7 @@ import {
 import jwt_decode from "jwt-decode";
 import React, { useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { PAGES, UserContext, UserContextType } from "./App";
+import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "./App";
 import { OAuth } from "./OAuth";
 import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
 import { UserProfileChip } from "./components/UserProfileChip";
@@ -119,9 +119,11 @@ export const Footer: React.FC = () => {
 
       console.log("SIWT Connected to web2 backend", jwt_decode(idToken));
 
-      await localStorage.set("access_token", accessToken);
-      await localStorage.set("refresh_token", refreshToken);
-      await localStorage.set("id_token", idToken);
+      await localStorage.set(LocalStorageKeys.access_token, accessToken);
+      await localStorage.set(LocalStorageKeys.refresh_token, refreshToken);
+      await localStorage.set(LocalStorageKeys.id_token, idToken);
+
+      console.log("token stored");
 
       const up = await getUserProfile(userAddress);
       if (up) {
@@ -165,7 +167,7 @@ export const Footer: React.FC = () => {
   };
 
   const unlinkSocialAccount = async () => {
-    const accessToken = await localStorage.get("access_token");
+    const accessToken = await localStorage.get(LocalStorageKeys.access_token);
     if (!accessToken) throw Error("You lost your SIWT accessToken");
 
     const response = await fetch(

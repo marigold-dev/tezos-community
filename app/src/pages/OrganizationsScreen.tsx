@@ -36,6 +36,7 @@ import { addCircle, ellipse, mailOutline, peopleCircle } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import {
+  LocalStorageKeys,
   Organization,
   PAGES,
   SOCIAL_ACCOUNT_TYPE,
@@ -150,9 +151,15 @@ export const OrganizationsScreen: React.FC = () => {
             organization.members as unknown as { id: BigNumber }
           ).id.toNumber();
 
-          const keys: BigMapKey[] = await api.bigMapsGetKeys(membersBigMapId, {
-            micheline: "Json",
-          });
+          const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+          let keys: BigMapKey[] = await localStorage.getCachedRequest(url);
+
+          if (!keys) {
+            keys = await api.bigMapsGetKeys(membersBigMapId, {
+              micheline: "Json",
+            });
+            await localStorage.cacheRequest(url, keys);
+          }
 
           orgMembers.set(
             organization.name,
@@ -165,7 +172,7 @@ export const OrganizationsScreen: React.FC = () => {
 
           //cache userprofiles
           for (const key of keys) {
-            if (await localStorage.get("access_token")) {
+            if (await localStorage.get(LocalStorageKeys.access_token)) {
               const up = await getUserProfile(key.key);
               if (up) {
                 userProfiles.set(key.key, up);
