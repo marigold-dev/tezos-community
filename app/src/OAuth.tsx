@@ -1,7 +1,7 @@
 import { Browser } from "@capacitor/browser";
 import { IonButton } from "@ionic/react";
 import React, { useEffect } from "react";
-import { UserContext, UserContextType } from "./App";
+import { LocalStorageKeys, UserContext, UserContextType } from "./App";
 import { address } from "./type-aliases";
 type OAuthProps = {
   provider: string;
@@ -27,7 +27,7 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
           " , let's claim it now"
       );
 
-      const accessToken = await localStorage.get("access_token");
+      const accessToken = await localStorage.get(LocalStorageKeys.access_token);
       if (!accessToken) throw Error("You lost your SIWT accessToken");
 
       const response = await fetch(

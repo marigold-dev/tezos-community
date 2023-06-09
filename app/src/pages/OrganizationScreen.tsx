@@ -36,7 +36,12 @@ import React, {
   useState,
 } from "react";
 import { useHistory } from "react-router";
-import { Organization, UserContext, UserContextType } from "../App";
+import {
+  LocalStorageKeys,
+  Organization,
+  UserContext,
+  UserContextType,
+} from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
@@ -78,6 +83,7 @@ export const OrganizationScreen = ({
     loading,
     userProfiles,
     refreshStorage,
+    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   api.defaults.baseUrl =
@@ -202,9 +208,15 @@ export const OrganizationScreen = ({
           organization?.members as unknown as { id: BigNumber }
         ).id.toNumber();
 
-        const keys: BigMapKey[] = await api.bigMapsGetKeys(membersBigMapId, {
-          micheline: "Json",
-        });
+        const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+        let keys: BigMapKey[] = await localStorage.getCachedRequest(url);
+
+        if (!keys) {
+          keys = await api.bigMapsGetKeys(membersBigMapId, {
+            micheline: "Json",
+          });
+          await localStorage.cacheRequest(url, keys);
+        }
 
         setMembers(
           Array.from(
@@ -215,13 +227,6 @@ export const OrganizationScreen = ({
         ); //take only active keys
 
         setOrganization(organization!);
-        console.log(
-          "refreshOrganization",
-          organization,
-          members,
-          membersBigMapId,
-          keys
-        );
       }
     } else {
       console.log("organization fetch his not ready yet");

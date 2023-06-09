@@ -37,6 +37,7 @@ import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { CachingService } from "./caching.service";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
@@ -46,40 +47,14 @@ import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, nat, unit } from "./type-aliases";
 setupIonicReact();
 
-const localStorage = new LocalStorage();
+const localStorage = new CachingService(new LocalStorage());
 
-export const refreshToken = async (userAddress: string) => {
-  try {
-    const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL + "/siwt/refreshToken",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          refreshToken: await localStorage.get("refresh_token"),
-          pkh: userAddress,
-        }),
-      }
-    );
-    const data = await response.json();
-    if (response.ok) {
-      const { accessToken, idToken, refreshToken } = data;
-      console.log("SIWT reconnected to web2 backend", jwt_decode(idToken));
-
-      localStorage.set("access_token", accessToken);
-      localStorage.set("refresh_token", refreshToken);
-      localStorage.set("id_token", idToken);
-    } else {
-      console.error("error trying to refresh token", response);
-      return new Promise((resolve, reject) => resolve(null));
-    }
-  } catch (error) {
-    console.error("error", error);
-    return new Promise((resolve, reject) => resolve(null));
-  }
-};
+export enum LocalStorageKeys {
+  access_token = "access_token",
+  refresh_token = "refresh_token",
+  id_token = "id_token",
+  bigMapsGetKeys = "bigMapsGetKeys",
+}
 
 export type TZIP21TokenMetadata = TokenMetadata & {
   artifactUri?: string; //A URI (as defined in the JSON Schema Specification) to the asset.
@@ -168,7 +143,7 @@ export type UserContextType = {
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
   socket: Socket;
-  localStorage: LocalStorage;
+  localStorage: CachingService;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
@@ -498,7 +473,7 @@ const App: React.FC = () => {
         setUserBalance(balance.toNumber());
 
         //only refresh userProfile if there is SIWT
-        if (await localStorage.get("access_token")) {
+        if (await localStorage.get(LocalStorageKeys.access_token)) {
           const newUserProfile = await getUserProfile(userAddress);
           if (newUserProfile) {
             userProfiles.set(userAddress as address, newUserProfile);
@@ -553,7 +528,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      await localStorage.create();
+      await localStorage.initStorage();
     })();
   }, []);
 
@@ -563,7 +538,10 @@ const App: React.FC = () => {
     setUserBalance(0);
     console.log("disconnecting wallet");
     await wallet.clearActiveAccount();
-    await localStorage.clear(); //remove SIWT tokens
+    await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
+    await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
+    await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
+
     history.replace(PAGES.ORGANIZATIONS);
   };
 
@@ -571,44 +549,88 @@ const App: React.FC = () => {
     whateverUserAddress: string
   ): Promise<UserProfile | null> => {
     try {
-      const accessToken = await localStorage.get("access_token");
+      const accessToken = await localStorage.get(LocalStorageKeys.access_token);
+
       if (!accessToken) {
         console.error("you lost the SIWT accessToken, disconnecting...");
         disconnectWallet();
         return null;
       }
+      const url =
+        process.env.REACT_APP_BACKEND_URL + "/user/" + whateverUserAddress;
+      const up = await localStorage.getCachedRequest(url);
 
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "/user/" + whateverUserAddress,
-        {
+      if (up && Object.keys(up).length > 0) {
+        //not empty
+        return new Promise((resolve, reject) => resolve(up));
+      } else if (up && Object.keys(up).length === 0) {
+        //empty
+        return new Promise((resolve, reject) => resolve(null));
+      } else {
+        const response = await fetch(url, {
           method: "GET",
           headers: {
             authorization: `Bearer ${accessToken}`,
           },
-        }
-      );
+        });
 
-      const json = await response.json();
+        const json = await response.json();
 
-      if (response.ok) {
-        return new Promise((resolve, reject) => resolve(json));
-      } else if (response.status === 401 || response.status === 403) {
-        console.warn("Silently refreshing token", response);
-        try {
-          await refreshToken(whateverUserAddress);
-        } catch (error) {
-          console.error("Cannot refresh token, disconnect");
-          disconnectWallet();
-          return null;
+        if (response.ok) {
+          await localStorage.cacheRequest(url, json);
+          return new Promise((resolve, reject) => resolve(json));
+        } else if (response.status === 401 || response.status === 403) {
+          console.warn("Silently refreshing token", response);
+          try {
+            await refreshToken(whateverUserAddress);
+          } catch (error) {
+            console.error("Cannot refresh token, disconnect");
+            disconnectWallet();
+            return null;
+          }
+          return await getUserProfile(whateverUserAddress);
+        } else {
+          console.warn("User Profile not found", response);
+          await localStorage.cacheRequest(url, {});
+          return new Promise((resolve, reject) => resolve(null));
         }
-        return await getUserProfile(whateverUserAddress);
-      } else {
-        console.warn("User Profile not found", response);
-        return new Promise((resolve, reject) => resolve(null));
       }
     } catch (error) {
       console.error("error", error);
       return new Promise((resolve, reject) => resolve(null));
+    }
+  };
+
+  const refreshToken = async (userAddress: string) => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "/siwt/refreshToken",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refreshToken: await localStorage.get("refresh_token"),
+            pkh: userAddress,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        const { accessToken, idToken, refreshToken } = data;
+        console.log("SIWT reconnected to web2 backend", jwt_decode(idToken));
+
+        localStorage.set(LocalStorageKeys.access_token, accessToken);
+        localStorage.set(LocalStorageKeys.refresh_token, refreshToken);
+        localStorage.set(LocalStorageKeys.id_token, idToken);
+      } else {
+        console.error("error trying to refresh token", response);
+        return new Promise((resolve, reject) => resolve(null));
+      }
+    } catch (error) {
+      console.error("error", error); //cannot do more because session is dead
+      disconnectWallet();
     }
   };
 
