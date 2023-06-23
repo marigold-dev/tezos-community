@@ -236,6 +236,22 @@ const default_storage =
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "OBJKT",
+          admins: Set.literal(
+            list(["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://d1fdloi71mui9q.cloudfront.net/WPsoyXgtRe8mkCe2FLcQ_objkt-com-logo-xl.png",
+          members: Big_map.literal(
+            list([["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address, unit]])
+          ),
+          siteUrl: "https://objkt.com/",
+          business: " The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
         }
       ]
     ),
@@ -481,6 +497,22 @@ const mainnet =
           ),
           siteUrl: "https://bakingbad.dev/",
           business: "Software Development",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>
+        },
+        {
+          name: "OBJKT",
+          admins: Set.literal(
+            list(["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://d1fdloi71mui9q.cloudfront.net/WPsoyXgtRe8mkCe2FLcQ_objkt-com-logo-xl.png",
+          members: Big_map.literal(
+            list([["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address, unit]])
+          ),
+          siteUrl: "https://objkt.com/",
+          business: " The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
