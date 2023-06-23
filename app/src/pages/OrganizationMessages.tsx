@@ -59,7 +59,7 @@ export const OrganizationMessages = ({
   }, [organizationName]);
 
   return (
-    <IonContent className="ion-padding">
+    <IonContent className="ion-padding" style={{ height: "calc(100% - 56px)" }}>
       <IonList>
         {contractEvents.map((ev) => (
           <IonItem key={ev.id}>

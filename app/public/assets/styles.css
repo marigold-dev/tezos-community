@@ -173,3 +173,12 @@ ion-thumbnail {
     --height: 80vh !important;
   }
 }
+
+.sc-ion-textarea-md-h,
+.sc-ion-input-md-h {
+  --border-color: var(--ion-color-primary);
+}
+
+.readonly {
+  --border-width: 0px;
+}

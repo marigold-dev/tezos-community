@@ -244,7 +244,7 @@ export const OrganizationScreen = ({
   return (
     <IonContent className="ion-page" id="main">
       {organization ? (
-        <IonContent style={{ height: "calc(100% - 56px - 56px)" }}>
+        <IonContent style={{ height: "calc(100%  - 56px  - 56px)" }}>
           <IonToolbar>
             <IonSegment
               onIonChange={(e) =>
@@ -270,10 +270,7 @@ export const OrganizationScreen = ({
           </IonToolbar>
 
           {selectedTab == TABS.DESCRIPTION ? (
-            <IonContent
-              style={{ height: "calc(100% - 158px)" }}
-              className="ion-padding"
-            >
+            <IonContent className="ion-padding">
               <IonTitle>{organization.name}</IonTitle>
 
               <IonList lines="none">
@@ -317,7 +314,11 @@ export const OrganizationScreen = ({
                     errorText="Business required"
                     className={`${businessIsValid && "ion-valid"} ${
                       businessIsValid === false && "ion-invalid"
-                    } `}
+                    }    ${
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "edit"
+                        : "readonly"
+                    }    `}
                   ></IonTextarea>
                 </IonItem>
                 <IonItem>
