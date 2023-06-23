@@ -536,7 +536,7 @@ export const OrganizationsScreen: React.FC = () => {
                     <IonInput
                       labelPlacement="floating"
                       value={reason}
-                      label="Reason *"
+                      label="Reason * (ASCII characters only)"
                       placeholder="because ..."
                       type="text"
                       maxlength={255}
@@ -549,7 +549,12 @@ export const OrganizationsScreen: React.FC = () => {
                         ) {
                           setReasonIsValid(false);
                         } else {
-                          setReason(str.target.value as string);
+                          setReason(
+                            (str.target.value as string).replace(
+                              /[^\x00-\x7F]/g,
+                              ""
+                            )
+                          );
                           setReasonIsValid(true);
                         }
                       }}
@@ -668,7 +673,12 @@ export const OrganizationsScreen: React.FC = () => {
                         ) {
                           setBusinessIsValid(false);
                         } else {
-                          setBusiness(str.target.value as string);
+                          setBusiness(
+                            (str.target.value as string).replace(
+                              /[^\x00-\x7F]/g,
+                              ""
+                            )
+                          );
                           setBusinessIsValid(true);
                         }
                       }}
@@ -802,19 +812,20 @@ export const OrganizationsScreen: React.FC = () => {
                       labelPlacement="floating"
                       color="primary"
                       value={message}
-                      label="Message *"
+                      label="Message *   (ASCII characters only)"
                       placeholder="Type here ..."
                       maxlength={250}
                       counter
                       onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
+                        let input = str.detail.value;
+                        //cleaning non ascii
+
+                        if (input === undefined || !input || input === "") {
                           setMessageIsValid(false);
                         } else {
-                          setMessage(str.target.value as string);
+                          setMessage(
+                            (input as string).replace(/[^\x00-\x7F]/g, "")
+                          );
                           setMessageIsValid(true);
                         }
                       }}

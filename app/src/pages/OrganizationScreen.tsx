@@ -302,7 +302,9 @@ export const OrganizationScreen = ({
                       ) {
                         setBusinessIsValid(false);
                       } else {
-                        organization.business = str.target.value as string;
+                        organization.business = (
+                          str.target.value as string
+                        ).replace(/[^\x00-\x7F]/g, "");
                         setOrganization(organization);
                         setBusinessIsValid(true);
                       }
