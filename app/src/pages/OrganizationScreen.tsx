@@ -270,7 +270,10 @@ export const OrganizationScreen = ({
           </IonToolbar>
 
           {selectedTab == TABS.DESCRIPTION ? (
-            <IonContent className="ion-padding">
+            <IonContent
+              style={{ height: "calc(100% - 158px)" }}
+              className="ion-padding"
+            >
               <IonTitle>{organization.name}</IonTitle>
 
               <IonList lines="none">

@@ -14,7 +14,6 @@ import {
   IonLabel,
   IonModal,
   IonPopover,
-  IonText,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -30,6 +29,7 @@ import {
   personCircle,
   unlinkOutline,
   wallet as walletIcon,
+  warningOutline,
 } from "ionicons/icons";
 import jwt_decode from "jwt-decode";
 import React, { useRef } from "react";
@@ -264,6 +264,8 @@ export const Footer: React.FC = () => {
                 </IonToolbar>
               </IonHeader>
               <IonContent color="light" class="ion-padding">
+                <IonTitle>Identity</IonTitle>
+
                 {userProfile ? (
                   <IonItem>
                     <UserProfileChip
@@ -281,13 +283,17 @@ export const Footer: React.FC = () => {
                   </IonItem>
                 ) : (
                   <>
-                    <IonItem>
-                      <IonLabel>Address : </IonLabel>
-                      <IonText>{userAddress}</IonText>
-                    </IonItem>
+                    <UserProfileChip
+                      address={userAddress as address}
+                      userProfiles={userProfiles}
+                    />
                     <IonItem>
                       <IonLabel color="warning">
-                        Link your address to a social network
+                        <IonIcon slot="start" icon={warningOutline} />
+                        We recommend to link your address to a social network,
+                        only people from same organizations can see this
+                        information, it is not an onchain data
+                        <IonIcon slot="end" icon={warningOutline} />
                       </IonLabel>
                       {providers.map((provider) => (
                         <OAuth key={provider} provider={provider} />
@@ -296,25 +302,54 @@ export const Footer: React.FC = () => {
                   </>
                 )}
 
+                <hr
+                  color="danger"
+                  style={{ borderWidth: "1px", height: "0" }}
+                />
+
+                <IonTitle>Membership</IonTitle>
+
                 {storageNFT &&
                 storageNFT.owner_token_ids.findIndex(
                   (obj) => obj[0] === (userAddress as address)
                 ) >= 0 ? (
-                  <IonItem>
-                    <IonImg
-                      src={nftContratTokenMetadataMap
-                        .get(0)!
-                        .thumbnailUri?.replace(
-                          "ipfs://",
-                          "https://gateway.pinata.cloud/ipfs/"
-                        )}
-                    />
-                  </IonItem>
+                  <>
+                    <IonItem>
+                      <IonImg
+                        style={{ padding: "2em" }}
+                        src={nftContratTokenMetadataMap
+                          .get(0)!
+                          .thumbnailUri?.replace(
+                            "ipfs://",
+                            "https://gateway.pinata.cloud/ipfs/"
+                          )}
+                      />
+                    </IonItem>
+                    <a
+                      href={
+                        "https://" +
+                        process.env.REACT_APP_NETWORK +
+                        ".tzkt.io/" +
+                        storage?.nftAddress
+                      }
+                      target="_blank"
+                    >
+                      View the NFT contract on TZKT
+                    </a>
+                  </>
                 ) : (
-                  <IonButton size="large" onClick={claimNFT} color="warning">
-                    <IonIcon slot="start" icon={cardOutline}></IonIcon>
-                    Claim your Tezos membership NFT card
-                  </IonButton>
+                  <IonItem>
+                    <IonLabel color="warning">
+                      <IonIcon slot="start" icon={warningOutline} />
+                      Claim your Tezos membership card to use it as access
+                      control later for events or whatever other use case
+                      <IonIcon slot="end" icon={warningOutline} />
+                    </IonLabel>
+                    <IonButton size="large" onClick={claimNFT} color="warning">
+                      <IonIcon slot="start" icon={cardOutline}></IonIcon>
+                      Claim NFT
+                    </IonButton>{" "}
+                  </IonItem>
                 )}
               </IonContent>
             </IonModal>
