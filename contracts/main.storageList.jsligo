@@ -152,7 +152,7 @@ const default_storage =
             list([["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address, unit]])
           ),
           siteUrl: "https://tezosindia.org.in/",
-          business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development. Advancing innovation in the Indian blockchain space is their goal.",
+          business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
@@ -184,7 +184,7 @@ const default_storage =
             list([["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address, unit]])
           ),
           siteUrl: "https://alterhen.art/",
-          business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, art-focused and exciting opportunities that will benefit museums, curators, festivals and artists.",
+          business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, exciting opportunities that will benefit museums, curators, festivals and artists.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
@@ -248,7 +248,7 @@ const default_storage =
             list([["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address, unit]])
           ),
           siteUrl: "https://objkt.com/",
-          business: " The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
+          business: "The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
@@ -416,7 +416,7 @@ const mainnet =
             list([["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address, unit]])
           ),
           siteUrl: "https://tezosindia.org.in/",
-          business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development. Advancing innovation in the Indian blockchain space is their goal.",
+          business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
@@ -448,7 +448,7 @@ const mainnet =
             list([["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address, unit]])
           ),
           siteUrl: "https://alterhen.art/",
-          business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, art-focused and exciting opportunities that will benefit museums, curators, festivals and artists.",
+          business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, exciting opportunities that will benefit museums, curators, festivals and artists.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>
