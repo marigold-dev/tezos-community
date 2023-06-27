@@ -85,8 +85,6 @@ export type UserProfile = {
 
 export type MemberRequest = {
   joinRequest: {
-    contactId: string;
-    contactIdProvider: string;
     orgName: string;
     reason: string;
   };
@@ -101,14 +99,13 @@ export type Limits = {
 
 export type Organization = {
   admins: Array<address>;
+  autoRegistration: boolean;
   business: string;
   fundingAddress: address | null;
   ipfsNftUrl: string;
   logoUrl: string;
   memberRequests: Array<{
     joinRequest: {
-      contactId: string;
-      contactIdProvider: string;
       orgName: string;
       reason: string;
     };

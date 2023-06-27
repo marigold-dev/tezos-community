@@ -42,7 +42,8 @@ const tezosOrganization: CONTRACT.organization =
     admins: Set.literal(list([tezosAdmin])) as set<address>,
     status: Active(),
     memberRequests: Set.empty as set<CONTRACT.joinOrganizationRequest>,
-    fundingAddress: None() as option<address>
+    fundingAddress: None() as option<address>,
+    autoRegistration : false
   };
 
 const token_info: map<string, bytes> =
@@ -461,7 +462,8 @@ const newOrganization: CONTRACT.addOrganizationRequest =
     siteUrl: "https://",
     logoUrl: "https://",
     ipfsNftUrl: "https://",
-    fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address)
+    fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+    autoRegistration : false
   };
 
 const testAddOrganizationNotAdmin =
@@ -505,8 +507,6 @@ const testActivateOrganization =
 const user2joinRequest =
   {
     orgName: newOrganization.name,
-    contactId: "user2",
-    contactIdProvider: "TWITTER",
     reason: "reason"
   };
 
@@ -546,7 +546,8 @@ const newOrganization2: CONTRACT.addOrganizationRequest =
     siteUrl: "https://",
     logoUrl: "https://",
     ipfsNftUrl: "https://",
-    fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address)
+    fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+    autoRegistration : true
   };
 
 const testAddOrganizationNotAdmin2 =

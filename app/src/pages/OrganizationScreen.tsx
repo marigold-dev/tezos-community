@@ -5,6 +5,7 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
+  IonCheckbox,
   IonContent,
   IonHeader,
   IonIcon,
@@ -113,6 +114,7 @@ export const OrganizationScreen = ({
       setLoading(true);
       const op = await mainWalletType!.methods
         .updateOrganization(
+          organization!.autoRegistration,
           organization!.business,
           organization!.fundingAddress,
           organization!.ipfsNftUrl,
@@ -536,6 +538,32 @@ export const OrganizationScreen = ({
                   ) : (
                     ""
                   )}
+                </IonItem>
+
+                <IonItem>
+                  <IonCheckbox
+                    label-placement="stacked"
+                    checked={organization.autoRegistration}
+                    disabled={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    className="checkbox-enabled"
+                    onIonChange={(str) => {
+                      console.log(
+                        "autoRegistration",
+                        str.target.checked,
+                        organization.autoRegistration
+                      );
+
+                      if (str.detail.checked === undefined) return;
+                      organization.autoRegistration = str.target.checked!;
+                      setOrganization(organization);
+                    }}
+                  >
+                    AutoRegistration
+                  </IonCheckbox>
                 </IonItem>
 
                 {!isTezosOrganization ? (

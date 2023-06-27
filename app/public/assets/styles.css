@@ -182,3 +182,7 @@ ion-thumbnail {
 .readonly {
   --border-width: 0px;
 }
+
+.checkbox-disabled {
+  opacity: 1;
+}

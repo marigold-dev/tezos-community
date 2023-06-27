@@ -52,21 +52,23 @@ export const FAQScreen: React.FC = () => {
               <IonLabel>What is TzCommunity?</IonLabel>
             </IonItem>
             <div className="ion-padding ion-text-justify" slot="content">
-              TzCommunity objective is to bring a tool to remove community pain
-              points :
+              TzCommunity objective is a <b>PSEUDONYM SOCIAL GRAPH</b> as a tool
+              to remove community pain points :
               <ul>
                 <li>
                   lack of ecosystem global registry. We ease newcomers to find
-                  or build communities
+                  or build communities, also helping dapp developers to reach a
+                  pseudonym user database and improve UX
                 </li>
                 <li>
                   priorize important messages while keeping away trollers. We
                   don't want to replace existing web2 messaging platform or
-                  forums
+                  forums, we enforce proof of alerts onchain delivery
                 </li>
                 <li>
                   be the entrypoint for funding ecosystem projects. We redirect
-                  investors or founders to existing Tezos funding platforms
+                  investors or founders to existing Tezos funding platforms :
+                  TzSafe, Homebase, etc ...
                 </li>
                 <li>more ideas to come depending on future feedbacks</li>
               </ul>
@@ -182,7 +184,8 @@ export const FAQScreen: React.FC = () => {
             <div className="ion-padding ion-text-justify" slot="content">
               Click on <b>JOIN AN ORGANIZATION</b> and fill the form. The
               administrators will receive a notification and can approve or deny
-              you.
+              you. For organization with auto-registration, no need to wait for
+              an approval.
             </div>
           </IonAccordion>
 

@@ -68,10 +68,11 @@ export class UserProfilesController {
 
     const storage = await this.mainContractType.storage();
 
-    //check if user is a super admin or part of same organization
+    //check if user is a super admin or part of same organization or an admin where someone who wants to join his org
     if (
       storage.tezosOrganization.admins.indexOf(pkh) >= 0 ||
-      (await this.isOnSameGroup(pkh, address as address, storage))
+      (await this.isOnSameGroup(pkh, address as address, storage)) ||
+      (await this.isOnMemberRequestList(pkh, address as address, storage))
     ) {
       //fetch it
       const up = await this.userProfilesService.getUserProfile(address);
@@ -126,6 +127,27 @@ export class UserProfilesController {
     );
 
     return isOnSameGroup;
+  }
+
+  async isOnMemberRequestList(
+    admin: address,
+    member: address,
+    storage: Storage,
+  ): Promise<boolean> {
+    //get user groups
+    let isOnMemberRequestList = false;
+    await Promise.all(
+      storage.organizations
+        .filter((o) => o.admins.indexOf(admin) >= 0)
+        .map(async (org) => {
+          if (org.memberRequests.findIndex((mr) => mr.user == member) >= 0) {
+            isOnMemberRequestList = true;
+            return;
+          }
+        }),
+    );
+
+    return isOnMemberRequestList;
   }
 
   @UseGuards(SiwtGuard)

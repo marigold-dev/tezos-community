@@ -1,6 +1,7 @@
 import {
   IonButton,
   IonButtons,
+  IonCheckbox,
   IonCol,
   IonContent,
   IonGrid,
@@ -18,8 +19,6 @@ import {
   IonRefresherContent,
   IonRow,
   IonSearchbar,
-  IonSelect,
-  IonSelectOption,
   IonSpinner,
   IonSplitPane,
   IonText,
@@ -39,7 +38,6 @@ import {
   LocalStorageKeys,
   Organization,
   PAGES,
-  SOCIAL_ACCOUNT_TYPE,
   UserContext,
   UserContextType,
 } from "../App";
@@ -86,6 +84,7 @@ export const OrganizationsScreen: React.FC = () => {
 
   //modal ADD
   const modalAdd = useRef<HTMLIonModalElement>(null);
+  const [autoRegistration, setAutoRegistration] = useState<boolean>(false);
   const [business, setBusiness] = useState<string>("");
   const [businessIsValid, setBusinessIsValid] = useState<boolean>(false);
   const [businessMarkTouched, setBusinessMarkTouched] =
@@ -100,16 +99,6 @@ export const OrganizationsScreen: React.FC = () => {
 
   //modal JOIN
   const modalJoin = useRef<HTMLIonModalElement>(null);
-  const [contactId, setContactId] = useState<string>("");
-  const [contactIdIsValid, setContactIdIsValid] = useState<boolean>(false);
-  const [contactIdMarkTouched, setContactIdMarkTouched] =
-    useState<boolean>(false);
-
-  const [contactIdProvider, setContactIdProvider] = useState<string>("");
-  const [contactIdProviderIsValid, setContactIdProviderIsValid] =
-    useState<boolean>(false);
-  const [contactIdProviderMarkTouched, setContactIdProviderMarkTouched] =
-    useState<boolean>(false);
 
   const [reason, setReason] = useState<string>("");
   const [reasonIsValid, setReasonIsValid] = useState<boolean>(false);
@@ -268,12 +257,7 @@ export const OrganizationsScreen: React.FC = () => {
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .requestToJoinOrganization(
-          contactId,
-          contactIdProvider,
-          joiningOrganization!.name,
-          reason
-        )
+        .requestToJoinOrganization(joiningOrganization!.name, reason)
         .send();
       await op?.confirmation();
       const newStorage = await mainWalletType!.storage();
@@ -306,6 +290,7 @@ export const OrganizationsScreen: React.FC = () => {
       setLoading(true);
       const op = await mainWalletType!.methods
         .addOrganization(
+          autoRegistration,
           business,
           fundingAddress,
           ipfsNftUrl,
@@ -421,12 +406,7 @@ export const OrganizationsScreen: React.FC = () => {
                       <IonButtons slot="end">
                         <IonButton
                           onClick={joinOrganization}
-                          disabled={
-                            !contactIdIsValid ||
-                            !contactIdProviderIsValid ||
-                            !reasonIsValid ||
-                            !joiningOrganization
-                          }
+                          disabled={!reasonIsValid || !joiningOrganization}
                         >
                           Done
                         </IonButton>
@@ -476,63 +456,6 @@ export const OrganizationsScreen: React.FC = () => {
                   </IonHeader>
 
                   <IonContent color="light" class="ion-padding">
-                    <IonInput
-                      labelPlacement="floating"
-                      color="primary"
-                      value={contactId}
-                      label="Contact identifier/alias *"
-                      placeholder="@twitterAlias"
-                      type="text"
-                      maxlength={36}
-                      counter
-                      onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
-                          setContactIdIsValid(false);
-                        } else {
-                          setContactId(str.target.value as string);
-                          setContactIdIsValid(true);
-                        }
-                      }}
-                      helperText="Enter an alias as identifier from your social account provider"
-                      errorText="Alias required"
-                      className={`${contactIdIsValid && "ion-valid"} ${
-                        contactIdIsValid === false && "ion-invalid"
-                      } ${contactIdMarkTouched && "ion-touched"}`}
-                      onIonBlur={() => setContactIdMarkTouched(true)}
-                    />
-
-                    <IonSelect
-                      labelPlacement="floating"
-                      value={contactIdProvider}
-                      label="Select your Social account provider *"
-                      onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
-                          setContactIdProviderIsValid(false);
-                        } else {
-                          setContactIdProvider(str.target.value as string);
-                          setContactIdProviderIsValid(true);
-                        }
-                      }}
-                      className={`${contactIdProviderIsValid && "ion-valid"} ${
-                        contactIdProviderIsValid === false && "ion-invalid"
-                      } ${contactIdProviderMarkTouched && "ion-touched"}`}
-                      onIonBlur={() => setContactIdProviderMarkTouched(true)}
-                    >
-                      {Object.keys(SOCIAL_ACCOUNT_TYPE).map((e) => (
-                        <IonSelectOption key={e} value={e}>
-                          {e}
-                        </IonSelectOption>
-                      ))}
-                    </IonSelect>
-
                     <IonInput
                       labelPlacement="floating"
                       value={reason}
@@ -751,6 +674,16 @@ export const OrganizationsScreen: React.FC = () => {
                         );
                       }}
                     />
+
+                    <IonCheckbox
+                      value={autoRegistration}
+                      onIonChange={(str) => {
+                        if (str.target.checked === undefined) return;
+                        setAutoRegistration(str.target.checked!);
+                      }}
+                    >
+                      AutoRegistration
+                    </IonCheckbox>
                   </IonContent>
                 </IonModal>
 

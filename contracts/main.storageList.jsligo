@@ -13,7 +13,8 @@ const default_storage =
       ) as set<address>,
       status: Active(),
       memberRequests: Set.empty as set<joinOrganizationRequest>,
-      fundingAddress: None() as option<address>
+      fundingAddress: None() as option<address>,
+      autoRegistration : false
     },
     organizations: list(
       [
@@ -33,7 +34,8 @@ const default_storage =
           fundingAddress: Some(
             "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+          autoRegistration : false
         },
         {
           name: "Teia DAO LLC",
@@ -63,7 +65,8 @@ const default_storage =
           fundingAddress: Some(
             "KT1J9FYz29RBQi1oGLw8uXyACrzXzV1dHuvb" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Functori",
@@ -81,7 +84,8 @@ const default_storage =
           fundingAddress: Some(
             "tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Marigold",
@@ -103,7 +107,8 @@ const default_storage =
           business: "Tezos core protocol and adoption",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Tezos France",
@@ -121,7 +126,8 @@ const default_storage =
           fundingAddress: Some(
             "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Pyratz Labs",
@@ -139,7 +145,8 @@ const default_storage =
           fundingAddress: Some(
             "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "TZ INDIA PVT. LTD",
@@ -155,7 +162,8 @@ const default_storage =
           business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Oxhead Alpha",
@@ -171,7 +179,8 @@ const default_storage =
           business: "Research, development and key infrastructure support for the Tezos community.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "alterHEN",
@@ -187,7 +196,8 @@ const default_storage =
           business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, exciting opportunities that will benefit museums, curators, festivals and artists.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Tezos Commons",
@@ -203,7 +213,8 @@ const default_storage =
           business: "The Tezos Commons Foundation empowers the community to be the architects through bootstrapping local communities, communications, promotion, education, funding open source initiatives and advocacy.",
           ipfsNftUrl: "ipfs://QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Bloometa",
@@ -219,7 +230,8 @@ const default_storage =
           business: "The first multi-chain platform for Web3 gamers & GameFi projects - NFT Marketplace - GameFi Launchpad - OTC In-Game Asset Trading - Web3 Gaming Analytics",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Baking Bad",
@@ -235,7 +247,8 @@ const default_storage =
           business: "Software Development",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "OBJKT",
@@ -251,7 +264,8 @@ const default_storage =
           business: "The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         }
       ]
     ),
@@ -277,7 +291,8 @@ const mainnet =
       ) as set<address>,
       status: Active(),
       memberRequests: Set.empty as set<joinOrganizationRequest>,
-      fundingAddress: None() as option<address>
+      fundingAddress: None() as option<address>,
+      autoRegistration : false
     },
     organizations: list(
       [
@@ -297,7 +312,8 @@ const mainnet =
           fundingAddress: Some(
             "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Teia DAO LLC",
@@ -327,7 +343,8 @@ const mainnet =
           fundingAddress: Some(
             "KT1J9FYz29RBQi1oGLw8uXyACrzXzV1dHuvb" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Functori",
@@ -345,7 +362,8 @@ const mainnet =
           fundingAddress: Some(
             "tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Marigold",
@@ -367,7 +385,8 @@ const mainnet =
           business: "Tezos core protocol and adoption",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Tezos France",
@@ -385,7 +404,8 @@ const mainnet =
           fundingAddress: Some(
             "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Pyratz Labs",
@@ -403,7 +423,8 @@ const mainnet =
           fundingAddress: Some(
             "tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address
           ),
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "TZ INDIA PVT. LTD",
@@ -419,7 +440,8 @@ const mainnet =
           business: "Tezos India, a Bengaluru-based startup funded by Tezos Foundation, promotes blockchain adoption in India. We tackle barriers to adoption by focusing on developer adoption, education, training, and ecosystem development.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Oxhead Alpha",
@@ -435,7 +457,8 @@ const mainnet =
           business: "Research, development and key infrastructure support for the Tezos community.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "alterHEN",
@@ -451,7 +474,8 @@ const mainnet =
           business: "alterHEN is a collective of artists exploring the cultural economy of NFT's, with a mission to present these transformative new models to the art world as accessible, exciting opportunities that will benefit museums, curators, festivals and artists.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Tezos Commons",
@@ -467,7 +491,8 @@ const mainnet =
           business: "The Tezos Commons Foundation empowers the community to be the architects through bootstrapping local communities, communications, promotion, education, funding open source initiatives and advocacy.",
           ipfsNftUrl: "ipfs://QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Bloometa",
@@ -483,7 +508,8 @@ const mainnet =
           business: "The first multi-chain platform for Web3 gamers & GameFi projects - NFT Marketplace - GameFi Launchpad - OTC In-Game Asset Trading - Web3 Gaming Analytics",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "Baking Bad",
@@ -499,7 +525,8 @@ const mainnet =
           business: "Software Development",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         },
         {
           name: "OBJKT",
@@ -515,7 +542,8 @@ const mainnet =
           business: " The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
-          memberRequests: Set.empty as set<joinOrganizationRequest>
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         }
       ]
     ),
