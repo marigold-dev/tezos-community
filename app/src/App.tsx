@@ -4,7 +4,6 @@ import {
   RefresherEventDetail,
   setupIonicReact,
 } from "@ionic/react";
-import { useHistory } from "react-router-dom";
 
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
@@ -43,6 +42,7 @@ import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
+import { ProfileScreen } from "./pages/ProfileScreen";
 import { BigMap, address, nat, unit } from "./type-aliases";
 setupIonicReact();
 
@@ -145,8 +145,6 @@ export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
   const socket: Socket = io(process.env.REACT_APP_BACKEND_URL!);
-
-  const history = useHistory();
 
   const [Tezos, setTezos] = useState<TezosToolkit>(
     new TezosToolkit(
@@ -324,7 +322,7 @@ const App: React.FC = () => {
             (orgItem: Organization) =>
               orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
           );
-          console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
+          //console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
 
           if (storage && myOrganizationsAsAdmin.length > 0) {
             joinOrganizationRequestSubscription.on("data", async (e) => {
@@ -475,10 +473,10 @@ const App: React.FC = () => {
             userProfiles.set(userAddress as address, newUserProfile);
             setUserProfiles(userProfiles); //cache
             setUserProfile(newUserProfile); //cache
-            console.log(
+            /* console.log(
               "userProfile refreshed for " + userAddress,
               newUserProfile
-            );
+            );*/
           }
         }
       }
@@ -537,8 +535,6 @@ const App: React.FC = () => {
     await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
     await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
     await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
-
-    history.replace(PAGES.ORGANIZATIONS);
   };
 
   const getUserProfile = async (
@@ -670,6 +666,7 @@ const App: React.FC = () => {
               component={OrganizationScreen}
             />
             <Route path={"/" + PAGES.FAQ} component={FAQScreen} />
+            <Route path={"/" + PAGES.PROFILE} component={ProfileScreen} />
             <Redirect exact from="/" to={PAGES.ORGANIZATIONS} />
           </IonRouterOutlet>
         </IonReactRouter>
@@ -682,6 +679,7 @@ export enum PAGES {
   ORGANIZATIONS = "organizations",
   ORGANIZATION = "organization",
   FAQ = "faq",
+  PROFILE = "profile",
 }
 
 export default App;

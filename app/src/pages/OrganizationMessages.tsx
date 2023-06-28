@@ -6,13 +6,22 @@ import {
   IonIcon,
   IonItem,
   IonList,
+  IonRefresher,
+  IonRefresherContent,
   IonRow,
   IonTextarea,
+  RefresherEventDetail,
   useIonAlert,
 } from "@ionic/react";
 import * as api from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
-import { mailOutline, returnUpBackOutline, timeOutline } from "ionicons/icons";
+import {
+  arrowDownCircleOutline,
+  mailOutline,
+  repeatOutline,
+  returnUpBackOutline,
+  timeOutline,
+} from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
@@ -61,7 +70,7 @@ export const OrganizationMessages = ({
   const [replyId, setReplyId] = useState<number | undefined>();
   const [replyUser, setReplyUser] = useState<address | undefined>();
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (event?: CustomEvent<RefresherEventDetail>) => {
     const contractEventReplies: (api.ContractEvent & {
       replies: api.ContractEvent[] | undefined;
     })[] = [];
@@ -78,14 +87,20 @@ export const OrganizationMessages = ({
           contract: { eq: process.env.REACT_APP_CONTRACT_ADDRESS! },
           tag: { eq: "reply" },
           payload: { eq: { jsonValue: ce.id + "", jsonPath: "nat" } },
+          sort: { asc: "id" },
         });
         contractEventReplies.push({ ...ce, replies });
       })
     );
 
-    setcontractEvents(contractEventReplies);
+    setcontractEvents(
+      contractEventReplies.sort((item1, item2) =>
+        item1.id! < item2.id! ? -1 : item1.id! == item2.id! ? 0 : 1
+      )
+    );
 
-    console.log("Events", contractEventReplies);
+    //    console.log("Events", contractEventReplies);
+    if (event) event.detail.complete();
   };
 
   useEffect(() => {
@@ -93,11 +108,11 @@ export const OrganizationMessages = ({
   }, [organizationName]);
 
   useEffect(() => {
-    textareaRef.current!.disabled = true;
+    if (textareaRef.current) textareaRef.current.disabled = true;
     setTimeout(() => {
       (async () => await fetchMessages())();
       contentRef.current?.scrollToBottom(500);
-      textareaRef.current!.disabled = false;
+      if (textareaRef.current) textareaRef.current.disabled = false;
       console.log("Refresh messages");
     }, 1000);
   }, []);
@@ -158,6 +173,10 @@ export const OrganizationMessages = ({
 
   return (
     <IonContent className="ion-padding" style={{ height: "calc(100% - 56px)" }}>
+      <IonRefresher slot="fixed" onIonRefresh={fetchMessages}>
+        <IonRefresherContent></IonRefresherContent>
+      </IonRefresher>
+
       <IonContent ref={contentRef} style={{ height: "calc(100% - 142px)" }}>
         <IonList>
           {contractEvents.map((ev) => (
@@ -219,6 +238,14 @@ export const OrganizationMessages = ({
             </IonItem>
           ))}
         </IonList>
+        <IonButton
+          color="transparent"
+          size="small"
+          onClick={() => fetchMessages()}
+        >
+          <IonIcon icon={arrowDownCircleOutline} />
+          Pull to refresh
+        </IonButton>
       </IonContent>
       <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
 
@@ -265,7 +292,9 @@ export const OrganizationMessages = ({
             labelPlacement="floating"
             color="primary"
             value={message}
-            label="Reply *   (ASCII characters only)"
+            label={
+              "Reply to messageId " + replyId + " *   (ASCII characters only)"
+            }
             placeholder="Type here ..."
             maxlength={250}
             counter
@@ -290,6 +319,16 @@ export const OrganizationMessages = ({
           <IonButton onClick={reply} color="dark">
             <IonIcon slot="start" icon={returnUpBackOutline}></IonIcon>
             Reply
+          </IonButton>
+          <IonButton
+            onClick={() => {
+              setReplyId(undefined);
+              setReplyUser(undefined);
+            }}
+            color="warning"
+          >
+            <IonIcon slot="start" icon={repeatOutline}></IonIcon>
+            Cancel reply
           </IonButton>
         </IonItem>
       )}

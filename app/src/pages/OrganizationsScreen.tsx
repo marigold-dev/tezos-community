@@ -199,7 +199,7 @@ export const OrganizationsScreen: React.FC = () => {
         setSelectedOrganizationName(myOrganizations[0].name); //init
         setIsTezosOrganization(false);
       }
-      console.log("myOrganizations", myOrganizations);
+      //console.log("myOrganizations", myOrganizations);
     } else {
       //storage not ready yet
     }

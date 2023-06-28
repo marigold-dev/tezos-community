@@ -1,49 +1,20 @@
 import { NetworkType, SigningType } from "@airgap/beacon-types";
 
 import { Clipboard } from "@capacitor/clipboard";
-import {
-  IonButton,
-  IonButtons,
-  IonChip,
-  IonContent,
-  IonFooter,
-  IonHeader,
-  IonIcon,
-  IonImg,
-  IonItem,
-  IonLabel,
-  IonModal,
-  IonPopover,
-  IonTitle,
-  IonToolbar,
-  useIonAlert,
-} from "@ionic/react";
+import { IonButton, IonFooter, IonIcon, IonToolbar } from "@ionic/react";
 import { createMessagePayload, signIn } from "@siwt/sdk";
 import {
-  arrowBackOutline,
-  cardOutline,
   helpCircleOutline,
   home,
-  logOut,
   personCircle,
-  unlinkOutline,
   wallet as walletIcon,
-  warningOutline,
 } from "ionicons/icons";
 import jwt_decode from "jwt-decode";
 import React, { useRef } from "react";
-import { useHistory } from "react-router-dom";
 import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "./App";
-import { OAuth } from "./OAuth";
-import { TransactionInvalidBeaconError } from "./TransactionInvalidBeaconError";
-import { UserProfileChip } from "./components/UserProfileChip";
 import { address } from "./type-aliases";
-const providers = ["twitter"];
 
 export const Footer: React.FC = () => {
-  const history = useHistory();
-  const [presentAlert] = useIonAlert();
-
   const {
     Tezos,
     wallet,
@@ -142,53 +113,6 @@ export const Footer: React.FC = () => {
     }
   };
 
-  const claimNFT = async () => {
-    console.log("claimNFT");
-
-    try {
-      setLoading(true);
-      const op = await nftWalletType!.methods.createNFTCardForMember().send();
-      await op?.confirmation();
-      await refreshStorage();
-      history.replace(PAGES.ORGANIZATIONS);
-    } catch (error) {
-      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
-      let tibe: TransactionInvalidBeaconError =
-        new TransactionInvalidBeaconError(error);
-      presentAlert({
-        header: "Error",
-        message: tibe.data_message,
-        buttons: ["Close"],
-      });
-      setLoading(false);
-    }
-    setLoading(false);
-  };
-
-  const unlinkSocialAccount = async () => {
-    const accessToken = await localStorage.get(LocalStorageKeys.access_token);
-    if (!accessToken) throw Error("You lost your SIWT accessToken");
-
-    const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL + "/user" + "/unlink",
-      {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    if (response.ok) {
-      console.log("UserProfile unlinked on backend");
-      setUserProfile(null);
-      userProfiles.delete(userAddress as address);
-      setUserProfiles(userProfiles); //update cache
-    } else {
-      console.log("ERROR : " + response.status);
-    }
-  };
-
   const writeToClipboard = async (content: string) => {
     console.log("writeToClipboard", content);
 
@@ -214,139 +138,10 @@ export const Footer: React.FC = () => {
               FAQ
             </IonButton>
 
-            <IonButton id="profile" color="dark">
+            <IonButton color="dark" routerLink={PAGES.PROFILE}>
               <IonIcon slot="start" icon={personCircle}></IonIcon>
               Profile
             </IonButton>
-
-            <IonModal trigger="profile" ref={modalProfile}>
-              <IonHeader>
-                <IonToolbar>
-                  <IonButtons slot="start">
-                    <IonButton onClick={() => modalProfile.current?.dismiss()}>
-                      <IonIcon slot="start" icon={arrowBackOutline}></IonIcon>
-                      BACK
-                    </IonButton>
-                  </IonButtons>
-                  <IonButtons slot="end">
-                    <IonButton onClick={disconnectWallet}>
-                      <IonIcon slot="start" icon={logOut}></IonIcon>
-                      Logout
-                    </IonButton>
-                  </IonButtons>
-                  <IonTitle>
-                    Profile
-                    <IonChip
-                      id="verified"
-                      color={userProfile ? "success" : "warning"}
-                    >
-                      {userProfile ? "Verified" : "Unverified"}
-                    </IonChip>
-                    {userProfile ? (
-                      ""
-                    ) : (
-                      <IonPopover trigger="verified" triggerAction="hover">
-                        <IonContent class="ion-padding">
-                          Optionally, you can link with your preferred social
-                          account to be able to receive urgent/important
-                          messages and also display a human-readable alias
-                          instead of tz1xxx
-                        </IonContent>
-                      </IonPopover>
-                    )}
-                  </IonTitle>
-                </IonToolbar>
-              </IonHeader>
-              <IonContent color="light" class="ion-padding">
-                <IonTitle>Identity</IonTitle>
-
-                {userProfile ? (
-                  <IonItem>
-                    <UserProfileChip
-                      address={userAddress as address}
-                      userProfiles={userProfiles}
-                    />
-                    <IonButton
-                      color="danger"
-                      slot="end"
-                      onClick={(e) => unlinkSocialAccount()}
-                    >
-                      <IonIcon icon={unlinkOutline} />
-                      Unlink social account
-                    </IonButton>
-                  </IonItem>
-                ) : (
-                  <>
-                    <UserProfileChip
-                      address={userAddress as address}
-                      userProfiles={userProfiles}
-                    />
-                    <IonItem>
-                      <IonLabel color="warning">
-                        <IonIcon slot="start" icon={warningOutline} />
-                        We recommend to link your address to a social network,
-                        only people from same organizations can see this
-                        information, it is not an onchain data
-                        <IonIcon slot="end" icon={warningOutline} />
-                      </IonLabel>
-                      {providers.map((provider) => (
-                        <OAuth key={provider} provider={provider} />
-                      ))}
-                    </IonItem>
-                  </>
-                )}
-
-                <hr
-                  color="danger"
-                  style={{ borderWidth: "1px", height: "0" }}
-                />
-
-                <IonTitle>Membership</IonTitle>
-
-                {storageNFT &&
-                storageNFT.owner_token_ids.findIndex(
-                  (obj) => obj[0] === (userAddress as address)
-                ) >= 0 ? (
-                  <>
-                    <IonItem>
-                      <IonImg
-                        style={{ padding: "2em" }}
-                        src={nftContratTokenMetadataMap
-                          .get(0)!
-                          .thumbnailUri?.replace(
-                            "ipfs://",
-                            "https://gateway.pinata.cloud/ipfs/"
-                          )}
-                      />
-                    </IonItem>
-                    <a
-                      href={
-                        "https://" +
-                        process.env.REACT_APP_NETWORK +
-                        ".tzkt.io/" +
-                        storage?.nftAddress
-                      }
-                      target="_blank"
-                    >
-                      View the NFT contract on TZKT
-                    </a>
-                  </>
-                ) : (
-                  <IonItem>
-                    <IonLabel color="warning">
-                      <IonIcon slot="start" icon={warningOutline} />
-                      Claim your Tezos membership card to use it as access
-                      control later for events or whatever other use case
-                      <IonIcon slot="end" icon={warningOutline} />
-                    </IonLabel>
-                    <IonButton size="large" onClick={claimNFT} color="warning">
-                      <IonIcon slot="start" icon={cardOutline}></IonIcon>
-                      Claim NFT
-                    </IonButton>{" "}
-                  </IonItem>
-                )}
-              </IonContent>
-            </IonModal>
           </>
         ) : (
           <IonButton color="dark" onClick={connectWallet}>

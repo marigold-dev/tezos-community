@@ -273,7 +273,7 @@ const default_storage =
             list(["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address])
           ),
           status: Active(),
-          logoUrl: "https://drive.google.com/file/d/1xyEP7q1rw_j9A9_OY5tQohyg9w08Mf-1/view",
+          logoUrl: "https://serokell.io/static/images/serokell-logo-new-black.png",
           members: Big_map.literal(
             list([["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address, unit]])
           ),
@@ -568,7 +568,7 @@ const mainnet =
             list(["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address])
           ),
           status: Active(),
-          logoUrl: "https://drive.google.com/file/d/1xyEP7q1rw_j9A9_OY5tQohyg9w08Mf-1/view",
+          logoUrl: "https://serokell.io/static/images/serokell-logo-new-black.png",
           members: Big_map.literal(
             list([["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address, unit]])
           ),
