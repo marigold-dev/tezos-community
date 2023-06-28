@@ -46,7 +46,7 @@ import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
 import { address } from "../type-aliases";
-import { OrganizationScreen } from "./OrganizationScreen";
+import { OrganizationScreen, TABS } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
@@ -127,6 +127,8 @@ export const OrganizationsScreen: React.FC = () => {
   const [selectedOrganizationName, setSelectedOrganizationName] = useState<
     string | undefined
   >();
+  const [selectedTab, setSelectedTab] = useState<TABS>(TABS.DESCRIPTION);
+
   const [isTezosOrganization, setIsTezosOrganization] =
     useState<boolean>(false);
 
@@ -882,6 +884,8 @@ export const OrganizationsScreen: React.FC = () => {
               isTezosOrganization={isTezosOrganization}
               refreshMyOrganizations={refreshMyOrganizations}
               setSelectedOrganizationName={setSelectedOrganizationName}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
             />
           </IonSplitPane>
         )}

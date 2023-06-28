@@ -22,7 +22,6 @@ import { createMessagePayload, signIn } from "@siwt/sdk";
 import {
   arrowBackOutline,
   cardOutline,
-  cash,
   helpCircleOutline,
   home,
   logOut,
@@ -208,11 +207,6 @@ export const Footer: React.FC = () => {
           <>
             <IonButton color="dark" routerLink={PAGES.ORGANIZATIONS}>
               <IonIcon slot="icon-only" icon={home}></IonIcon>
-            </IonButton>
-
-            <IonButton disabled color="dark" routerLink={PAGES.FUNDING}>
-              <IonIcon slot="start" icon={cash}></IonIcon>
-              Funding
             </IonButton>
 
             <IonButton color="dark" routerLink={PAGES.FAQ}>

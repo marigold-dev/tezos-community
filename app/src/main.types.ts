@@ -77,6 +77,7 @@ type Methods = {
   ) => Promise<void>;
   removeMember: (member: address, orgName: string) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
+  replyToMessage: (_0: nat, _1: string, _2: string) => Promise<void>;
   requestToJoinOrganization: (orgName: string, reason: string) => Promise<void>;
   responseToJoinOrganization: (
     membersToApprove: Array<address>,
@@ -121,6 +122,7 @@ type MethodsObject = {
   }) => Promise<void>;
   removeMember: (params: { member: address; orgName: string }) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
+  replyToMessage: (params: { 0: nat; 1: string; 2: string }) => Promise<void>;
   requestToJoinOrganization: (params: {
     orgName: string;
     reason: string;

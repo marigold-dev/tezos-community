@@ -642,3 +642,11 @@ const sendMessage = ([to, message]: [string, string], store: storage): _return =
     store
   ]
 };
+
+// @entry
+const replyToMessage = ([replyId,replyUser, message]: [nat,string, string], store: storage): _return => {
+  return [
+    list([Tezos.emit("%reply", [Tezos.get_source(), replyUser,replyId, message])]),
+    store
+  ]
+};

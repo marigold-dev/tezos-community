@@ -54,9 +54,11 @@ type OrganizationProps = {
   isTezosOrganization: boolean;
   refreshMyOrganizations: () => Promise<void>;
   setSelectedOrganizationName: Dispatch<SetStateAction<string | undefined>>;
+  selectedTab: TABS;
+  setSelectedTab: Dispatch<SetStateAction<TABS>>;
 };
 
-enum TABS {
+export enum TABS {
   DESCRIPTION = "DESCRIPTION",
   MESSAGES = "MESSAGES",
   ADMINISTRATION = "ADMINISTRATION",
@@ -67,6 +69,8 @@ export const OrganizationScreen = ({
   isTezosOrganization,
   refreshMyOrganizations,
   setSelectedOrganizationName,
+  selectedTab,
+  setSelectedTab,
 }: OrganizationProps): JSX.Element => {
   const history = useHistory();
 
@@ -96,7 +100,6 @@ export const OrganizationScreen = ({
     undefined
   );
 
-  const [selectedTab, setSelectedTab] = useState<TABS>(TABS.DESCRIPTION);
   const [members, setMembers] = useState<address[]>([]);
 
   //fund transfer

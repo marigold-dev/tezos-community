@@ -41,7 +41,6 @@ import { CachingService } from "./caching.service";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
-import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { BigMap, address, nat, unit } from "./type-aliases";
@@ -670,7 +669,6 @@ const App: React.FC = () => {
               path={"/" + PAGES.ORGANIZATION}
               component={OrganizationScreen}
             />
-            <Route path={"/" + PAGES.FUNDING} component={FundingScreen} />
             <Route path={"/" + PAGES.FAQ} component={FAQScreen} />
             <Redirect exact from="/" to={PAGES.ORGANIZATIONS} />
           </IonRouterOutlet>
@@ -683,7 +681,6 @@ const App: React.FC = () => {
 export enum PAGES {
   ORGANIZATIONS = "organizations",
   ORGANIZATION = "organization",
-  FUNDING = "funding",
   FAQ = "faq",
 }
 

@@ -266,6 +266,23 @@ const default_storage =
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>,
       autoRegistration : false
+        },
+        {
+          name: "Serokell OU",
+          admins: Set.literal(
+            list(["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://drive.google.com/file/d/1xyEP7q1rw_j9A9_OY5tQohyg9w08Mf-1/view",
+          members: Big_map.literal(
+            list([["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address, unit]])
+          ),
+          siteUrl: "https://serokell.io",
+          business: " Serokell is a software development company focused on creating customized high-performance solutions using modern technologies. Our team consists of 60+ professionals from all over the world. Our core competencies are in AI and blockchain.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         }
       ]
     ),
@@ -540,6 +557,23 @@ const mainnet =
           ),
           siteUrl: "https://objkt.com/",
           business: " The largest Digital Art & Collectible marketplace on Tezos. Buy and sell your NFTs on our marketplace or try out an English or a Dutch Auction",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Serokell OU",
+          admins: Set.literal(
+            list(["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://drive.google.com/file/d/1xyEP7q1rw_j9A9_OY5tQohyg9w08Mf-1/view",
+          members: Big_map.literal(
+            list([["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address, unit]])
+          ),
+          siteUrl: "https://serokell.io",
+          business: " Serokell is a software development company focused on creating customized high-performance solutions using modern technologies. Our team consists of 60+ professionals from all over the world. Our core competencies are in AI and blockchain.",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>,
