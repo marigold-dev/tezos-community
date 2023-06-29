@@ -1,6 +1,10 @@
 import {
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
   IonCheckbox,
   IonCol,
   IonContent,
@@ -31,7 +35,16 @@ import {
 import * as api from "@tzkt/sdk-api";
 import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
-import { addCircle, ellipse, mailOutline, peopleCircle } from "ionicons/icons";
+import {
+  addCircle,
+  constructOutline,
+  ellipse,
+  keyOutline,
+  mailOutline,
+  mapOutline,
+  peopleCircle,
+  sendOutline,
+} from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import {
@@ -363,14 +376,87 @@ export const OrganizationsScreen: React.FC = () => {
             </IonItem>
           </div>
         ) : !userAddress ? (
-          <>
-            <h2 style={{ paddingTop: "10vh" }}>Welcome to Tezos Community !</h2>
-
-            <IonImg
-              style={{ paddingTop: "10vh" }}
-              src={process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg"}
-            />
-          </>
+          <IonContent
+            style={{
+              "--background": "none",
+              backgroundImage:
+                "url(" + process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg)",
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundBlendMode: "overlay",
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+            }}
+          >
+            <IonContent style={{ "--background": "none", color: "primary" }}>
+              <h1 style={{ paddingTop: "10vh" }}>
+                Entering Tezos Social Graph
+              </h1>
+              <IonGrid>
+                <IonRow>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <IonIcon icon={mapOutline}></IonIcon>
+                          &nbsp;&nbsp; Social graph registry
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        Build and manage your own community onchain. Control who
+                        can join or not and deliver NFT membership cards
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <IonIcon icon={keyOutline}></IonIcon>
+                          &nbsp;&nbsp; Preserve pseudonymity
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        You are identified by your Tezos address. Only people
+                        from same organization can see your social profile, if
+                        you decide to link it.
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <IonIcon icon={sendOutline}></IonIcon>
+                          &nbsp;&nbsp; Send secure onchain alerts
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        Notify you community or others one via onchain events.
+                        Receive important messages on your phone or via web push
+                        (gas cost applies to avoid spam)
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        {" "}
+                        <IonCardTitle>
+                          <IonIcon icon={constructOutline}></IonIcon>
+                          &nbsp;&nbsp; Free integration to other dapps
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        Leverage Tezos social graph as user registry for other
+                        dapps, like an universal contact list, custom player
+                        registry, or community database builder and more ..
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonContent>
+          </IonContent>
         ) : (
           <IonSplitPane when="xs" contentId="main">
             <IonMenu

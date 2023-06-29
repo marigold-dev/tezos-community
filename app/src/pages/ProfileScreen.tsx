@@ -220,7 +220,7 @@ export const ProfileScreen: React.FC = () => {
                 history.replace(PAGES.ORGANIZATIONS);
               }}
             >
-              <IonButton color="danger">
+              <IonButton color="dark">
                 <IonIcon icon={logOut}></IonIcon>
                 Logout
               </IonButton>
