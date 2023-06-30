@@ -18,8 +18,8 @@ import { SiwtService } from 'src/siwt/siwt.service';
 import { UserProfile } from 'src/userprofiles/UserProfile';
 import { UserProfilesService } from 'src/userprofiles/userprofiles.service';
 
-@Controller('twitter')
-export class TwitterController {
+@Controller('facebook')
+export class FacebookController {
   constructor(
     private eg: EventsGateway,
     private userProfilesService: UserProfilesService,
@@ -28,13 +28,13 @@ export class TwitterController {
   ) {}
 
   @UseGuards(SiwtGuard)
-  @UseGuards(AuthGuard('twitter'))
+  @UseGuards(AuthGuard('facebook'))
   @Get()
-  async twitter() {}
+  async Facebook() {}
 
   @UseGuards(SiwtGuard)
   @Post('claim')
-  async claimMyTwitter(
+  async claimMyFacebook(
     @Req() req: express.Request,
     @Body('providerAccessToken')
     providerAccessToken: string,
@@ -48,34 +48,34 @@ export class TwitterController {
     const token = this.siwtGuard.extractTokenFromHeader(req);
     const pkh = this.siwtService.siwtClient.verifyAccessToken(token!);
 
-    Logger.debug('Calling claimMyTwitter');
+    Logger.debug('Calling claimMyFacebook');
 
     let up: UserProfile | undefined =
-      this.siwtService.twitterPending.get(providerAccessToken);
+      this.siwtService.facebookPending.get(providerAccessToken);
     if (up) {
-      this.siwtService.twitterPending.delete(providerAccessToken); //remove from cache
+      this.siwtService.facebookPending.delete(providerAccessToken); //remove from cache
       up!._id = pkh; //set owner
       up = await this.userProfilesService.save(up!);
       return up;
     } else {
       throw new HttpException(
-        'Cannot retrieve claim for Twitter on memory for address ' + pkh,
+        'Cannot retrieve claim for Facebook on memory for address ' + pkh,
         HttpStatus.NOT_FOUND,
       );
     }
   }
 
-  @UseGuards(AuthGuard('twitter'))
+  @UseGuards(AuthGuard('facebook'))
   @Get('callback')
-  async twitterCallback(@Req() req: any, @Res() res: express.Response) {
-    const twitterAccessToken = req.user.accessToken;
+  async FacebookCallback(@Req() req: any, @Res() res: express.Response) {
+    const facebookAccessToken = req.user.accessToken;
 
-    Logger.debug('Twitter callback received user with twitterAccessToken');
+    Logger.debug('Facebook callback received user with FacebookAccessToken');
 
-    this.siwtService.twitterPending.set(
-      twitterAccessToken,
+    this.siwtService.facebookPending.set(
+      facebookAccessToken,
       new UserProfile(
-        twitterAccessToken,
+        facebookAccessToken,
         req.user.name,
         req.user.provider,
         req.user.username,
@@ -83,18 +83,8 @@ export class TwitterController {
       ),
     );
 
-    /*
-    Logger.debug(
-      'insetrted on cache ',
-      this.siwtService.twitterPending.get(twitterAccessToken),
-    );
-*/
-
     //push on websocket
-    this.eg.server.emit('twitter', twitterAccessToken);
-
-    Logger.debug('websocket emitted ', 'twitter', twitterAccessToken);
-
+    this.eg.server.emit('facebook', facebookAccessToken);
     res.end();
   }
 }

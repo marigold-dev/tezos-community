@@ -7,7 +7,6 @@ import {
 
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
-import { Socket, io } from "socket.io-client";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -36,6 +35,7 @@ import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
 import { CachingService } from "./caching.service";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
@@ -43,6 +43,7 @@ import { FAQScreen } from "./pages/FAQScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { ProfileScreen } from "./pages/ProfileScreen";
+import { socket } from "./socket";
 import { BigMap, address, nat, unit } from "./type-aliases";
 setupIonicReact();
 
@@ -66,13 +67,16 @@ export type TZIP21TokenMetadata = TokenMetadata & {
 };
 
 export enum SOCIAL_ACCOUNT_TYPE {
-  // GOOGLE = "GOOGLE",
-  TWITTER = "twitter",
-  /* WHATSAPP = "WHATSAPP",
-  FACEBOOK = "FACEBOOK",
-  DISCORD = "DISCORD",
-  TELEGRAM = "TELEGRAM",
-  SLACK = "SLACK",*/
+  google = "google",
+  twitter = "twitter",
+  facebook = "facebook",
+  github = "github",
+  gitlab = "gitlab",
+  apple = "apple",
+  microsoft = "microsoft",
+  slack = "slack",
+  reddit = "reddit",
+  telegram = "telegram",
 }
 
 export type UserProfile = {
@@ -138,14 +142,12 @@ export type UserContextType = {
   getUserProfile: (whateverUserAddress: string) => Promise<UserProfile | null>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
-  socket: Socket;
   localStorage: CachingService;
+  socket: Socket;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
-  const socket: Socket = io(process.env.REACT_APP_BACKEND_URL!);
-
   const [Tezos, setTezos] = useState<TezosToolkit>(
     new TezosToolkit(
       "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev"
@@ -520,10 +522,33 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
+  function onConnect() {
+    console.log("Socket connected");
+  }
+
+  function onDisconnect(reason: any) {
+    console.log(`Socket disconnected due to ${reason}`);
+  }
+
+  function onError(err: any) {
+    console.log("received socket error:");
+    console.log(err);
+  }
+
   useEffect(() => {
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("error", onError);
+
     (async () => {
       await localStorage.initStorage();
     })();
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("error", onError);
+    };
   }, []);
 
   const disconnectWallet = async (): Promise<void> => {
@@ -650,9 +675,9 @@ const App: React.FC = () => {
           refreshStorage,
           getUserProfile,
           nftContratTokenMetadataMap,
-          socket,
           localStorage,
           disconnectWallet,
+          socket,
         }}
       >
         <IonReactRouter>

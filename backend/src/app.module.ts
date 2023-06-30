@@ -1,8 +1,9 @@
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FacebookModule } from './facebook/facebook.module';
+import { GoogleModule } from './google/google.module';
 import { HealthcheckModule } from './healthcheck/healthcheck.module';
 import { SiwtModule } from './siwt/siwt.module';
 import { TwitterModule } from './twitter/twitter.module';
@@ -34,15 +35,11 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
     }),
     UserProfilesModule,
     TwitterModule,
+    FacebookModule,
+    GoogleModule,
     HealthcheckModule,
     SiwtModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
-  ],
 })
 export class AppModule {}

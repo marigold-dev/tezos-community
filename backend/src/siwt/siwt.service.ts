@@ -14,4 +14,6 @@ export class SiwtService {
   });
 
   public twitterPending = new Map<string, UserProfile>(); //twitterAccessToken,
+  public facebookPending = new Map<string, UserProfile>(); //facebookAccessToken,
+  public googlePending = new Map<string, UserProfile>(); //googleAccessToken,
 }

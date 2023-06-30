@@ -31,15 +31,20 @@ import {
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router";
-import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "../App";
+
+import {
+  LocalStorageKeys,
+  PAGES,
+  SOCIAL_ACCOUNT_TYPE,
+  UserContext,
+  UserContextType,
+} from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { OAuth } from "../OAuth";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
-
-const providers = ["twitter"];
 
 export const ProfileScreen: React.FC = () => {
   const [presentAlert] = useIonAlert();
@@ -67,6 +72,8 @@ export const ProfileScreen: React.FC = () => {
     setUserProfile,
     setUserProfiles,
     storageNFT,
+    getUserProfile,
+    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   const history = useHistory();
@@ -79,7 +86,12 @@ export const ProfileScreen: React.FC = () => {
 
   const unlinkSocialAccount = async () => {
     const accessToken = await localStorage.get(LocalStorageKeys.access_token);
-    if (!accessToken) throw Error("You lost your SIWT accessToken");
+
+    if (!accessToken) {
+      console.warn("You lost your SIWT accessToken");
+      disconnectWallet();
+      history.push(PAGES.ORGANIZATIONS);
+    }
 
     const response = await fetch(
       process.env.REACT_APP_BACKEND_URL + "/user" + "/unlink",
@@ -136,7 +148,7 @@ export const ProfileScreen: React.FC = () => {
   >([]);
 
   const fetchReplies = async (event?: CustomEvent<RefresherEventDetail>) => {
-    console.log("fetchReplies");
+    //console.log("fetchReplies");
 
     const contractEventRepliesAndOriginal: (api.ContractEvent & {
       original: api.ContractEvent;
@@ -149,7 +161,7 @@ export const ProfileScreen: React.FC = () => {
       sort: { desc: "id" },
     });
 
-    console.log("replies", replies);
+    //console.log("replies", replies);
 
     await Promise.all(
       replies.map(async (r) => {
@@ -163,7 +175,7 @@ export const ProfileScreen: React.FC = () => {
           ...r,
           original: originalMessages[0],
         });
-        console.log("originalMessages", originalMessages);
+        //console.log("originalMessages", originalMessages);
       })
     );
 
@@ -260,8 +272,8 @@ export const ProfileScreen: React.FC = () => {
                       <IonIcon slot="end" icon={warningOutline} />
                     </IonLabel>
                   </IonItem>
-                  <IonItem>
-                    {providers.map((provider) => (
+                  <IonItem lines="none">
+                    {Object.keys(SOCIAL_ACCOUNT_TYPE).map((provider) => (
                       <OAuth key={provider} provider={provider} />
                     ))}
                   </IonItem>
