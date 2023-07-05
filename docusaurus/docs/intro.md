@@ -15,10 +15,10 @@ Before proceeding with any action, please ensure you use the correct URL:&#x20;
 
 &#x20;Our platform currently supports both desktop and mobile devices for seamless accessibility.
 
-<figure><img src="./img/image (37).png" alt=""/><figcaption><p>Access the Mainnet on a mobile device</p></figcaption></figure>
+<figure><img src="../../img/image (37).png" alt=""/><figcaption><p>Access the Mainnet on a mobile device</p></figcaption></figure>
 
 <div data-full-width="true">
 
-<figure><img src="./img/image (22).png" alt=""/><figcaption><p>Access the Mainnet on a desktop</p></figcaption></figure>
+<figure><img src="../../img/image (22).png" alt=""/><figcaption><p>Access the Mainnet on a desktop</p></figcaption></figure>
 
 </div>
