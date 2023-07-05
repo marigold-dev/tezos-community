@@ -18,8 +18,8 @@ import { SiwtService } from 'src/siwt/siwt.service';
 import { UserProfile } from 'src/userprofiles/UserProfile';
 import { UserProfilesService } from 'src/userprofiles/userprofiles.service';
 
-@Controller('google')
-export class GoogleController {
+@Controller('reddit')
+export class RedditController {
   constructor(
     private eg: EventsGateway,
     private userProfilesService: UserProfilesService,
@@ -28,13 +28,13 @@ export class GoogleController {
   ) {}
 
   @UseGuards(SiwtGuard)
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(AuthGuard('reddit'))
   @Get()
-  async Google() {}
+  async Reddit() {}
 
   @UseGuards(SiwtGuard)
   @Post('claim')
-  async claimMyGoogle(
+  async claimMyReddit(
     @Req() req: express.Request,
     @Body('providerAccessToken')
     providerAccessToken: string,
@@ -48,50 +48,48 @@ export class GoogleController {
     const token = this.siwtGuard.extractTokenFromHeader(req);
     const pkh = this.siwtService.siwtClient.verifyAccessToken(token!);
 
-    Logger.debug('Calling claimMyGoogle');
+    Logger.debug('Calling claimMyReddit');
 
     let up: UserProfile | undefined =
-      this.siwtService.googlePending.get(providerAccessToken);
+      this.siwtService.redditPending.get(providerAccessToken);
     if (up) {
-      this.siwtService.googlePending.delete(providerAccessToken); //remove from cache
+      this.siwtService.redditPending.delete(providerAccessToken); //remove from cache
       up!._id = pkh; //set owner
       up = await this.userProfilesService.save(up!);
       return up;
     } else {
       Logger.warn(
-        'Cannot retrieve claim for Google on memory for address ' + pkh,
+        'Cannot retrieve claim for Reddit on memory for address ' + pkh,
       );
     }
   }
 
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(AuthGuard('reddit'))
   @Get('callback')
-  async GoogleCallback(@Req() req: any, @Res() res: express.Response) {
-    const googleAccessToken = req.user.accessToken;
+  async RedditCallback(@Req() req: any, @Res() res: express.Response) {
+    const redditAccessToken = req.user.accessToken;
 
     Logger.debug(
-      'Google callback received user with GoogleAccessToken',
-      googleAccessToken,
+      'Reddit callback received user with RedditAccessToken',
+      redditAccessToken,
+      req.user,
     );
 
-    this.siwtService.googlePending.set(
-      googleAccessToken,
+    this.siwtService.redditPending.set(
+      redditAccessToken,
       new UserProfile(
-        googleAccessToken,
+        redditAccessToken,
         req.user.name,
         req.user.provider,
         req.user.username,
-        req.user.photo.replace(/_normal/, ''),
+        req.user.photo,
       ),
     );
 
-    Logger.debug('CALLBACK=>', [...this.siwtService.googlePending.entries()]);
+    Logger.debug('CALLBACK=>', [...this.siwtService.redditPending.entries()]);
 
     //push on websocket
-    this.eg.server.emit('google', googleAccessToken);
-
-    Logger.debug('websocket emitted ', 'google', googleAccessToken);
-
+    this.eg.server.emit('reddit', redditAccessToken);
     res.end();
   }
 }

@@ -69,14 +69,13 @@ export type TZIP21TokenMetadata = TokenMetadata & {
 export enum SOCIAL_ACCOUNT_TYPE {
   google = "google",
   twitter = "twitter",
-  facebook = "facebook",
+  // facebook = "facebook",
   github = "github",
   gitlab = "gitlab",
-  apple = "apple",
-  microsoft = "microsoft",
+  // microsoft = "microsoft",
   slack = "slack",
-  reddit = "reddit",
-  telegram = "telegram",
+  //reddit = "reddit",
+  //telegram = "telegram",
 }
 
 export type UserProfile = {

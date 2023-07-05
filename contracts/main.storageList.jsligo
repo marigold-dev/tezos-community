@@ -283,6 +283,23 @@ const default_storage =
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>,
       autoRegistration : false
+        } ,
+        {
+          name: "Trilitech",
+          admins: Set.literal(
+            list(["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://localhr.co/storage/user_files/employers/2730/logo.png",
+          members: Big_map.literal(
+            list([["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address, unit]])
+          ),
+          siteUrl: "https://www.trili.tech/",
+          business: "Building the future on the Tezos Blockchain",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         }
       ]
     ),
@@ -574,6 +591,24 @@ const mainnet =
           ),
           siteUrl: "https://serokell.io",
           business: " Serokell is a software development company focused on creating customized high-performance solutions using modern technologies. Our team consists of 60+ professionals from all over the world. Our core competencies are in AI and blockchain.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        }
+        ,
+        {
+          name: "Trilitech",
+          admins: Set.literal(
+            list(["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://localhr.co/storage/user_files/employers/2730/logo.png",
+          members: Big_map.literal(
+            list([["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address, unit]])
+          ),
+          siteUrl: "https://www.trili.tech/",
+          business: "Building the future on the Tezos Blockchain",
           ipfsNftUrl: "",
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>,

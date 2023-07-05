@@ -1,5 +1,5 @@
 import { Browser } from "@capacitor/browser";
-import { IonButton } from "@ionic/react";
+import { IonAvatar, IonChip, IonLabel } from "@ionic/react";
 import React, { useEffect } from "react";
 import { useHistory } from "react-router";
 import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "./App";
@@ -81,8 +81,11 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
   };
 
   return (
-    <IonButton id={"open-" + provider} color="warning" onClick={openPopup}>
-      {provider}
-    </IonButton>
+    <IonChip id={"open-" + provider} color="warning" onClick={openPopup}>
+      <IonAvatar>
+        <img alt="." src={"/assets/" + provider + ".png"} />
+      </IonAvatar>
+      <IonLabel> {provider}</IonLabel>
+    </IonChip>
   );
 };

@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
 
       // create the message to be signed
       const messagePayload = createMessagePayload({
-        dappUrl: "tzCommunity.marigold.dev",
+        dappUrl: "tezos-community.com",
         pkh: userAddress,
       });
 
@@ -76,16 +76,21 @@ export const Footer: React.FC = () => {
       });
 
       // sign in the user to our app
-      const { data } = await signIn(
-        process.env.REACT_APP_BACKEND_URL! + "/siwt"
-      )({
+      const res = (await signIn(process.env.REACT_APP_BACKEND_URL! + "/siwt")({
         pk: (await wallet.client.getActiveAccount())?.publicKey!,
         pkh: userAddress,
         message: messagePayload.payload,
         signature: signedPayload.signature,
-      });
+      })) as Promise<{
+        data: {
+          accessToken: string;
+          idToken: string;
+          refreshToken: string;
+          tokenType: string;
+        };
+      }>;
 
-      const { accessToken, idToken, refreshToken } = data;
+      const { accessToken, idToken, refreshToken } = (await res).data;
 
       console.log("SIWT Connected to web2 backend", jwt_decode(idToken));
 

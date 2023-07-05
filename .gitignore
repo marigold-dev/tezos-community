@@ -4,3 +4,4 @@ artifacts/*.tz
 .taq/config.local.*.json
 .taq/config.json
 node_modules/
+backend/.env
