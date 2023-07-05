@@ -90,16 +90,19 @@ const default_storage =
         {
           name: "Marigold",
           admins: Set.literal(
-            list(["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address])
+            list(["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address,"tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address])
           ),
           status: Active(),
           logoUrl: "https://bit.ly/MarigolddevLogo",
           members: Big_map.literal(
             list(
               [
-                ["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address, unit],
+                 ["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address, unit],
                 ["tz1aH7Hj1s95wkPjCbMr2RMgTPq4RPHE1LLU" as address, unit],
-                ["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address, unit]
+                ["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address, unit],
+                ["tz2NLWrNL3ca1zHNNH5WwviGkrgh6eDAxzCa" as address, unit],
+                ["tz1gmU4CLRVKnFW9jAKkGXGix4fB7jjKYFjP" as address, unit],
+                ["tz1VukQjwd3WFVPvPCpmRvqfwxLsQX6BNsgD" as address, unit]
               ]
             )
           ),
@@ -300,6 +303,274 @@ const default_storage =
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>,
       autoRegistration : false
+        } ,
+        {
+          name: "DaiLambda, Inc.",
+          admins: Set.literal(
+            list(["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://www.dailambda.jp/img/triangle.png",
+          members: Big_map.literal(
+            list([["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address, unit]])
+          ),
+          siteUrl: "https://dailamba.jp",
+          business: "Tezos core developer",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "TheTezosCommunity",
+          admins: Set.literal(
+            list(["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://cdn.discordapp.com/attachments/973238864342839357/1116093223119618220/ron_west_TTC_logo_01.jpg",
+          members: Big_map.literal(
+            list([["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address, unit]])
+          ),
+          siteUrl: "https://zealy.io/c/thetezoscommunity/questboard",
+          business: "We are a community driven project and we thrive to be a neutral hub for the tezos community to discuss everything tezos. We wanna learn together, hang out together and have some fun together.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        }
+        ,
+        {
+          name: "TZ APAC",
+          admins: Set.literal(
+            list(["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address])
+          ),
+          status: Active(),
+          logoUrl: "",
+          members: Big_map.literal(
+            list([["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address, unit]])
+          ),
+          siteUrl: "https://zealy.io/c/thetezoscommunity/questboard",
+          business: "TZ APAC Pte. Ltd. (TZ APAC) is the leading Asia-based blockchain adoption entity supporting the Tezos ecosystem.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Ottez",
+          admins: Set.literal(
+            list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez.png",
+          members: Big_map.literal(
+            list([
+              ["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address, unit],
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]
+            ])
+          ),
+          siteUrl: "https://www.ottez.xyz/",
+          business: "Humans are gone, Ottez have moved in. 4,007 generative artworks on the Tezos blockchain.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Ottez Evolution",
+          admins: Set.literal(
+            list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez_evolution.png",
+          members: Big_map.literal(
+            list([
+              ["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address, unit],
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]
+            ])
+          ),
+          siteUrl: "https://www.ottez.xyz/",
+          business: "An artistic expansion to the Ottez project. 5993 evolved Ottez are now on Tezos.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Tezos Domains",
+          admins: Set.literal(
+            list(["tz1ZW6AvZCjSvz5xARo2L9QVKq3ofHU6Z6Hc" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://app.tezos.domains/assets/img/logo_notext.svg",
+          members: Big_map.literal(
+            list([
+              ["tz1ZW6AvZCjSvz5xARo2L9QVKq3ofHU6Z6Hc" as address, unit],
+              ["tz1gkpxY95CP5nwu9aNi2a2Fu7qy31H9qFuU" as address, unit]
+            ])
+          ),
+          siteUrl: "https://tezos.domains",
+          business: "Human-readable names on Tezos",
+          ipfsNftUrl: "",
+          fundingAddress: Some("KT1W56o8dK5En5hM46VsD1zKtgpqWPhs3bLh" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Volume DAO",
+          admins: Set.literal(
+            list(["tz1PaCaFf6cf6tL8vkVE71WELKuYXyoSG5C6" as address,"tz1i35AGt1HS1FKN1Mqw4DuCMYHvWAHnUT3H" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://images.squarespace-cdn.com/content/v1/621e19e02a75bc5e24ce9a20/377b2c63-db90-4369-8b0a-3e47a5f2f6f4/Frame.png?format=1500w",
+          members: Big_map.literal(
+            list([
+              ["tz1PaCaFf6cf6tL8vkVE71WELKuYXyoSG5C6" as address, unit],
+              ["tz1i35AGt1HS1FKN1Mqw4DuCMYHvWAHnUT3H" as address, unit]
+            ])
+          ),
+          siteUrl: "https://www.volumedao.xyz/",
+          business: "Creation, Collection, Exhibition and Education of Blockchain/Crypto/Generative Art",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Vessels",
+          admins: Set.literal(
+            list(["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address ])
+          ),
+          status: Active(),
+          logoUrl: "",
+          members: Big_map.literal(
+            list([
+              ["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address, unit]
+            ])
+          ),
+          siteUrl: "https://vesselsproject.xyz/",
+          business: "IP and World Building",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "First Rain",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808523041488896/Profilbild.jpg",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit],
+              ["tz1RRqM5XLdH78PzEVLwiVsJY86ibpKt6EoA" as address, unit]
+            ])
+          ),
+          siteUrl: "https://objkt.com/profile/firstrain/collections",
+          business: "I'm a hobby photographer who also likes to write. I try to combine these two passions with my NFTs. At the same time I try to bring some awereness of mental health and that each and everyone of us is beautiful and important.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "First Rain Charity",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808941091950642/IMG_20230503_124736.jpg",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit],
+              ["tz1RRqM5XLdH78PzEVLwiVsJY86ibpKt6EoA" as address, unit]
+            ])
+          ),
+          siteUrl: "https://objkt.com/profile/firstraincharity/collections",
+          business: "This project is all about charity and helping those in need - may it be animals or humans!",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1PLQv5F7qvzjRZKrgB8Nt9vxifqigdvM18" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Chainborn",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address , "tz1UZZnrre9H7KzAufFVm7ubuJh5cCfjGwam" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://chainborn.xyz/static/media/logo-big-color.8c8a0cec.webp",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit],
+              ["tz1UZZnrre9H7KzAufFVm7ubuJh5cCfjGwam" as address, unit]
+            ])
+          ),
+          siteUrl: "https://chainborn.xyz/",
+          business: "Chainborn is a TCG for existing pfp collections on Tezos. You can summon a Hero from one of your existing NFT pfp collections and start battling other Heroes for fame and glory. By engaging in battles a Hero gains experience to become stronger!",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1Tj4ZaQSnQiUEom25v8qb573XFwT32obhQ" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "BatBits",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://twitter.com/batbitsofficial/photo",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]
+            ])
+          ),
+          siteUrl: "https://batbits.xyz/",
+          business: "BatBits is a colony of cute Batsies, living in a cave on Tezos ecosystem! It's a community driven project which tries to give back to the community and to support the artists!",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1bZ7eUmhbV99wy3qZxJXrTAVj3LARQq791" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Plenty Labs",
+          admins: Set.literal(
+            list(["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://uploads-ssl.webflow.com/6307b856943c0f1358714dab/6307be3a634c24b505d20cb3_plentyIcon.svg",
+          members: Big_map.literal(
+            list([
+              ["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address, unit]
+            ])
+          ),
+          siteUrl: "",
+          business: "The Plenty team is building an all-in-one decentralized platform on Tezos. Plenty DEX allows swaps on uncorrelated assets, low-cost trades on tightly correlated assets, and features a bridge from Ethereum and Polygon to Tezos. Plenty manages Ctez, a synth",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "TezFin (Tezos Finance)",
+          admins: Set.literal(
+            list(["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address ])
+          ),
+          status: Active(),
+          logoUrl: "",
+          members: Big_map.literal(
+            list([
+              ["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address, unit]
+            ])
+          ),
+          siteUrl: "https://tezos.finance",
+          business: "Decentralized lending and borrowing platform on Tezos blockchain. Lending pools guided by an automated interest rate market maker ",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         }
       ]
     ),
@@ -402,7 +673,7 @@ const mainnet =
         {
           name: "Marigold",
           admins: Set.literal(
-            list(["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address])
+            list(["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address,"tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address])
           ),
           status: Active(),
           logoUrl: "https://bit.ly/MarigolddevLogo",
@@ -411,7 +682,11 @@ const mainnet =
               [
                 ["tz1LB2f981WfmnXhz42hxybpabx1C7Js8f2y" as address, unit],
                 ["tz1aH7Hj1s95wkPjCbMr2RMgTPq4RPHE1LLU" as address, unit],
-                ["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address, unit]
+                ["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address, unit],
+                ["tz2NLWrNL3ca1zHNNH5WwviGkrgh6eDAxzCa" as address, unit],
+                ["tz1gmU4CLRVKnFW9jAKkGXGix4fB7jjKYFjP" as address, unit],
+                ["tz1VukQjwd3WFVPvPCpmRvqfwxLsQX6BNsgD" as address, unit]
+
               ]
             )
           ),
@@ -613,7 +888,277 @@ const mainnet =
           fundingAddress: None() as option<address>,
           memberRequests: Set.empty as set<joinOrganizationRequest>,
       autoRegistration : false
+        }  ,
+        {
+          name: "DaiLambda, Inc.",
+          admins: Set.literal(
+            list(["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://www.dailambda.jp/img/triangle.png",
+          members: Big_map.literal(
+            list([["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address, unit]])
+          ),
+          siteUrl: "https://dailamba.jp",
+          business: "Tezos core developer",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "TheTezosCommunity",
+          admins: Set.literal(
+            list(["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://cdn.discordapp.com/attachments/973238864342839357/1116093223119618220/ron_west_TTC_logo_01.jpg",
+          members: Big_map.literal(
+            list([["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address, unit]])
+          ),
+          siteUrl: "https://zealy.io/c/thetezoscommunity/questboard",
+          business: "We are a community driven project and we thrive to be a neutral hub for the tezos community to discuss everything tezos. We wanna learn together, hang out together and have some fun together.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "TZ APAC",
+          admins: Set.literal(
+            list(["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address])
+          ),
+          status: Active(),
+          logoUrl: "",
+          members: Big_map.literal(
+            list([["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address, unit]])
+          ),
+          siteUrl: "https://zealy.io/c/thetezoscommunity/questboard",
+          business: "TZ APAC Pte. Ltd. (TZ APAC) is the leading Asia-based blockchain adoption entity supporting the Tezos ecosystem.",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Ottez",
+          admins: Set.literal(
+            list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez.png",
+          members: Big_map.literal(
+            list([
+              ["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address, unit],
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]
+            ])
+          ),
+          siteUrl: "https://www.ottez.xyz/",
+          business: "Humans are gone, Ottez have moved in. 4,007 generative artworks on the Tezos blockchain.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Ottez Evolution",
+          admins: Set.literal(
+            list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez_evolution.png",
+          members: Big_map.literal(
+            list([
+              ["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address, unit],
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]
+            ])
+          ),
+          siteUrl: "https://www.ottez.xyz/",
+          business: "An artistic expansion to the Ottez project. 5993 evolved Ottez are now on Tezos.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Tezos Domains",
+          admins: Set.literal(
+            list(["tz1ZW6AvZCjSvz5xARo2L9QVKq3ofHU6Z6Hc" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://app.tezos.domains/assets/img/logo_notext.svg",
+          members: Big_map.literal(
+            list([
+              ["tz1ZW6AvZCjSvz5xARo2L9QVKq3ofHU6Z6Hc" as address, unit],
+              ["tz1gkpxY95CP5nwu9aNi2a2Fu7qy31H9qFuU" as address, unit]
+            ])
+          ),
+          siteUrl: "https://tezos.domains",
+          business: "Human-readable names on Tezos",
+          ipfsNftUrl: "",
+          fundingAddress: Some("KT1W56o8dK5En5hM46VsD1zKtgpqWPhs3bLh" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Volume DAO",
+          admins: Set.literal(
+            list(["tz1PaCaFf6cf6tL8vkVE71WELKuYXyoSG5C6" as address,"tz1i35AGt1HS1FKN1Mqw4DuCMYHvWAHnUT3H" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://images.squarespace-cdn.com/content/v1/621e19e02a75bc5e24ce9a20/377b2c63-db90-4369-8b0a-3e47a5f2f6f4/Frame.png?format=1500w",
+          members: Big_map.literal(
+            list([
+              ["tz1PaCaFf6cf6tL8vkVE71WELKuYXyoSG5C6" as address, unit],
+              ["tz1i35AGt1HS1FKN1Mqw4DuCMYHvWAHnUT3H" as address, unit]
+            ])
+          ),
+          siteUrl: "https://www.volumedao.xyz/",
+          business: "Creation, Collection, Exhibition and Education of Blockchain/Crypto/Generative Art",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Vessels",
+          admins: Set.literal(
+            list(["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address ])
+          ),
+          status: Active(),
+          logoUrl: "",
+          members: Big_map.literal(
+            list([
+              ["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address, unit]
+            ])
+          ),
+          siteUrl: "https://vesselsproject.xyz/",
+          business: "IP and World Building",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "First Rain",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808523041488896/Profilbild.jpg",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit],
+              ["tz1RRqM5XLdH78PzEVLwiVsJY86ibpKt6EoA" as address, unit]
+            ])
+          ),
+          siteUrl: "https://objkt.com/profile/firstrain/collections",
+          business: "I'm a hobby photographer who also likes to write. I try to combine these two passions with my NFTs. At the same time I try to bring some awereness of mental health and that each and everyone of us is beautiful and important.",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "First Rain Charity",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808941091950642/IMG_20230503_124736.jpg",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit],
+              ["tz1RRqM5XLdH78PzEVLwiVsJY86ibpKt6EoA" as address, unit]
+            ])
+          ),
+          siteUrl: "https://objkt.com/profile/firstraincharity/collections",
+          business: "This project is all about charity and helping those in need - may it be animals or humans!",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1PLQv5F7qvzjRZKrgB8Nt9vxifqigdvM18" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Chainborn",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address , "tz1UZZnrre9H7KzAufFVm7ubuJh5cCfjGwam" as address])
+          ),
+          status: Active(),
+          logoUrl: "https://chainborn.xyz/static/media/logo-big-color.8c8a0cec.webp",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit],
+              ["tz1UZZnrre9H7KzAufFVm7ubuJh5cCfjGwam" as address, unit]
+            ])
+          ),
+          siteUrl: "https://chainborn.xyz/",
+          business: "Chainborn is a TCG for existing pfp collections on Tezos. You can summon a Hero from one of your existing NFT pfp collections and start battling other Heroes for fame and glory. By engaging in battles a Hero gains experience to become stronger!",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1Tj4ZaQSnQiUEom25v8qb573XFwT32obhQ" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "BatBits",
+          admins: Set.literal(
+            list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://twitter.com/batbitsofficial/photo",
+          members: Big_map.literal(
+            list([
+              ["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]
+            ])
+          ),
+          siteUrl: "https://batbits.xyz/",
+          business: "BatBits is a colony of cute Batsies, living in a cave on Tezos ecosystem! It's a community driven project which tries to give back to the community and to support the artists!",
+          ipfsNftUrl: "",
+          fundingAddress: Some("tz1bZ7eUmhbV99wy3qZxJXrTAVj3LARQq791" as address) as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "Plenty Labs",
+          admins: Set.literal(
+            list(["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address ])
+          ),
+          status: Active(),
+          logoUrl: "https://uploads-ssl.webflow.com/6307b856943c0f1358714dab/6307be3a634c24b505d20cb3_plentyIcon.svg",
+          members: Big_map.literal(
+            list([
+              ["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address, unit]
+            ])
+          ),
+          siteUrl: "",
+          business: "The Plenty team is building an all-in-one decentralized platform on Tezos. Plenty DEX allows swaps on uncorrelated assets, low-cost trades on tightly correlated assets, and features a bridge from Ethereum and Polygon to Tezos. Plenty manages Ctez, a synth",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
+        },
+        {
+          name: "TezFin (Tezos Finance)",
+          admins: Set.literal(
+            list(["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address ])
+          ),
+          status: Active(),
+          logoUrl: "",
+          members: Big_map.literal(
+            list([
+              ["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address, unit]
+            ])
+          ),
+          siteUrl: "https://tezos.finance",
+          business: "Decentralized lending and borrowing platform on Tezos blockchain. Lending pools guided by an automated interest rate market maker ",
+          ipfsNftUrl: "",
+          fundingAddress: None() as option<address>,
+          memberRequests: Set.empty as set<joinOrganizationRequest>,
+      autoRegistration : false
         }
+
+
+        
       ]
     ),
     limits: {
