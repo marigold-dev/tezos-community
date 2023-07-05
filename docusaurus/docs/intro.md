@@ -2,46 +2,23 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# 📪 TzSafe
 
-Let's discover **Docusaurus in less than 5 minutes**.
+TzSafe offers a user-friendly platform for creating and managing multisig wallets. We prioritize the privacy of our users by not storing any of their private data. Information such as Tezos address aliases and regularly used wallets are exclusively stored locally in the user's browser.
 
-## Getting Started
+Please note that the BETA version does not include the implementation of [TZIP-026](https://gitlab.com/tezos/tzip/-/merge_requests/202/diffs), which pertains to _Proof of Event: Message Signing as an alternative for Account Abstracted Wallets_. This TZIP is still on draft. Thus, it has not been integrated into the current version.
 
-Get started by **creating a new site**.
+Before proceeding with any action, please ensure you use the correct URL:&#x20;
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+- The Mainnet can be found at the URL: [https://tzsafe.marigold.dev/](https://tzsafe.marigold.dev/). We will provide biweekly updates on this platform regarding Marigold announcements.
+- The Ghostnet can be accessed at the URL: [https://ghostnet.tzsafe.marigold.dev](https://ghostnet.tzsafe.marigold.dev/). We will periodically update and release new changes on this platform without further announcement.&#x20;
 
-### What you'll need
+&#x20;Our platform currently supports both desktop and mobile devices for seamless accessibility.
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+<figure><img src=".gitbook/assets/image (37).png" alt=""></img><figcaption><p>Access the Mainnet on a mobile device</p></figcaption></figure>
 
-## Generate a new site
+<div data-full-width="true">
 
-Generate a new Docusaurus site using the **classic template**.
+<figure><img src=".gitbook/assets/image (22).png" alt=""></img><figcaption><p>Access the Mainnet on a desktop</p></figcaption></figure>
 
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+</div>

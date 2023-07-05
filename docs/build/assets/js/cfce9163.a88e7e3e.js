@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[491],{1609:s=>{s.exports=JSON.parse('{"label":"hola","permalink":"/tezos-community/blog/tags/hola","allTagsPath":"/tezos-community/blog/tags","count":1}')}}]);
