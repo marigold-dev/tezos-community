@@ -259,6 +259,7 @@ export const FAQScreen: React.FC = () => {
               "_blank"
             )
           }
+          color="transparent"
           target="_blank"
         >
           Documentation
