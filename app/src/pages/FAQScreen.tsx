@@ -1,6 +1,7 @@
 import {
   IonAccordion,
   IonAccordionGroup,
+  IonButton,
   IonContent,
   IonItem,
   IonLabel,
@@ -250,6 +251,18 @@ export const FAQScreen: React.FC = () => {
             </div>
           </IonAccordion>
         </IonAccordionGroup>
+
+        <IonButton
+          onClick={() =>
+            window.open(
+              "https://marigold-dev.github.io/tezos-community",
+              "_blank"
+            )
+          }
+          target="_blank"
+        >
+          Documentation
+        </IonButton>
       </IonContent>
       <Footer />
     </IonPage>
