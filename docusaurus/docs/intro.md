@@ -4,6 +4,10 @@ sidebar_position: 1
 
 # 📪 TzSafe
 
+```typescript
+const hello = "test";
+```
+
 TzSafe offers a user-friendly platform for creating and managing multisig wallets. We prioritize the privacy of our users by not storing any of their private data. Information such as Tezos address aliases and regularly used wallets are exclusively stored locally in the user's browser.
 
 Please note that the BETA version does not include the implementation of [TZIP-026](https://gitlab.com/tezos/tzip/-/merge_requests/202/diffs), which pertains to _Proof of Event: Message Signing as an alternative for Account Abstracted Wallets_. This TZIP is still on draft. Thus, it has not been integrated into the current version.
