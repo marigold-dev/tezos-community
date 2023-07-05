@@ -21,7 +21,7 @@ This transaction allows us to transfer XTZ to the target account, including all 
 
 First, click `New Proposal` on the sidebar. Then, click `Transfer`. Filling in the amount and the target address on UI. Before submitting, please double-check the address and transfer amount. Finally, click `Submit` to create our new proposal.
 
-<figure><img src=".././assets/img/image (42).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src=".././img/image (42).png" alt=""/><figcaption></figcaption></figure>
 
 Note that TzSafe doesn’t validate transferring amount is equal to or greater than the balance while the proposal is being created. The validation only happens when the proposal is executed. In other words, it's possible to fund an insufficient wallet before the proposal is executed.
 
@@ -31,13 +31,13 @@ TzSafe provides support for approvals of FA1.2 tokens, allowing users to authori
 
 To create a new proposal, navigate to the sidebar and click on `New Proposal`. From there, select the option for `FA1.2 Approve`. To grant approval, fill in the desired token and amount and the spender's address. Once the information is filled out, click the \`Submit\` button to complete the approval proposal.
 
-<figure><img src=".././assets/img/image (23).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src=".././img/image (23).png" alt=""/><figcaption></figcaption></figure>
 
 ### FA1.2 Transfer
 
 TzSafe also offers the capability to perform transfers for FA1.2 tokens. To create a new proposal, simply access the sidebar and click on `New Proposal`. Then, select the `FA1.2 Transfer` option from the available choices. Select the desired token, specify the amount, and provide the transfer-to address. Finally, click `Submit` to click a proposal.
 
-<figure><img src=".././assets/img/image (55).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src=".././img/image (55).png" alt=""/><figcaption></figcaption></figure>
 
 ### **FA2 Transfer**
 
@@ -45,7 +45,7 @@ TzSafe also provides support for transferring FA2 tokens. Currently, it allows f
 
 To create a new proposal, navigate to the sidebar and click on `New Proposal`. From there, select the option for `FA2 Transfer`. Choose an FA2 token and specify the desired amount and the recipient's address. When adding a second token, please note that it must belong to the same FA2 contract as the first token. Finally, click the `Submit` button to create your new proposal.
 
-<figure><img src=".././assets/img/image (15).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src=".././img/image (15).png" alt=""/><figcaption></figcaption></figure>
 
 ### **Contract Execution**
 
@@ -53,11 +53,11 @@ Contract execution allows us to create a proposal to execute arbitrary Tezos con
 
 Taking an FA2 contract as an example, click `New Proposal` on the sidebar and select `Contract Execution`. Next, fill in a target address and the amount sent to the address. In this case, we fill FA2 address, `KT1Gh6T9CjpxEV6WxCzgExhrATEYtcLN5Fdp`, and amount 0.
 
-<figure><img src=".././assets/img/image (19).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src=".././img/image (19).png" alt=""/><figcaption></figcaption></figure>
 
 After click `Continue`, TzSafe will check if the contract of the given address exists. If so, we can see the contract parameters rendered on the page, as the following shows.
 
-<figure><img src=".././assets/img/image (25).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src=".././img/image (25).png" alt=""/><figcaption></figcaption></figure>
 
 To transfer FA2 tokens, we select the entrypoint `transfer` and click `Add item` to fill in the details. Finally, click the `Submit` button to create a new proposal. As the same as the transaction of transferring XTZ, an insufficient amount can be funded after proposal creation is done.
 
@@ -69,4 +69,4 @@ This is useful when we want to _exchange_ assets with others. For example, if we
 
 The following is the figure showing a batch. Users can click any type of transaction to add it and click `Submit` all transactions at once. It is important to note that the indexes indicate the order in which the transactions will be executed.
 
-<figure><img src="./assets/img/image (10).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (10).png" alt=""/><figcaption></figcaption></figure>

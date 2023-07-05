@@ -6,19 +6,19 @@ sidebar_position: 2
 
 The first time we go to the website, we shall see two options in the center, `New Wallet` and `Import Wallet`, as the figure shows.
 
-<figure><img src="./assets/img/image (7).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (7).png" alt=""/><figcaption></figcaption></figure>
 
 Let’s click `New Wallet` to create our first blankly new multisig wallet! Before we start the creation process, it’s required to log in to our Tezos account. The purpose of login is to make Tezos operations, such as contract origination, transaction, etc. In this case, we are going to originate a TzSafe contract later.
 
-<figure><img src="./assets/img/image (54).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (54).png" alt=""/><figcaption></figcaption></figure>
 
 Now, we follow the step on UI to finish the remaining process of creation. First, name our wallet. The name is only stored in our browser locally. Therefore, no one will know what name we use for our wallet.
 
-<figure><img src="./assets/img/image (4).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (4).png" alt=""/><figcaption></figcaption></figure>
 
 Then, click `Continue` to proceed to the second step. The name can be changed on the `Address book` page later. Next, we will need to finish the setting as the figure shows.
 
-<figure><img src="./assets/img/image (61).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (61).png" alt=""/><figcaption></figcaption></figure>
 
 By default, TzSafe will put our Tezos account as an owner in `Owner Address`_._ We can add more owners here. It’s strongly recommended that add more owners. Please be extra careful here. If we aren’t one of the owners, we will lose control of the newly created wallet forever.
 
@@ -32,10 +32,10 @@ Notice that before we proceed the next step, please make sure that we are one of
 
 Finally, click `Continue` and wait for the wallet creation. It will need to a few minutes for confirmation.
 
-<figure><img src="./assets/img/image (3).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (3).png" alt=""/><figcaption></figcaption></figure>
 
 If a wallet has been created successfully, we will see as follow:
 
 Currently, the creation fee, which is a one-time fee, is around 1.62 XTZ, depending on the number of owners.\
 
-<figure><img src="./assets/img/image (44).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (44).png" alt=""/><figcaption></figcaption></figure>

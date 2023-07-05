@@ -14,7 +14,7 @@ We can add owners by clicking `Add Owner` ; and remove by `Remove`. When adding 
 
 After we are satisfied with the changes, please double-check all the settings, especially check if we just unexpectedly remove ourselves from owners. Finally, click `Save` and then all changes will be in the newly created proposal.
 
-<figure><img src="./assets/img/image (5).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (5).png" alt=""/><figcaption></figcaption></figure>
 
 ### Change Without proposal <a href="#b0d2a202-5932-43e1-bc96-b6b4e5087028" id="b0d2a202-5932-43e1-bc96-b6b4e5087028"></a>
 
@@ -22,4 +22,4 @@ Currently, there is only one change that needs no proposal. That is to remove an
 
 If we don’t want the wallet present on the sidebar anymore, click the `Deleting wallet` button in the top right corner of the setting page. After clicking, we will see the button showing deleting. Please wait for a few seconds to fully delete the wallet. If we accidentally delete the wallet, don’t worry. We can import it back by Import wallet.\
 
-<figure><img src="./assets/img/image (47).png" alt=""/><figcaption></figcaption></figure>
+<figure><img src="./img/image (47).png" alt=""/><figcaption></figcaption></figure>
