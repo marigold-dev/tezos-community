@@ -156,3 +156,33 @@ ion-thumbnail {
 .item-fill-outline {
   --border-width: 1px !important;
 }
+
+.ion-delegate-host {
+  width: 100%;
+  height: 100%;
+}
+
+@media only screen and (min-width: 768px) and (min-height: 768px) {
+  .ion-delegate-host {
+    --width: 80vw !important;
+    --height: 80vh !important;
+  }
+
+  .show-modal {
+    --width: 80vw !important;
+    --height: 80vh !important;
+  }
+}
+
+.sc-ion-textarea-md-h,
+.sc-ion-input-md-h {
+  --border-color: var(--ion-color-primary);
+}
+
+.readonly {
+  --border-width: 0px;
+}
+
+.checkbox-disabled {
+  opacity: 1;
+}

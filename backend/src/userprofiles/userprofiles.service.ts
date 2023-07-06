@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { SOCIAL_ACCOUNT_TYPE, UserProfile } from './UserProfile';
 
 @Injectable()
@@ -24,16 +24,37 @@ export class UserProfilesService {
     });
   }
 
+  async remove(address: string): Promise<void> {
+    const dr: DeleteResult = await this.userProfileRepository.delete({
+      _id: address,
+    });
+    Logger.debug('Deleted ' + dr.affected + ' on ' + address);
+    return;
+  }
+
   async save(up: UserProfile): Promise<UserProfile> {
-    const updateResult = await this.userProfileRepository.update(
-      { _id: up._id },
-      up,
-    );
-    if (updateResult && updateResult.affected && updateResult.affected! > 0)
-      return up;
-    else
-      return new Promise((resolve, reject) =>
-        reject('Cannot update address ' + up._id),
+    if (await this.userProfileRepository.findOneBy({ _id: up._id })) {
+      Logger.debug('update UserProfile', up._id);
+      const updateResult = await this.userProfileRepository.update(
+        { _id: up._id },
+        up,
       );
+      if (updateResult && updateResult.affected && updateResult.affected! > 0)
+        return up;
+      else {
+        const err = 'Cannot update address ' + up._id;
+        Logger.error(err);
+        return new Promise((resolve, reject) => reject(err));
+      }
+    } else {
+      Logger.debug('insert UserProfile', up._id);
+      const insertResult = await this.userProfileRepository.insert(up);
+      if (insertResult) return up;
+      else {
+        const err = 'Cannot update address ' + up._id;
+        Logger.error(err);
+        return new Promise((resolve, reject) => reject(err));
+      }
+    }
   }
 }

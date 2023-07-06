@@ -2,6 +2,10 @@ ARG RUNNER_IMAGE="node:latest"
 
 FROM ${RUNNER_IMAGE}
 
+RUN apt-get update && apt-get install -y jq
+
+COPY .taq .taq
+
 WORKDIR /tezos-community
 
 COPY ./backend .

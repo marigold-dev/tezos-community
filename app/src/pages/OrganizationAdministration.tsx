@@ -5,7 +5,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
   IonCol,
   IonContent,
@@ -16,6 +15,7 @@ import {
   IonItem,
   IonList,
   IonModal,
+  IonPopover,
   IonRow,
   IonSelect,
   IonSelectOption,
@@ -24,19 +24,24 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
+import { BigNumber } from "bignumber.js";
 import {
   addCircleOutline,
   arrowBackOutline,
+  checkmarkCircleOutline,
   checkmarkDoneCircleOutline,
   ellipse,
   flagOutline,
+  informationCircleOutline,
   playCircleOutline,
+  removeCircleOutline,
   stopCircleOutline,
   trashBinOutline,
   trashOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  Limits,
   MemberRequest,
   Organization,
   UserContext,
@@ -45,7 +50,7 @@ import {
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
 import { UserProfileChip } from "../components/UserProfileChip";
-import { address } from "../type-aliases";
+import { address, nat } from "../type-aliases";
 
 type OrganizationProps = {
   organizationName: string | undefined;
@@ -77,6 +82,13 @@ export const OrganizationAdministration = ({
   const [presentAlert] = useIonAlert();
 
   const [organization, setOrganization] = useState<Organization>();
+
+  //limits
+  const [limits, setLimits] = useState<Limits>({
+    adminsMax: new BigNumber(1) as nat,
+    memberRequestMax: new BigNumber(1) as nat,
+    organizationMax: new BigNumber(1) as nat,
+  });
 
   //member requests
   const [membersToApprove, setMembersToApprove] = useState<address[]>([]);
@@ -293,6 +305,38 @@ export const OrganizationAdministration = ({
     setLoading(false);
   };
 
+  const updateLimits = async () => {
+    console.log("updateLimits");
+
+    try {
+      setLoading(true);
+      const op = await mainWalletType!.methods
+        .changeLimits(
+          limits.adminsMax,
+          limits.memberRequestMax,
+          limits.organizationMax
+        )
+        .send();
+
+      await op?.confirmation();
+
+      await refreshStorage();
+
+      setLoading(false);
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+        buttons: ["Close"],
+      });
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
   const refreshOrganization = () => {
     if (organizationName) {
       const organization = !isTezosOrganization
@@ -307,6 +351,9 @@ export const OrganizationAdministration = ({
           : []
       );
       setMembersToDecline([]);
+
+      setLimits(storage?.limits!);
+
       setOrganization(organization);
     }
   };
@@ -320,8 +367,14 @@ export const OrganizationAdministration = ({
   }, []);
 
   return (
-    <IonContent className="ion-padding">
+    <IonContent
+      className="ion-padding"
+      style={{ height: "calc(100%  - 56px)" }}
+    >
       <IonList>
+        {/* Administrators */}
+        <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
+
         <IonTitle>
           <IonGrid fixed={true}>
             <IonRow>
@@ -365,7 +418,7 @@ export const OrganizationAdministration = ({
               </IonCol>
               <IonCol>
                 <IonButton
-                  color="transparent"
+                  color="dark"
                   disabled={!selectedAdminIsValid}
                   onClick={addAdmin}
                 >
@@ -394,13 +447,22 @@ export const OrganizationAdministration = ({
               />
             ) : members.filter((u) => u !== admin).length > 0 ? (
               <>
-                <IonButton id="passFlag" color="transparent" slot="end">
+                <IonButton id="passFlag" color="dark" slot="end">
                   <IonIcon
                     onClick={(e) => removeAdmin(admin)}
                     color="white"
                     icon={flagOutline}
                   />
                   Pass the flag
+                </IonButton>
+
+                <IonButton
+                  color="danger"
+                  slot="end"
+                  onClick={(e) => removeOrganization(organization.name)}
+                >
+                  <IonIcon icon={trashOutline} />
+                  Delete organization
                 </IonButton>
 
                 <IonModal trigger="passFlag" ref={modalPassFlag}>
@@ -473,6 +535,9 @@ export const OrganizationAdministration = ({
 
         {!isTezosOrganization ? (
           <>
+            {/* Members */}
+            <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
+
             <IonList>
               <IonTitle>
                 Members <IonBadge>{members ? members.length : 0}</IonBadge>
@@ -502,86 +567,227 @@ export const OrganizationAdministration = ({
               ))}
             </IonList>
 
-            <IonList>
-              <IonTitle>
-                <IonGrid fixed={true}>
-                  <IonRow>
-                    <IonCol>
-                      {" "}
-                      Member requests{" "}
-                      <IonBadge>
-                        {organization?.memberRequests
-                          ? organization?.memberRequests.length
-                          : 0}
-                      </IonBadge>
-                    </IonCol>
+            {/* Member Requests */}
 
-                    {organization?.memberRequests &&
-                    organization?.memberRequests.length > 0 ? (
-                      <IonCol>
-                        {" "}
-                        <IonButton
-                          color="transparent"
-                          onClick={responseToJoinOrganization}
-                        >
-                          <IonIcon
-                            icon={checkmarkDoneCircleOutline}
-                            slot="end"
-                          />
-                          Apply all requests
-                        </IonButton>{" "}
-                      </IonCol>
-                    ) : (
-                      ""
-                    )}
-                  </IonRow>
-                </IonGrid>
-              </IonTitle>
+            {!organization?.autoRegistration ? (
+              <>
+                <hr
+                  color="danger"
+                  style={{ borderWidth: "1px", height: "0" }}
+                />
 
-              {organization?.memberRequests.map((memberRequest) => (
-                <IonCard key={memberRequest.user}>
-                  <IonCardHeader>
-                    <IonCardTitle>{memberRequest.user}</IonCardTitle>
-                    <IonCardSubtitle>
-                      {memberRequest.joinRequest.contactIdProvider +
-                        " - " +
-                        memberRequest.joinRequest.contactId}
-                    </IonCardSubtitle>
-                    <IonToggle
-                      labelPlacement="end"
-                      checked={
-                        membersToApprove.indexOf(memberRequest.user) >= 0
-                      }
-                      aria-label="approve/reject"
-                      onClick={(e) => {
-                        if (e.currentTarget.checked) {
-                          membersToApprove.push(memberRequest.user);
-                          setMembersToApprove(membersToApprove);
-                          setMembersToDecline(
-                            membersToDecline.filter(
-                              (mtod) => mtod !== memberRequest.user
-                            )
-                          );
-                        } else {
-                          membersToDecline.push(memberRequest.user);
-                          setMembersToDecline(membersToDecline);
-                          let newMembersToApprove = membersToApprove.filter(
-                            (mtoa) => mtoa !== memberRequest.user
-                          );
-                          setMembersToApprove(newMembersToApprove);
-                        }
-                      }}
-                    />
-                  </IonCardHeader>
-                  <IonCardContent>
-                    {memberRequest.joinRequest.reason}
-                  </IonCardContent>
-                </IonCard>
-              ))}
-            </IonList>
+                <IonList>
+                  <IonTitle>
+                    <IonGrid fixed={true}>
+                      <IonRow>
+                        <IonCol>
+                          {" "}
+                          Member requests{" "}
+                          <IonBadge>
+                            {organization?.memberRequests
+                              ? organization?.memberRequests.length
+                              : 0}
+                          </IonBadge>
+                        </IonCol>
+
+                        {organization?.memberRequests &&
+                        organization?.memberRequests.length > 0 ? (
+                          <>
+                            <IonCol>
+                              <IonButton
+                                color="dark"
+                                onClick={responseToJoinOrganization}
+                              >
+                                <IonIcon
+                                  icon={checkmarkDoneCircleOutline}
+                                  slot="end"
+                                />
+                                Apply all
+                              </IonButton>
+
+                              <IonIcon
+                                id="hover-trigger"
+                                icon={informationCircleOutline}
+                              />
+                              <IonPopover
+                                trigger="hover-trigger"
+                                triggerAction="hover"
+                              >
+                                <IonContent class="ion-padding">
+                                  Accept{" "}
+                                  <IonIcon icon={checkmarkCircleOutline} /> or
+                                  Decline <IonIcon icon={removeCircleOutline} />{" "}
+                                  below each requests and then click{" "}
+                                  <b>
+                                    Apply all{" "}
+                                    <IonIcon
+                                      icon={checkmarkDoneCircleOutline}
+                                      slot="end"
+                                    />
+                                  </b>
+                                </IonContent>
+                              </IonPopover>
+                            </IonCol>
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </IonRow>
+                    </IonGrid>
+                  </IonTitle>
+
+                  {organization?.memberRequests.map((memberRequest) => (
+                    <IonCard key={memberRequest.user}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <UserProfileChip
+                            key={memberRequest.user}
+                            userProfiles={userProfiles}
+                            address={memberRequest.user}
+                          ></UserProfileChip>
+                        </IonCardTitle>
+
+                        <IonToggle
+                          enableOnOffLabels={true}
+                          labelPlacement="end"
+                          checked={
+                            membersToApprove.indexOf(memberRequest.user) >= 0
+                          }
+                          aria-label="approve/reject"
+                          onClick={(e) => {
+                            if (e.currentTarget.checked) {
+                              membersToApprove.push(memberRequest.user);
+                              setMembersToApprove(membersToApprove);
+                              setMembersToDecline(
+                                membersToDecline.filter(
+                                  (mtod) => mtod !== memberRequest.user
+                                )
+                              );
+                            } else {
+                              membersToDecline.push(memberRequest.user);
+                              setMembersToDecline(membersToDecline);
+                              let newMembersToApprove = membersToApprove.filter(
+                                (mtoa) => mtoa !== memberRequest.user
+                              );
+                              setMembersToApprove(newMembersToApprove);
+                            }
+                          }}
+                        ></IonToggle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        {memberRequest.joinRequest.reason}
+                      </IonCardContent>
+                    </IonCard>
+                  ))}
+                </IonList>
+              </>
+            ) : (
+              ""
+            )}
           </>
         ) : (
           <>
+            {/* Limits */}
+            <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
+
+            <IonList>
+              <IonTitle>Limits</IonTitle>
+
+              <IonInput
+                labelPlacement="floating"
+                color="primary"
+                value={limits?.adminsMax.toNumber()}
+                label="Admins Max *"
+                type="number"
+                min={1}
+                max={100}
+                onIonChange={(str) => {
+                  if (
+                    str.detail.value === undefined ||
+                    !str.target.value ||
+                    str.target.value === "" ||
+                    str.target.value.toString().match("/[0-9]+/g")
+                  ) {
+                    setLimits({
+                      ...limits,
+                      adminsMax: new BigNumber(1) as nat,
+                    }); //force
+                  } else {
+                    setLimits({
+                      ...limits,
+                      adminsMax: new BigNumber(str.target.value!) as nat,
+                    }); //force
+                  }
+                }}
+                helperText="Enter max admins"
+              />
+
+              <IonInput
+                labelPlacement="floating"
+                color="primary"
+                value={limits?.organizationMax.toNumber()}
+                label="Organizations Max *"
+                type="number"
+                min={1}
+                max={100}
+                onIonChange={(str) => {
+                  if (
+                    str.detail.value === undefined ||
+                    !str.target.value ||
+                    str.target.value === "" ||
+                    str.target.value.toString().match("/[0-9]+/g")
+                  ) {
+                    setLimits({
+                      ...limits,
+                      organizationMax: new BigNumber(1) as nat,
+                    }); //force
+                  } else {
+                    setLimits({
+                      ...limits,
+                      organizationMax: new BigNumber(str.target.value!) as nat,
+                    }); //force
+                  }
+                }}
+                helperText="Enter max organizations"
+              />
+
+              <IonInput
+                labelPlacement="floating"
+                color="primary"
+                value={limits?.memberRequestMax.toNumber()}
+                label="Member requests Max *"
+                type="number"
+                min={1}
+                max={100}
+                onIonChange={(str) => {
+                  if (
+                    str.detail.value === undefined ||
+                    !str.target.value ||
+                    str.target.value === "" ||
+                    str.target.value.toString().match("/[0-9]+/g")
+                  ) {
+                    setLimits({
+                      ...limits,
+                      memberRequestMax: new BigNumber(1) as nat,
+                    }); //force
+                  } else {
+                    setLimits({
+                      ...limits,
+                      memberRequestMax: new BigNumber(str.target.value!) as nat,
+                    }); //force
+                  }
+                }}
+                helperText="Enter max member requests"
+              />
+
+              <IonButton color="dark" onClick={updateLimits}>
+                Update limits
+              </IonButton>
+            </IonList>
+
+            {/* Organizations */}
+            <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
+
             <IonList>
               <IonTitle>
                 Organizations{" "}

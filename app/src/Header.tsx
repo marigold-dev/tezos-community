@@ -26,10 +26,12 @@ export const Header: React.FC<Props> = ({ match }) => {
     <IonHeader>
       <IonToolbar>
         <IonTitle>
-          {!userAddress
-            ? "TzCommunity (version " + packageJson.version + ")"
-            : match.path.replaceAll("/", "").charAt(0).toUpperCase() +
-              match.path.replaceAll("/", "").slice(1)}
+          {!userAddress ? (
+            <>{"TzCommunity (version " + packageJson.version + ")"}</>
+          ) : (
+            match.path.replaceAll("/", "").charAt(0).toUpperCase() +
+            match.path.replaceAll("/", "").slice(1)
+          )}
         </IonTitle>
       </IonToolbar>
     </IonHeader>

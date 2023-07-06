@@ -1,15 +1,23 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GithubModule } from './github/github.module';
+import { GitlabModule } from './gitlab/gitlab.module';
+import { GoogleModule } from './google/google.module';
 import { HealthcheckModule } from './healthcheck/healthcheck.module';
+import { SiwtModule } from './siwt/siwt.module';
+import { SlackModule } from './slack/slack.module';
 import { TwitterModule } from './twitter/twitter.module';
 import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
-import { SiwtModule } from './siwt/siwt.module';
-
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: `.env.${process.env.NODE_ENV}` }),
+    CacheModule.register({
+      ttl: 15000,
+      max: 100,
+    }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -29,10 +37,16 @@ import { SiwtModule } from './siwt/siwt.module';
     }),
     UserProfilesModule,
     TwitterModule,
+    //FacebookModule,
+    GoogleModule,
+    GithubModule,
+    GitlabModule,
+    // RedditModule,
+    SlackModule,
+    //TelegramModule,
     HealthcheckModule,
     SiwtModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}
