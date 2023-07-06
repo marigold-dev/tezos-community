@@ -1,7 +1,15 @@
 import { NetworkType, SigningType } from "@airgap/beacon-types";
 
 import { Clipboard } from "@capacitor/clipboard";
-import { IonButton, IonFooter, IonIcon, IonToolbar } from "@ionic/react";
+import {
+  IonButton,
+  IonCol,
+  IonFooter,
+  IonGrid,
+  IonIcon,
+  IonRow,
+  IonToolbar,
+} from "@ionic/react";
 import { createMessagePayload, signIn } from "@siwt/sdk";
 import {
   helpCircleOutline,
@@ -149,10 +157,28 @@ export const Footer: React.FC = () => {
             </IonButton>
           </>
         ) : (
-          <IonButton color="dark" onClick={connectWallet}>
-            <IonIcon slot="start" icon={walletIcon}></IonIcon>
-            Connect your wallet
-          </IonButton>
+          <IonGrid>
+            <IonRow>
+              <IonCol sizeSm="12" sizeXs="12" sizeMd="10" sizeXl="10">
+                <IonButton color="dark" onClick={connectWallet}>
+                  <IonIcon slot="start" icon={walletIcon}></IonIcon>
+                  Connect your wallet
+                </IonButton>
+              </IonCol>
+              <IonCol sizeSm="12" sizeXs="12" sizeMd="2" sizeXl="2">
+                <a
+                  style={{
+                    fontSize: "0.8em",
+                    margin: "1em",
+                  }}
+                  href={"https://www.marigold.dev/data-protection"}
+                  target="_blank"
+                >
+                  Data Protection Policy & GDPR
+                </a>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         )}
       </IonToolbar>
     </IonFooter>
