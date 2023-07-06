@@ -2,7 +2,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FacebookModule } from './facebook/facebook.module';
 import { GithubModule } from './github/github.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import { GoogleModule } from './google/google.module';
@@ -38,7 +37,7 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
     }),
     UserProfilesModule,
     TwitterModule,
-    FacebookModule,
+    //FacebookModule,
     GoogleModule,
     GithubModule,
     GitlabModule,
