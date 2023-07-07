@@ -18,15 +18,14 @@ type updateOrganizationParameters = {
   siteUrl: string,
   logoUrl: string,
   ipfsNftUrl: string,
-  fundingAddress: option<address>
+  fundingAddress: option<address>,
+  autoRegistration : bool
 };
 
 type addAdminParameters = { admin: address, orgName: string };
 
 type joinRequest = {
   orgName: string,
-  contactId: string,
-  contactIdProvider: string,
   reason: string
 };
 
@@ -44,7 +43,8 @@ type addOrganizationRequest = {
   siteUrl: string,
   logoUrl: string,
   ipfsNftUrl: string,
-  fundingAddress: option<address>
+  fundingAddress: option<address>,
+  autoRegistration : bool
 };
 
 type organization = {
@@ -57,7 +57,8 @@ type organization = {
   admins: set<address>,
   status: organizationStatus,
   memberRequests: set<joinOrganizationRequest>,
-  fundingAddress: option<address>
+  fundingAddress: option<address>,
+  autoRegistration : bool
 };
 
 type limits = { organizationMax: nat, adminsMax: nat, memberRequestMax: nat };
@@ -95,7 +96,8 @@ const updateOrganization = (
             siteUrl: orgToUpdate.siteUrl,
             business: orgToUpdate.business,
             ipfsNftUrl: orgToUpdate.ipfsNftUrl,
-            fundingAddress: orgToUpdate.fundingAddress
+            fundingAddress: orgToUpdate.fundingAddress,
+            autoRegistration: orgToUpdate.autoRegistration
           }
         }
       ] : failwith(
@@ -125,7 +127,8 @@ const updateOrganization = (
                     siteUrl: orgToUpdate.siteUrl,
                     business: orgToUpdate.business,
                     ipfsNftUrl: orgToUpdate.ipfsNftUrl,
-                    fundingAddress: orgToUpdate.fundingAddress
+                    fundingAddress: orgToUpdate.fundingAddress,
+                    autoRegistration: orgToUpdate.autoRegistration
                   },
                   store.organizations
                 )
@@ -225,7 +228,8 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
       members: Big_map.add(Tezos.get_sender(), unit, Big_map.empty) as
         big_map<address, unit>,
       memberRequests: Set.empty as set<joinOrganizationRequest>,
-      fundingAddress: org.fundingAddress
+      fundingAddress: org.fundingAddress,
+      autoRegistration : org.autoRegistration
     };
   if (List.size(store.organizations) >= store.limits.organizationMax) {
     return failwith(
@@ -521,7 +525,30 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
           "You cannot receive requests until your organization is activated"
         ) else if (
           Set.cardinal(org.memberRequests) == store.limits.memberRequestMax
-        ) return failwith("We have reached member request size limit") else {
+        ) return failwith("We have reached member request size limit") 
+        else if (org.autoRegistration == true){
+          const newOrg = {
+                  ...org,
+                  members: Big_map.add(Tezos.get_sender(), unit, org.members)
+                };
+          return  [
+            list([Tezos.emit(
+                  "%orgMemberRequestsUpdated",
+                  [Set.literal(list([Tezos.get_sender()])),Set.empty as set<address> , org.name]
+                )]),
+            {
+              ...store,
+              organizations: List.update_with(
+                (orgItem: organization) => (orgItem.name == org.name),
+                newOrg
+                ,
+                store.organizations
+              )
+            }
+          ]
+
+        } 
+        else {
           const newOrg =
             {
               ...org,
@@ -612,6 +639,14 @@ const responseToJoinOrganization = (
 const sendMessage = ([to, message]: [string, string], store: storage): _return => {
   return [
     list([Tezos.emit("%message", [Tezos.get_source(), to, message])]),
+    store
+  ]
+};
+
+// @entry
+const replyToMessage = ([replyId,replyUser, message]: [nat,string, string], store: storage): _return => {
+  return [
+    list([Tezos.emit("%reply", [Tezos.get_source(), replyUser,replyId, message])]),
     store
   ]
 };

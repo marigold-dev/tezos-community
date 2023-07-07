@@ -1,6 +1,11 @@
 import {
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCheckbox,
   IonCol,
   IonContent,
   IonGrid,
@@ -18,8 +23,6 @@ import {
   IonRefresherContent,
   IonRow,
   IonSearchbar,
-  IonSelect,
-  IonSelectOption,
   IonSpinner,
   IonSplitPane,
   IonText,
@@ -32,14 +35,22 @@ import {
 import * as api from "@tzkt/sdk-api";
 import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
-import { addCircle, ellipse, mailOutline, peopleCircle } from "ionicons/icons";
+import {
+  addCircle,
+  constructOutline,
+  ellipse,
+  keyOutline,
+  mailOutline,
+  mapOutline,
+  peopleCircle,
+  sendOutline,
+} from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import {
   LocalStorageKeys,
   Organization,
   PAGES,
-  SOCIAL_ACCOUNT_TYPE,
   UserContext,
   UserContextType,
 } from "../App";
@@ -48,7 +59,7 @@ import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
 import { address } from "../type-aliases";
-import { OrganizationScreen } from "./OrganizationScreen";
+import { OrganizationScreen, TABS } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
@@ -86,6 +97,7 @@ export const OrganizationsScreen: React.FC = () => {
 
   //modal ADD
   const modalAdd = useRef<HTMLIonModalElement>(null);
+  const [autoRegistration, setAutoRegistration] = useState<boolean>(false);
   const [business, setBusiness] = useState<string>("");
   const [businessIsValid, setBusinessIsValid] = useState<boolean>(false);
   const [businessMarkTouched, setBusinessMarkTouched] =
@@ -100,16 +112,6 @@ export const OrganizationsScreen: React.FC = () => {
 
   //modal JOIN
   const modalJoin = useRef<HTMLIonModalElement>(null);
-  const [contactId, setContactId] = useState<string>("");
-  const [contactIdIsValid, setContactIdIsValid] = useState<boolean>(false);
-  const [contactIdMarkTouched, setContactIdMarkTouched] =
-    useState<boolean>(false);
-
-  const [contactIdProvider, setContactIdProvider] = useState<string>("");
-  const [contactIdProviderIsValid, setContactIdProviderIsValid] =
-    useState<boolean>(false);
-  const [contactIdProviderMarkTouched, setContactIdProviderMarkTouched] =
-    useState<boolean>(false);
 
   const [reason, setReason] = useState<string>("");
   const [reasonIsValid, setReasonIsValid] = useState<boolean>(false);
@@ -138,6 +140,8 @@ export const OrganizationsScreen: React.FC = () => {
   const [selectedOrganizationName, setSelectedOrganizationName] = useState<
     string | undefined
   >();
+  const [selectedTab, setSelectedTab] = useState<TABS>(TABS.DESCRIPTION);
+
   const [isTezosOrganization, setIsTezosOrganization] =
     useState<boolean>(false);
 
@@ -208,7 +212,7 @@ export const OrganizationsScreen: React.FC = () => {
         setSelectedOrganizationName(myOrganizations[0].name); //init
         setIsTezosOrganization(false);
       }
-      console.log("myOrganizations", myOrganizations);
+      //console.log("myOrganizations", myOrganizations);
     } else {
       //storage not ready yet
     }
@@ -268,12 +272,7 @@ export const OrganizationsScreen: React.FC = () => {
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .requestToJoinOrganization(
-          contactId,
-          contactIdProvider,
-          joiningOrganization!.name,
-          reason
-        )
+        .requestToJoinOrganization(joiningOrganization!.name, reason)
         .send();
       await op?.confirmation();
       const newStorage = await mainWalletType!.storage();
@@ -306,6 +305,7 @@ export const OrganizationsScreen: React.FC = () => {
       setLoading(true);
       const op = await mainWalletType!.methods
         .addOrganization(
+          autoRegistration,
           business,
           fundingAddress,
           ipfsNftUrl,
@@ -376,14 +376,87 @@ export const OrganizationsScreen: React.FC = () => {
             </IonItem>
           </div>
         ) : !userAddress ? (
-          <>
-            <h2 style={{ paddingTop: "10vh" }}>Welcome to Tezos Community !</h2>
-
-            <IonImg
-              style={{ paddingTop: "10vh" }}
-              src={process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg"}
-            />
-          </>
+          <IonContent
+            style={{
+              "--background": "none",
+              backgroundImage:
+                "url(" + process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg)",
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundBlendMode: "overlay",
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+            }}
+          >
+            <IonContent style={{ "--background": "none", color: "primary" }}>
+              <h1 style={{ paddingTop: "10vh" }}>
+                Entering Tezos Social Graph
+              </h1>
+              <IonGrid>
+                <IonRow>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <IonIcon icon={mapOutline}></IonIcon>
+                          &nbsp;&nbsp; Social graph registry
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        Build and manage your own community onchain. Control who
+                        can join or not and deliver NFT membership cards
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <IonIcon icon={keyOutline}></IonIcon>
+                          &nbsp;&nbsp; Preserve pseudonymity
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        You are identified by your Tezos address. Only people
+                        from same organization can see your social profile, if
+                        you decide to link it.
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <IonIcon icon={sendOutline}></IonIcon>
+                          &nbsp;&nbsp; Send secure onchain alerts
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        Notify you community or others one via onchain events.
+                        Receive important messages on your phone or via web push
+                        (gas cost applies to avoid spam)
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                    <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                      <IonCardHeader>
+                        {" "}
+                        <IonCardTitle>
+                          <IonIcon icon={constructOutline}></IonIcon>
+                          &nbsp;&nbsp; Free integration to other dapps
+                        </IonCardTitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        Leverage Tezos social graph as user registry for other
+                        dapps, like an universal contact list, custom player
+                        registry, or community database builder and more ..
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonContent>
+          </IonContent>
         ) : (
           <IonSplitPane when="xs" contentId="main">
             <IonMenu
@@ -421,12 +494,7 @@ export const OrganizationsScreen: React.FC = () => {
                       <IonButtons slot="end">
                         <IonButton
                           onClick={joinOrganization}
-                          disabled={
-                            !contactIdIsValid ||
-                            !contactIdProviderIsValid ||
-                            !reasonIsValid ||
-                            !joiningOrganization
-                          }
+                          disabled={!reasonIsValid || !joiningOrganization}
                         >
                           Done
                         </IonButton>
@@ -478,65 +546,8 @@ export const OrganizationsScreen: React.FC = () => {
                   <IonContent color="light" class="ion-padding">
                     <IonInput
                       labelPlacement="floating"
-                      color="primary"
-                      value={contactId}
-                      label="Contact identifier/alias *"
-                      placeholder="@twitterAlias"
-                      type="text"
-                      maxlength={36}
-                      counter
-                      onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
-                          setContactIdIsValid(false);
-                        } else {
-                          setContactId(str.target.value as string);
-                          setContactIdIsValid(true);
-                        }
-                      }}
-                      helperText="Enter an alias as identifier from your social account provider"
-                      errorText="Alias required"
-                      className={`${contactIdIsValid && "ion-valid"} ${
-                        contactIdIsValid === false && "ion-invalid"
-                      } ${contactIdMarkTouched && "ion-touched"}`}
-                      onIonBlur={() => setContactIdMarkTouched(true)}
-                    />
-
-                    <IonSelect
-                      labelPlacement="floating"
-                      value={contactIdProvider}
-                      label="Select your Social account provider *"
-                      onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
-                          setContactIdProviderIsValid(false);
-                        } else {
-                          setContactIdProvider(str.target.value as string);
-                          setContactIdProviderIsValid(true);
-                        }
-                      }}
-                      className={`${contactIdProviderIsValid && "ion-valid"} ${
-                        contactIdProviderIsValid === false && "ion-invalid"
-                      } ${contactIdProviderMarkTouched && "ion-touched"}`}
-                      onIonBlur={() => setContactIdProviderMarkTouched(true)}
-                    >
-                      {Object.keys(SOCIAL_ACCOUNT_TYPE).map((e) => (
-                        <IonSelectOption key={e} value={e}>
-                          {e}
-                        </IonSelectOption>
-                      ))}
-                    </IonSelect>
-
-                    <IonInput
-                      labelPlacement="floating"
                       value={reason}
-                      label="Reason *"
+                      label="Reason * (ASCII characters only)"
                       placeholder="because ..."
                       type="text"
                       maxlength={255}
@@ -549,7 +560,12 @@ export const OrganizationsScreen: React.FC = () => {
                         ) {
                           setReasonIsValid(false);
                         } else {
-                          setReason(str.target.value as string);
+                          setReason(
+                            (str.target.value as string).replace(
+                              /[^\x00-\x7F]/g,
+                              ""
+                            )
+                          );
                           setReasonIsValid(true);
                         }
                       }}
@@ -668,7 +684,12 @@ export const OrganizationsScreen: React.FC = () => {
                         ) {
                           setBusinessIsValid(false);
                         } else {
-                          setBusiness(str.target.value as string);
+                          setBusiness(
+                            (str.target.value as string).replace(
+                              /[^\x00-\x7F]/g,
+                              ""
+                            )
+                          );
                           setBusinessIsValid(true);
                         }
                       }}
@@ -741,6 +762,16 @@ export const OrganizationsScreen: React.FC = () => {
                         );
                       }}
                     />
+
+                    <IonCheckbox
+                      value={autoRegistration}
+                      onIonChange={(str) => {
+                        if (str.target.checked === undefined) return;
+                        setAutoRegistration(str.target.checked!);
+                      }}
+                    >
+                      AutoRegistration
+                    </IonCheckbox>
                   </IonContent>
                 </IonModal>
 
@@ -802,19 +833,20 @@ export const OrganizationsScreen: React.FC = () => {
                       labelPlacement="floating"
                       color="primary"
                       value={message}
-                      label="Message *"
+                      label="Message *   (ASCII characters only)"
                       placeholder="Type here ..."
                       maxlength={250}
                       counter
                       onIonChange={(str) => {
-                        if (
-                          str.detail.value === undefined ||
-                          !str.target.value ||
-                          str.target.value === ""
-                        ) {
+                        let input = str.detail.value;
+                        //cleaning non ascii
+
+                        if (input === undefined || !input || input === "") {
                           setMessageIsValid(false);
                         } else {
-                          setMessage(str.target.value as string);
+                          setMessage(
+                            (input as string).replace(/[^\x00-\x7F]/g, "")
+                          );
                           setMessageIsValid(true);
                         }
                       }}
@@ -938,6 +970,8 @@ export const OrganizationsScreen: React.FC = () => {
               isTezosOrganization={isTezosOrganization}
               refreshMyOrganizations={refreshMyOrganizations}
               setSelectedOrganizationName={setSelectedOrganizationName}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
             />
           </IonSplitPane>
         )}

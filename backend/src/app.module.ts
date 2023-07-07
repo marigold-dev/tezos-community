@@ -1,10 +1,13 @@
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GithubModule } from './github/github.module';
+import { GitlabModule } from './gitlab/gitlab.module';
+import { GoogleModule } from './google/google.module';
 import { HealthcheckModule } from './healthcheck/healthcheck.module';
 import { SiwtModule } from './siwt/siwt.module';
+import { SlackModule } from './slack/slack.module';
 import { TwitterModule } from './twitter/twitter.module';
 import { UserProfile } from './userprofiles/UserProfile';
 import { UserProfilesModule } from './userprofiles/userprofiles.module';
@@ -34,15 +37,16 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
     }),
     UserProfilesModule,
     TwitterModule,
+    //FacebookModule,
+    GoogleModule,
+    GithubModule,
+    GitlabModule,
+    // RedditModule,
+    SlackModule,
+    //TelegramModule,
     HealthcheckModule,
     SiwtModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
-  ],
 })
 export class AppModule {}

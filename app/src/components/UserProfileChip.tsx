@@ -41,7 +41,7 @@ export const UserProfileChip = ({
           </IonAvatar>
         </IonChip>
       ) : (
-        address
+        <IonChip>{address}</IonChip>
       )}
     </>
   );

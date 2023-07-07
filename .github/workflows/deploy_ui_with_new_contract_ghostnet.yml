@@ -47,11 +47,11 @@ jobs:
       - name: deploy main contract on ghostnet
         uses: laucans/taqueria-github-action@main
         with:
-          plugins: "@taqueria/plugin-contract-types@next, @taqueria/plugin-taquito, @taqueria/plugin-ligo, @taqueria/plugin-jest"
+          plugins: "@taqueria/plugin-contract-types, @taqueria/plugin-taquito, @taqueria/plugin-ligo, @taqueria/plugin-jest"
           environment: testing
           compile_contracts: main.jsligo
           compile_plugin: ligo
-          taq_ligo_image: ligolang/ligo_ci:next
+          taq_ligo_image: ligolang/ligo_ci:0.68.1
           ligo_libraries: "@ligo/fa"
           test_files: test.jsligo
           deploy_contracts: main.tz

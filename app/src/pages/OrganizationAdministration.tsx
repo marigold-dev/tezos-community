@@ -5,7 +5,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
   IonCol,
   IonContent,
@@ -569,109 +568,122 @@ export const OrganizationAdministration = ({
             </IonList>
 
             {/* Member Requests */}
-            <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
 
-            <IonList>
-              <IonTitle>
-                <IonGrid fixed={true}>
-                  <IonRow>
-                    <IonCol>
-                      {" "}
-                      Member requests{" "}
-                      <IonBadge>
-                        {organization?.memberRequests
-                          ? organization?.memberRequests.length
-                          : 0}
-                      </IonBadge>
-                    </IonCol>
+            {!organization?.autoRegistration ? (
+              <>
+                <hr
+                  color="danger"
+                  style={{ borderWidth: "1px", height: "0" }}
+                />
 
-                    {organization?.memberRequests &&
-                    organization?.memberRequests.length > 0 ? (
-                      <>
+                <IonList>
+                  <IonTitle>
+                    <IonGrid fixed={true}>
+                      <IonRow>
                         <IonCol>
-                          <IonButton
-                            color="dark"
-                            onClick={responseToJoinOrganization}
-                          >
-                            <IonIcon
-                              icon={checkmarkDoneCircleOutline}
-                              slot="end"
-                            />
-                            Apply all
-                          </IonButton>
+                          {" "}
+                          Member requests{" "}
+                          <IonBadge>
+                            {organization?.memberRequests
+                              ? organization?.memberRequests.length
+                              : 0}
+                          </IonBadge>
+                        </IonCol>
 
-                          <IonIcon
-                            id="hover-trigger"
-                            icon={informationCircleOutline}
-                          />
-                          <IonPopover
-                            trigger="hover-trigger"
-                            triggerAction="hover"
-                          >
-                            <IonContent class="ion-padding">
-                              Accept <IonIcon icon={checkmarkCircleOutline} />{" "}
-                              or Decline <IonIcon icon={removeCircleOutline} />{" "}
-                              below each requests and then click{" "}
-                              <b>
-                                Apply all{" "}
+                        {organization?.memberRequests &&
+                        organization?.memberRequests.length > 0 ? (
+                          <>
+                            <IonCol>
+                              <IonButton
+                                color="dark"
+                                onClick={responseToJoinOrganization}
+                              >
                                 <IonIcon
                                   icon={checkmarkDoneCircleOutline}
                                   slot="end"
                                 />
-                              </b>
-                            </IonContent>
-                          </IonPopover>
-                        </IonCol>
-                      </>
-                    ) : (
-                      ""
-                    )}
-                  </IonRow>
-                </IonGrid>
-              </IonTitle>
+                                Apply all
+                              </IonButton>
 
-              {organization?.memberRequests.map((memberRequest) => (
-                <IonCard key={memberRequest.user}>
-                  <IonCardHeader>
-                    <IonCardTitle>{memberRequest.user}</IonCardTitle>
-                    <IonCardSubtitle>
-                      {memberRequest.joinRequest.contactIdProvider +
-                        " - " +
-                        memberRequest.joinRequest.contactId}
-                    </IonCardSubtitle>
-                    <IonToggle
-                      enableOnOffLabels={true}
-                      labelPlacement="end"
-                      checked={
-                        membersToApprove.indexOf(memberRequest.user) >= 0
-                      }
-                      aria-label="approve/reject"
-                      onClick={(e) => {
-                        if (e.currentTarget.checked) {
-                          membersToApprove.push(memberRequest.user);
-                          setMembersToApprove(membersToApprove);
-                          setMembersToDecline(
-                            membersToDecline.filter(
-                              (mtod) => mtod !== memberRequest.user
-                            )
-                          );
-                        } else {
-                          membersToDecline.push(memberRequest.user);
-                          setMembersToDecline(membersToDecline);
-                          let newMembersToApprove = membersToApprove.filter(
-                            (mtoa) => mtoa !== memberRequest.user
-                          );
-                          setMembersToApprove(newMembersToApprove);
-                        }
-                      }}
-                    ></IonToggle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    {memberRequest.joinRequest.reason}
-                  </IonCardContent>
-                </IonCard>
-              ))}
-            </IonList>
+                              <IonIcon
+                                id="hover-trigger"
+                                icon={informationCircleOutline}
+                              />
+                              <IonPopover
+                                trigger="hover-trigger"
+                                triggerAction="hover"
+                              >
+                                <IonContent class="ion-padding">
+                                  Accept{" "}
+                                  <IonIcon icon={checkmarkCircleOutline} /> or
+                                  Decline <IonIcon icon={removeCircleOutline} />{" "}
+                                  below each requests and then click{" "}
+                                  <b>
+                                    Apply all{" "}
+                                    <IonIcon
+                                      icon={checkmarkDoneCircleOutline}
+                                      slot="end"
+                                    />
+                                  </b>
+                                </IonContent>
+                              </IonPopover>
+                            </IonCol>
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </IonRow>
+                    </IonGrid>
+                  </IonTitle>
+
+                  {organization?.memberRequests.map((memberRequest) => (
+                    <IonCard key={memberRequest.user}>
+                      <IonCardHeader>
+                        <IonCardTitle>
+                          <UserProfileChip
+                            key={memberRequest.user}
+                            userProfiles={userProfiles}
+                            address={memberRequest.user}
+                          ></UserProfileChip>
+                        </IonCardTitle>
+
+                        <IonToggle
+                          enableOnOffLabels={true}
+                          labelPlacement="end"
+                          checked={
+                            membersToApprove.indexOf(memberRequest.user) >= 0
+                          }
+                          aria-label="approve/reject"
+                          onClick={(e) => {
+                            if (e.currentTarget.checked) {
+                              membersToApprove.push(memberRequest.user);
+                              setMembersToApprove(membersToApprove);
+                              setMembersToDecline(
+                                membersToDecline.filter(
+                                  (mtod) => mtod !== memberRequest.user
+                                )
+                              );
+                            } else {
+                              membersToDecline.push(memberRequest.user);
+                              setMembersToDecline(membersToDecline);
+                              let newMembersToApprove = membersToApprove.filter(
+                                (mtoa) => mtoa !== memberRequest.user
+                              );
+                              setMembersToApprove(newMembersToApprove);
+                            }
+                          }}
+                        ></IonToggle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        {memberRequest.joinRequest.reason}
+                      </IonCardContent>
+                    </IonCard>
+                  ))}
+                </IonList>
+              </>
+            ) : (
+              ""
+            )}
           </>
         ) : (
           <>

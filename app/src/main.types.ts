@@ -13,14 +13,13 @@ export type Storage = {
   nftAddress: address;
   organizations: Array<{
     admins: Array<address>;
+    autoRegistration: boolean;
     business: string;
     fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
       joinRequest: {
-        contactId: string;
-        contactIdProvider: string;
         orgName: string;
         reason: string;
       };
@@ -33,14 +32,13 @@ export type Storage = {
   }>;
   tezosOrganization: {
     admins: Array<address>;
+    autoRegistration: boolean;
     business: string;
     fundingAddress: address | null;
     ipfsNftUrl: string;
     logoUrl: string;
     memberRequests: Array<{
       joinRequest: {
-        contactId: string;
-        contactIdProvider: string;
         orgName: string;
         reason: string;
       };
@@ -57,6 +55,7 @@ type Methods = {
   activateOrganization: (param: string) => Promise<void>;
   addAdmin: (admin: address, orgName: string) => Promise<void>;
   addOrganization: (
+    autoRegistration: boolean,
     business: string,
     fundingAddress: address | null,
     ipfsNftUrl: string,
@@ -78,12 +77,8 @@ type Methods = {
   ) => Promise<void>;
   removeMember: (member: address, orgName: string) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
-  requestToJoinOrganization: (
-    contactId: string,
-    contactIdProvider: string,
-    orgName: string,
-    reason: string
-  ) => Promise<void>;
+  replyToMessage: (_0: nat, _1: string, _2: string) => Promise<void>;
+  requestToJoinOrganization: (orgName: string, reason: string) => Promise<void>;
   responseToJoinOrganization: (
     membersToApprove: Array<address>,
     membersToDecline: Array<address>,
@@ -91,6 +86,7 @@ type Methods = {
   ) => Promise<void>;
   sendMessage: (_0: string, _1: string) => Promise<void>;
   updateOrganization: (
+    autoRegistration: boolean,
     business: string,
     fundingAddress: address | null,
     ipfsNftUrl: string,
@@ -104,6 +100,7 @@ type MethodsObject = {
   activateOrganization: (param: string) => Promise<void>;
   addAdmin: (params: { admin: address; orgName: string }) => Promise<void>;
   addOrganization: (params: {
+    autoRegistration: boolean;
     business: string;
     fundingAddress?: address;
     ipfsNftUrl: string;
@@ -125,9 +122,8 @@ type MethodsObject = {
   }) => Promise<void>;
   removeMember: (params: { member: address; orgName: string }) => Promise<void>;
   removeOrganization: (param: string) => Promise<void>;
+  replyToMessage: (params: { 0: nat; 1: string; 2: string }) => Promise<void>;
   requestToJoinOrganization: (params: {
-    contactId: string;
-    contactIdProvider: string;
     orgName: string;
     reason: string;
   }) => Promise<void>;
@@ -138,6 +134,7 @@ type MethodsObject = {
   }) => Promise<void>;
   sendMessage: (params: { 0: string; 1: string }) => Promise<void>;
   updateOrganization: (params: {
+    autoRegistration: boolean;
     business: string;
     fundingAddress?: address;
     ipfsNftUrl: string;

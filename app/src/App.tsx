@@ -4,11 +4,9 @@ import {
   RefresherEventDetail,
   setupIonicReact,
 } from "@ionic/react";
-import { useHistory } from "react-router-dom";
 
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
-import { Socket, io } from "socket.io-client";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -37,13 +35,15 @@ import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
 import { CachingService } from "./caching.service";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
-import { FundingScreen } from "./pages/FundingScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
 import { OrganizationsScreen } from "./pages/OrganizationsScreen";
+import { ProfileScreen } from "./pages/ProfileScreen";
+import { socket } from "./socket";
 import { BigMap, address, nat, unit } from "./type-aliases";
 setupIonicReact();
 
@@ -67,13 +67,15 @@ export type TZIP21TokenMetadata = TokenMetadata & {
 };
 
 export enum SOCIAL_ACCOUNT_TYPE {
-  // GOOGLE = "GOOGLE",
-  TWITTER = "twitter",
-  /* WHATSAPP = "WHATSAPP",
-  FACEBOOK = "FACEBOOK",
-  DISCORD = "DISCORD",
-  TELEGRAM = "TELEGRAM",
-  SLACK = "SLACK",*/
+  google = "google",
+  twitter = "twitter",
+  // facebook = "facebook",
+  github = "github",
+  gitlab = "gitlab",
+  // microsoft = "microsoft",
+  slack = "slack",
+  //reddit = "reddit",
+  //telegram = "telegram",
 }
 
 export type UserProfile = {
@@ -85,8 +87,6 @@ export type UserProfile = {
 
 export type MemberRequest = {
   joinRequest: {
-    contactId: string;
-    contactIdProvider: string;
     orgName: string;
     reason: string;
   };
@@ -101,14 +101,13 @@ export type Limits = {
 
 export type Organization = {
   admins: Array<address>;
+  autoRegistration: boolean;
   business: string;
   fundingAddress: address | null;
   ipfsNftUrl: string;
   logoUrl: string;
   memberRequests: Array<{
     joinRequest: {
-      contactId: string;
-      contactIdProvider: string;
       orgName: string;
       reason: string;
     };
@@ -142,16 +141,12 @@ export type UserContextType = {
   getUserProfile: (whateverUserAddress: string) => Promise<UserProfile | null>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
-  socket: Socket;
   localStorage: CachingService;
+  socket: Socket;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
-  const socket: Socket = io(process.env.REACT_APP_BACKEND_URL!);
-
-  const history = useHistory();
-
   const [Tezos, setTezos] = useState<TezosToolkit>(
     new TezosToolkit(
       "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev"
@@ -328,7 +323,7 @@ const App: React.FC = () => {
             (orgItem: Organization) =>
               orgItem.admins.indexOf(userAddress as address) >= 0 ? true : false
           );
-          console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
+          //console.log("myOrganizationsAsAdmin", myOrganizationsAsAdmin);
 
           if (storage && myOrganizationsAsAdmin.length > 0) {
             joinOrganizationRequestSubscription.on("data", async (e) => {
@@ -479,10 +474,10 @@ const App: React.FC = () => {
             userProfiles.set(userAddress as address, newUserProfile);
             setUserProfiles(userProfiles); //cache
             setUserProfile(newUserProfile); //cache
-            console.log(
+            /* console.log(
               "userProfile refreshed for " + userAddress,
               newUserProfile
-            );
+            );*/
           }
         }
       }
@@ -526,10 +521,33 @@ const App: React.FC = () => {
     event?.detail.complete();
   };
 
+  function onConnect() {
+    console.log("Socket connected");
+  }
+
+  function onDisconnect(reason: any) {
+    console.log(`Socket disconnected due to ${reason}`);
+  }
+
+  function onError(err: any) {
+    console.log("received socket error:");
+    console.log(err);
+  }
+
   useEffect(() => {
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("error", onError);
+
     (async () => {
       await localStorage.initStorage();
     })();
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("error", onError);
+    };
   }, []);
 
   const disconnectWallet = async (): Promise<void> => {
@@ -541,8 +559,6 @@ const App: React.FC = () => {
     await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
     await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
     await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
-
-    history.replace(PAGES.ORGANIZATIONS);
   };
 
   const getUserProfile = async (
@@ -658,9 +674,9 @@ const App: React.FC = () => {
           refreshStorage,
           getUserProfile,
           nftContratTokenMetadataMap,
-          socket,
           localStorage,
           disconnectWallet,
+          socket,
         }}
       >
         <IonReactRouter>
@@ -673,8 +689,8 @@ const App: React.FC = () => {
               path={"/" + PAGES.ORGANIZATION}
               component={OrganizationScreen}
             />
-            <Route path={"/" + PAGES.FUNDING} component={FundingScreen} />
             <Route path={"/" + PAGES.FAQ} component={FAQScreen} />
+            <Route path={"/" + PAGES.PROFILE} component={ProfileScreen} />
             <Redirect exact from="/" to={PAGES.ORGANIZATIONS} />
           </IonRouterOutlet>
         </IonReactRouter>
@@ -686,8 +702,8 @@ const App: React.FC = () => {
 export enum PAGES {
   ORGANIZATIONS = "organizations",
   ORGANIZATION = "organization",
-  FUNDING = "funding",
   FAQ = "faq",
+  PROFILE = "profile",
 }
 
 export default App;

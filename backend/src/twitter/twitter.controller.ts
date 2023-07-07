@@ -83,8 +83,18 @@ export class TwitterController {
       ),
     );
 
+    /*
+    Logger.debug(
+      'insetrted on cache ',
+      this.siwtService.twitterPending.get(twitterAccessToken),
+    );
+*/
+
     //push on websocket
     this.eg.server.emit('twitter', twitterAccessToken);
+
+    Logger.debug('websocket emitted ', 'twitter', twitterAccessToken);
+
     res.end();
   }
 }

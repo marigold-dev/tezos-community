@@ -14,4 +14,12 @@ export class SiwtService {
   });
 
   public twitterPending = new Map<string, UserProfile>(); //twitterAccessToken,
+  public facebookPending = new Map<string, UserProfile>(); //facebookAccessToken,
+  public googlePending = new Map<string, UserProfile>(); //googleAccessToken,
+  public githubPending = new Map<string, UserProfile>(); //githubAccessToken,
+  public gitlabPending = new Map<string, UserProfile>(); //gitlabAccessToken,
+  public microsoftPending = new Map<string, UserProfile>(); //microsoftAccessToken,
+  public redditPending = new Map<string, UserProfile>(); //redditAccessToken,
+  public slackPending = new Map<string, UserProfile>(); //slackAccessToken,
+  public telegramPending = new Map<string, UserProfile>(); //telegramAccessToken,
 }

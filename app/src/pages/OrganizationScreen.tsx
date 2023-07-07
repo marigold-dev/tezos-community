@@ -5,6 +5,7 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
+  IonCheckbox,
   IonContent,
   IonHeader,
   IonIcon,
@@ -53,9 +54,11 @@ type OrganizationProps = {
   isTezosOrganization: boolean;
   refreshMyOrganizations: () => Promise<void>;
   setSelectedOrganizationName: Dispatch<SetStateAction<string | undefined>>;
+  selectedTab: TABS;
+  setSelectedTab: Dispatch<SetStateAction<TABS>>;
 };
 
-enum TABS {
+export enum TABS {
   DESCRIPTION = "DESCRIPTION",
   MESSAGES = "MESSAGES",
   ADMINISTRATION = "ADMINISTRATION",
@@ -66,6 +69,8 @@ export const OrganizationScreen = ({
   isTezosOrganization,
   refreshMyOrganizations,
   setSelectedOrganizationName,
+  selectedTab,
+  setSelectedTab,
 }: OrganizationProps): JSX.Element => {
   const history = useHistory();
 
@@ -95,7 +100,6 @@ export const OrganizationScreen = ({
     undefined
   );
 
-  const [selectedTab, setSelectedTab] = useState<TABS>(TABS.DESCRIPTION);
   const [members, setMembers] = useState<address[]>([]);
 
   //fund transfer
@@ -113,6 +117,7 @@ export const OrganizationScreen = ({
       setLoading(true);
       const op = await mainWalletType!.methods
         .updateOrganization(
+          organization!.autoRegistration,
           organization!.business,
           organization!.fundingAddress,
           organization!.ipfsNftUrl,
@@ -244,7 +249,7 @@ export const OrganizationScreen = ({
   return (
     <IonContent className="ion-page" id="main">
       {organization ? (
-        <IonContent style={{ height: "calc(100% - 56px - 56px)" }}>
+        <IonContent style={{ height: "calc(100%  - 56px  - 56px)" }}>
           <IonToolbar>
             <IonSegment
               onIonChange={(e) =>
@@ -299,7 +304,9 @@ export const OrganizationScreen = ({
                       ) {
                         setBusinessIsValid(false);
                       } else {
-                        organization.business = str.target.value as string;
+                        organization.business = (
+                          str.target.value as string
+                        ).replace(/[^\x00-\x7F]/g, "");
                         setOrganization(organization);
                         setBusinessIsValid(true);
                       }
@@ -312,7 +319,11 @@ export const OrganizationScreen = ({
                     errorText="Business required"
                     className={`${businessIsValid && "ion-valid"} ${
                       businessIsValid === false && "ion-invalid"
-                    } `}
+                    }    ${
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? "edit"
+                        : "readonly"
+                    }    `}
                   ></IonTextarea>
                 </IonItem>
                 <IonItem>
@@ -530,6 +541,32 @@ export const OrganizationScreen = ({
                   ) : (
                     ""
                   )}
+                </IonItem>
+
+                <IonItem>
+                  <IonCheckbox
+                    label-placement="stacked"
+                    checked={organization.autoRegistration}
+                    disabled={
+                      organization.admins.indexOf(userAddress as address) >= 0
+                        ? false
+                        : true
+                    }
+                    className="checkbox-enabled"
+                    onIonChange={(str) => {
+                      console.log(
+                        "autoRegistration",
+                        str.target.checked,
+                        organization.autoRegistration
+                      );
+
+                      if (str.detail.checked === undefined) return;
+                      organization.autoRegistration = str.target.checked!;
+                      setOrganization(organization);
+                    }}
+                  >
+                    AutoRegistration
+                  </IonCheckbox>
                 </IonItem>
 
                 {!isTezosOrganization ? (
