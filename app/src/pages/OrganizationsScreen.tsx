@@ -211,6 +211,8 @@ export const OrganizationsScreen: React.FC = () => {
       if (myOrganizations.length > 0 && !selectedOrganizationName) {
         setSelectedOrganizationName(myOrganizations[0].name); //init
         setIsTezosOrganization(false);
+      } else if (myOrganizations.length == 0) {
+        setSelectedOrganizationName(undefined);
       }
       //console.log("myOrganizations", myOrganizations);
     } else {

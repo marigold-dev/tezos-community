@@ -234,6 +234,7 @@ export const OrganizationScreen = ({
         setOrganization(organization!);
       }
     } else {
+      setOrganization(undefined);
       console.log("organization fetch his not ready yet");
     }
   };

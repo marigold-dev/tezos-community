@@ -4,7 +4,7 @@
 
 Project to build a dapp for Tezos community that includes a DAO, organization rules, multisig, message broadcast, etc ...
 
-[slides](https://docs.google.com/presentation/d/1Tao9c4QZm_YGRz9PxwZlPks2EbUCN8K_XKldVN4V0zQ/edit#slide=id.g2133bbaece6_0_0)
+[slides](https://docs.google.com/presentation/d/1vkLs8356xRQIn5h9nxBeyj2hT8oPyv2w/edit?usp=drive_link&ouid=112389132178955160048&rtpof=true&sd=true)
 
 Add @ligo/fa lib
 
@@ -106,4 +106,13 @@ Run it
 cd backend
 yarn install
 yarn run start:dev
+```
+
+# Docs
+
+import git submodule and run doc locally
+
+```
+git submodule update --init --recursive
+mdbook serve --open --port 3003
 ```
