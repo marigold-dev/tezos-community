@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Tezos-Community Documentation</title>
-        <meta name="robots" content="noindex" />
+        <title>Create an organization - Tezos-Community Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -86,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="contributors.html">Contributors</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html" class="active"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="contributors.html">Contributors</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -172,79 +171,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<h2 id="the-problem"><a class="header" href="#the-problem">The problem</a></h2>
-<ul>
-<li>Lot of decentralized groups : the community is scattered and very diverse from core developers to artist and gamers</li>
-<li>No single entrypoint : There are plenty of tools, social networks and user registries</li>
-<li>No effective information broadcast to all members : lot of scams, spams, bots or trollers</li>
-<li>No global company/member directory : each application reimplements its own user registry bringing either duplication or separated worlds</li>
-</ul>
-<h2 id="tezos-pseudonym-social-graph"><a class="header" href="#tezos-pseudonym-social-graph">Tezos pseudonym social graph</a></h2>
-<p><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fbrewminate.com%2Fwp-content%2Fuploads%2F2018%2F03%2F030218-62-Sociology-Groups.jpg&amp;f=1&amp;nofb=1&amp;ipt=cc57ae859b81d6de42b7468249a2ff771a143343104785beb3d0a3f362cb226c&amp;ipo=images" alt="" /></p>
-<p>We are not going to tackle the problem of the unique identity like <a href="https://www.brightid.org/">BrightID</a>, instead we concentrate our effort on the <strong>pseudonymity</strong> already provided by <strong>Tezos addresses</strong> combined with <strong>grouping</strong> feature and restricted <strong>social media linking</strong></p>
-<ul>
-<li><strong>Identity</strong> :
-<ol>
-<li>strictly pseudonymous Tezos addresses</li>
-<li>(optional) restricted display name, alias and picture from different social networks available for people from same organization</li>
-</ol>
-</li>
-<li><strong>Organizations</strong> : a way to regroup people inside a cluster</li>
-<li><strong>Internal alerting system</strong> : a non gas-free way to send important message to other clusters and get alerted on real time</li>
-</ul>
-<h2 id="final-goal"><a class="header" href="#final-goal">Final goal</a></h2>
-<p>This application :</p>
-<ul>
-<li>should not be seen as a final product but as a <strong>base layer for other application to integrate with</strong>. Example : providing a list of player for a mobile game where it is hard to type and remember a tz1 address</li>
-<li>does not require high presence. It has to be seen <strong>as a configuration tool</strong> like a contact list, a LDAP or other user registries running in background</li>
-</ul>
-<h2 id="links"><a class="header" href="#links">Links</a></h2>
-<ul>
-<li><a href="https://tezos-community.com/">TEZOS COMMUNITY DAPP (Web based)</a></li>
-<li>TEZOS COMMUNITY DAPP (Android) Soon</li>
-<li>TEZOS COMMUNITY DAPP (iOS) Soon</li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
-<h2 id="login"><a class="header" href="#login"><a href="./Login.html">Login</a></a></h2>
-<p>Login with your preferred wallet, configure your social account link, claim your NFT membership card</p>
-<h2 id="create-an-organization"><a class="header" href="#create-an-organization"><a href="./CreateAnOrganization.html">Create an organization</a></a></h2>
-<p>Create an organization, be the administrator and start to manage it</p>
-<h2 id="manage-an-organization"><a class="header" href="#manage-an-organization"><a href="./ManageAnOrganization.html">Manage an organization</a></a></h2>
-<p>Manage an organization, approve/refuse members and add more administrators</p>
-<h2 id="join-an-organization"><a class="header" href="#join-an-organization"><a href="./JoinAnOrganization.html">Join an organization</a></a></h2>
-<p>Join an existing organization</p>
-<h2 id="write-to-an-organization"><a class="header" href="#write-to-an-organization"><a href="./WriteToAnOrganization.html">Write to an organization</a></a></h2>
-<p>Write to an organization and receive replies and notifications</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="login-1"><a class="header" href="#login-1">Login</a></h1>
-<p>Open/Connect to <a href="https://tezos-community.com">Tezos community</a></p>
-<p>Your identity is your wallet account</p>
-<p><img src="images/tzcommunity.png" alt="" /></p>
-<p>Click on <strong>Connect your wallet</strong> and select your preferred wallet and account</p>
-<p><img src="images/wallet.png" alt="" /></p>
-<p><img src="images/emptyOrganizations.png" alt="" /></p>
-<h1 id="link"><a class="header" href="#link">Link</a></h1>
-<p>You can choose to link your profile with one of the listed social account. If you do so, other people from same group are able to see your real name and picture. It will improve human readable identities for others third party applications, messaging, etc ...</p>
-<blockquote>
-<p>Note : if you want to stay totally pseudonymous, don't do this step</p>
-</blockquote>
-<p>Click on bottom button <strong>Profile</strong> and select of the social account you have</p>
-<p><img src="images/profile.png" alt="" /></p>
-<blockquote>
-<p>Note : if your social account does not exist on the list , please send an email to <a href="mailto:benjamin.fuentes@marigold.dev">benjamin.fuentes@marigold.dev</a></p>
-</blockquote>
-<p>Once you confirm all intermediate popups, your Tezos address will now appear with the social account information</p>
-<p><img src="images/linked.png" alt="" /></p>
-<p>You can unlink social account at any time clicking on button <strong>UNLINK SOCIAL ACCOUNT</strong></p>
-<h1 id="claim-nft-membership-card"><a class="header" href="#claim-nft-membership-card">Claim NFT membership card</a></h1>
-<p>On MEMBERSHIP tab, you can claim your Tezos NFT membership card for free</p>
-<p>It can be used later for loyalty programs, access token, etc ...</p>
-<p><img src="images/membership.png" alt="" /></p>
-<p>Click on <strong>CLAIM NFT</strong> button</p>
-<p><img src="images/nft.png" alt="" /></p>
-<h1 id="logout"><a class="header" href="#logout">Logout</a></h1>
-<p>On top right corner of Profile menu, click on <strong>LOGOUT</strong> button to disconnect your wallet</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="create-an-organization-1"><a class="header" href="#create-an-organization-1">Create an organization</a></h1>
+                        <h1 id="create-an-organization"><a class="header" href="#create-an-organization">Create an organization</a></h1>
 <p>On <strong>Home/Organizations</strong> menu, click on <strong>CREATE AN ORGANIZATION</strong> and fill the form then click on <strong>DONE</strong> button</p>
 <p><img src="images/addOrganization.png" alt="" /></p>
 <p>Confirm the transaction with your wallet, and wait few seconds for refresh</p>
@@ -272,35 +199,18 @@ Note : You will have to behave as a good father/mother and not have an unappropr
 <p>For more information on how to send message, got to this <a href="WriteToAnOrganization.html">chapter</a></p>
 <h2 id="administration"><a class="header" href="#administration">Administration</a></h2>
 <p>The last tab is where you manage your organization, go to this <a href="ManageAnOrganization.html">chapter</a> to know more about it</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="manage-an-organization-1"><a class="header" href="#manage-an-organization-1">Manage an organization</a></h1>
-<p>If you are administrator, on your Organization page, the last tab lets you manage your org</p>
-<p><img src="images/manage.png" alt="" /></p>
-<h2 id="administrators"><a class="header" href="#administrators">Administrators</a></h2>
-<h3 id="add-administrator"><a class="header" href="#add-administrator">Add administrator</a></h3>
-<p>Enter the address of someone you want to invite as administrator and click on <strong>ADD ADMIN</strong></p>
-<p><img src="images/addadmin.png" alt="" /></p>
-<p>Once confirmed he/she will appear on both admin and member</p>
-<p><img src="images/adminadded.png" alt="" /></p>
-<h2 id="delete-admin"><a class="header" href="#delete-admin">Delete admin</a></h2>
-<p>Click on the trash to delete an admin</p>
-<p><img src="images/admindelete.png" alt="" /></p>
-<p>Now you are the only admin.</p>
-<blockquote>
-<p>Note : as there is at least 1 member on your organization (that is not you), you can pass the admin flag to another member or either decide to delete your organization</p>
-</blockquote>
-<h2 id="members"><a class="header" href="#members">Members</a></h2>
-<p>//TODO</p>
-<h2 id="memeber-requests"><a class="header" href="#memeber-requests">Memeber requests</a></h2>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="join-an-organization-1"><a class="header" href="#join-an-organization-1">Join an organization</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="write-to-an-organization-1"><a class="header" href="#write-to-an-organization-1">Write to an organization</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="developer-guide"><a class="header" href="#developer-guide">Developer Guide</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="contributors"><a class="header" href="#contributors">Contributors</a></h1>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Login.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
+                            <a rel="next" href="ManageAnOrganization.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -308,7 +218,13 @@ Note : You will have to behave as a good father/mother and not have an unappropr
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Login.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
+                    <a rel="next" href="ManageAnOrganization.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
@@ -340,13 +256,6 @@ Note : You will have to behave as a good father/mother and not have an unappropr
         <!-- Custom JS scripts -->
         <script src="theme/marigold.js"></script>
 
-        <script>
-        window.addEventListener('load', function() {
-            MathJax.Hub.Register.StartupHook('End', function() {
-                window.setTimeout(window.print, 100);
-            });
-        });
-        </script>
 
     </div>
     </body>

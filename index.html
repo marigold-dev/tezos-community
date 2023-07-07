@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> Tezos Community</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html" class="active">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="contributors.html">Contributors</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -171,82 +171,48 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="tezos-community"><a class="header" href="#tezos-community">tezos-community</a></h1>
-<h2 id="build--compile"><a class="header" href="#build--compile">Build / compile</a></h2>
-<p>Project to build a dapp for Tezos community that includes a DAO, organization rules, multisig, message broadcast, etc ...</p>
-<p><a href="https://docs.google.com/presentation/d/1Tao9c4QZm_YGRz9PxwZlPks2EbUCN8K_XKldVN4V0zQ/edit#slide=id.g2133bbaece6_0_0">slides</a></p>
-<p>Add @ligo/fa lib</p>
-<pre><code>echo &quot;{}&quot; &gt; esy.json
-taq ligo --command &quot;install @ligo/fa&quot;
-taq install @taqueria/plugin-ligo@next
-</code></pre>
-<h3 id="nft"><a class="header" href="#nft">NFT</a></h3>
-<p>Compile with last version</p>
-<pre><code class="language-bash">TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile nft.jsligo
-</code></pre>
-<h3 id="registry"><a class="header" href="#registry">Registry</a></h3>
-<p>Compile with last version</p>
-<pre><code class="language-bash">TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile main.jsligo
-</code></pre>
-<p>Run test</p>
-<pre><code class="language-bash">TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq test test.jsligo
-</code></pre>
-<h2 id="deploy"><a class="header" href="#deploy">Deploy</a></h2>
-<p>intall plugin first</p>
-<pre><code>taq install @taqueria/plugin-taquito
-</code></pre>
-<blockquote>
-<p>Note : When deploying on first time, override with alice account on .taq/config.local.testing.json</p>
-</blockquote>
-<pre><code class="language-json">{
-  &quot;networkName&quot;: &quot;ghostnet&quot;,
-  &quot;accounts&quot;: {
-    &quot;taqOperatorAccount&quot;: {
-      &quot;publicKey&quot;: &quot;edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn&quot;,
-      &quot;publicKeyHash&quot;: &quot;tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb&quot;,
-      &quot;privateKey&quot;: &quot;edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq&quot;
-    }
-  }
-}
-</code></pre>
-<h2 id="nft-first"><a class="header" href="#nft-first">NFT (first)</a></h2>
-<pre><code>taq deploy nft.tz -e &quot;testing&quot;
-</code></pre>
-<blockquote>
-<p>Important : Copy/paste the deployed address and change the nftAddress field on main.storageList.jsligo</p>
-</blockquote>
-<h2 id="registry-1"><a class="header" href="#registry-1">Registry</a></h2>
-<p>Compile again as you need to have the last nft deployment address to change the initial storage file, then deploy</p>
-<pre><code>TAQ_LIGO_IMAGE=ligolang/ligo:0.65.0 taq compile main.jsligo
-taq deploy main.tz -e &quot;testing&quot; --storage main.storage.ghostnet.tz
-
-or
-
-taq deploy main.tz -e &quot;production&quot; --storage main.storage.mainnet.tz
-</code></pre>
-<h1 id="mobile-app"><a class="header" href="#mobile-app">Mobile app</a></h1>
-<pre><code>taq install @taqueria/plugin-contract-types
-taq generate types ./app/src
-cd app
-npm run postinstall
-npm run start
-</code></pre>
-<h1 id="backend-app"><a class="header" href="#backend-app">Backend app</a></h1>
-<p>Create it</p>
-<pre><code>npm i -g @nestjs/cli
-nest new backend --strict
-</code></pre>
-<p>Run it</p>
-<pre><code>cd backend
-yarn install
-yarn run start:dev
-</code></pre>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<h2 id="the-problem"><a class="header" href="#the-problem">The problem</a></h2>
+<ul>
+<li>Lot of decentralized groups : the community is scattered and very diverse from core developers to artist and gamers</li>
+<li>No single entrypoint : There are plenty of tools, social networks and user registries</li>
+<li>No effective information broadcast to all members : lot of scams, spams, bots or trollers</li>
+<li>No global company/member directory : each application reimplements its own user registry bringing either duplication or separated worlds</li>
+</ul>
+<h2 id="tezos-pseudonym-social-graph"><a class="header" href="#tezos-pseudonym-social-graph">Tezos pseudonym social graph</a></h2>
+<p><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fbrewminate.com%2Fwp-content%2Fuploads%2F2018%2F03%2F030218-62-Sociology-Groups.jpg&amp;f=1&amp;nofb=1&amp;ipt=cc57ae859b81d6de42b7468249a2ff771a143343104785beb3d0a3f362cb226c&amp;ipo=images" alt="" /></p>
+<p>We are not going to tackle the problem of the unique identity like <a href="https://www.brightid.org/">BrightID</a>, instead we concentrate our effort on the <strong>pseudonymity</strong> already provided by <strong>Tezos addresses</strong> combined with <strong>grouping</strong> feature and restricted <strong>social media linking</strong></p>
+<ul>
+<li><strong>Identity</strong> :
+<ol>
+<li>strictly pseudonymous Tezos addresses</li>
+<li>(optional) restricted display name, alias and picture from different social networks available for people from same organization</li>
+</ol>
+</li>
+<li><strong>Organizations</strong> : a way to regroup people inside a cluster</li>
+<li><strong>Internal alerting system</strong> : a non gas-free way to send important message to other clusters and get alerted on real time</li>
+</ul>
+<h2 id="final-goal"><a class="header" href="#final-goal">Final goal</a></h2>
+<p>This application :</p>
+<ul>
+<li>should not be seen as a final product but as a <strong>base layer for other application to integrate with</strong>. Example : providing a list of player for a mobile game where it is hard to type and remember a tz1 address</li>
+<li>does not require high presence. It has to be seen <strong>as a configuration tool</strong> like a contact list, a LDAP or other user registries running in background</li>
+</ul>
+<h2 id="links"><a class="header" href="#links">Links</a></h2>
+<ul>
+<li><a href="https://tezos-community.com/">TEZOS COMMUNITY DAPP (Web based)</a></li>
+<li>TEZOS COMMUNITY DAPP (Android) Soon</li>
+<li>TEZOS COMMUNITY DAPP (iOS) Soon</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
+                            <a rel="next" href="USER.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -255,6 +221,9 @@ yarn run start:dev
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
+                    <a rel="next" href="USER.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
