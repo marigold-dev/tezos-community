@@ -1,20 +1,6 @@
 {
     "operations": {},
     "tasks": {
-        "@taqueria/plugin-taquito.deploy.1684957671959": {
-            "task": "deploy",
-            "plugin": "@taqueria/plugin-taquito",
-            "time": 1684957671959,
-            "output": [
-                {
-                    "contract": "main.tz",
-                    "address": "KT1AvuJp5onQMSWDsGmVWqkUgsYgKrGcBVWh",
-                    "alias": "main",
-                    "balanceInMutez": "0",
-                    "destination": "https://mainnet.api.tez.ie"
-                }
-            ]
-        },
         "@taqueria/plugin-taquito.deploy.1685017591586": {
             "task": "deploy",
             "plugin": "@taqueria/plugin-taquito",
@@ -65,6 +51,20 @@
                 {
                     "contract": "main.tz",
                     "address": "KT1RKLanjW9LYHjsF4hspzCK7oXS1MRD4N5s",
+                    "alias": "main",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1688743628135": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1688743628135,
+            "output": [
+                {
+                    "contract": "main.tz",
+                    "address": "KT1UBuXfXgYViPn1mw7Bj3UuE3dbDECT8Qw6",
                     "alias": "main",
                     "balanceInMutez": "0",
                     "destination": "https://mainnet.api.tez.ie"
