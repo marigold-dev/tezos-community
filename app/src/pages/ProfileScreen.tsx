@@ -71,6 +71,7 @@ export const ProfileScreen: React.FC = () => {
     userProfiles,
     setUserProfile,
     setUserProfiles,
+
     storageNFT,
     getUserProfile,
     localStorage,

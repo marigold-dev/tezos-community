@@ -159,7 +159,8 @@ export const Footer: React.FC = () => {
         ) : (
           <IonGrid>
             <IonRow>
-              <IonCol sizeSm="12" sizeXs="12" sizeMd="10" sizeXl="10">
+              <IonCol sizeSm="0" sizeXs="0" sizeMd="2" sizeXl="2" />
+              <IonCol sizeSm="12" sizeXs="12" sizeMd="8" sizeXl="8">
                 <IonButton color="dark" onClick={connectWallet}>
                   <IonIcon slot="start" icon={walletIcon}></IonIcon>
                   Connect your wallet

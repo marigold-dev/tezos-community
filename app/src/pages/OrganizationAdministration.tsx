@@ -432,11 +432,7 @@ export const OrganizationAdministration = ({
 
         {organization?.admins.map((admin) => (
           <IonItem key={admin}>
-            {userProfiles.get(admin) ? (
-              <UserProfileChip address={admin} userProfiles={userProfiles} />
-            ) : (
-              admin
-            )}
+            <UserProfileChip address={admin} userProfiles={userProfiles} />
 
             {organization.admins.length > 1 && !isTezosOrganization ? (
               <IonIcon
@@ -450,7 +446,6 @@ export const OrganizationAdministration = ({
                 <IonButton id="passFlag" color="dark" slot="end">
                   <IonIcon
                     onClick={(e) => removeAdmin(admin)}
-                    color="white"
                     icon={flagOutline}
                   />
                   Pass the flag
