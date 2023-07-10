@@ -46,8 +46,17 @@ Click on the trash icon
 
 ## Member requests
 
-To have member requets, you need someone to send a join request, see [this chapter for more details](JoinAnOrganization.md)
+To have member requests, you need someone to send a join request, see [this chapter for more details](JoinAnOrganization.md)
 
 When you have user, you can approve/decline in batch
 
-//TODO
+![](images/approveMember.png)
+
+For each user, approve or remove it from selection clicking on each checkbox.
+When you are done, click on **APPLY ALL** button to confirm all
+
+If you accepted users, they will be part of member list now
+
+![](images/userapproved.png)
+
+Otherwise, they are discarded
