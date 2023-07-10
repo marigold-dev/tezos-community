@@ -312,19 +312,20 @@ const leaveOrganizationAsAdmin = (
             "You cannot leave an organization empty without naming another admin from members"
           ) else return {
             ...store,
-            organizations: List.filter_map(
+            organizations: List.update(
               (orgItem: organization) =>
                 (orgItem.name == org.name) ? Some(
                     {
                       ...org,
                       admins: Set.remove(Tezos.get_sender(), org.admins)
                     }
-                  ) : None() as option<organization>,
+                  ) : Some(org),
               store.organizations
             )
           }
         },
         Some: (lastAdmin) => {
+
           if (Set.cardinal(org.admins) != (1 as nat)) return failwith(
             "Don't name another admin to replace you if there are enough admins on the organization"
           ) else if (
@@ -343,14 +344,14 @@ const leaveOrganizationAsAdmin = (
                 ) : org.admins;
             return {
               ...store,
-              organizations: List.filter_map(
+              organizations: List.update(
                 (orgItem: organization) =>
-                  (orgItem.name == org.name) ? Some(
-                      {
+                  (orgItem.name == org.name) ? 
+                     Some({
                         ...org,
                         admins: Set.remove(Tezos.get_sender(), newAdmins)
-                      }
-                    ) : None() as option<organization>,
+                      }) : Some(org)
+                   ,
                 store.organizations
               )
             }
@@ -424,11 +425,10 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
             list([]),
             {
               ...store,
-              organizations: List.filter_map(
+              organizations: List.update_with(
                 (orgItem: organization) =>
-                  orgItem.name == org.name ? Some(
-                      { ...org, admins: Set.remove(rap.admin, org.admins) }
-                    ) : None() as option<organization>,
+                  orgItem.name == org.name , 
+                  { ...org, admins: Set.remove(rap.admin, org.admins) },
                 store.organizations
               )
             }
