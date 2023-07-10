@@ -28,6 +28,26 @@ Now you are the only admin.
 
 ## Members
 
-//TODO
+Users can be added only if :
 
-## Memeber requests
+- they send a request to join and are accepted (with AutoRegistration to false)
+- they send a request to join (with AutoRegistration to true)
+- they are no more admins
+
+You can only remove a user from organization, no other action are possible.
+
+## To remove a user
+
+Click on the trash icon
+
+![](images/removeuser.png)
+
+![](images/userremoved.png)
+
+## Member requests
+
+To have member requets, you need someone to send a join request, see [this chapter for more details](JoinAnOrganization.md)
+
+When you have user, you can approve/decline in batch
+
+//TODO
