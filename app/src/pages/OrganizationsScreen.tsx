@@ -23,6 +23,7 @@ import {
   IonRefresherContent,
   IonRow,
   IonSearchbar,
+  IonSkeletonText,
   IonSpinner,
   IonSplitPane,
   IonText,
@@ -180,6 +181,8 @@ export const OrganizationsScreen: React.FC = () => {
               const up = await getUserProfile(key.key);
               if (up) {
                 userProfiles.set(key.key, up);
+
+                console.log("OrgScreen CALLING setUserProfiles", userProfiles);
                 setUserProfiles(userProfiles);
               }
             }
@@ -939,32 +942,48 @@ export const OrganizationsScreen: React.FC = () => {
                   <></>
                 )}
 
-                {myOrganizations?.map((organization) => (
-                  <IonItem
-                    fill={
-                      selectedOrganizationName === organization.name
-                        ? "outline"
-                        : undefined
-                    }
-                    onClick={() => {
-                      setSelectedOrganizationName(organization.name);
-                      setIsTezosOrganization(false);
-                    }}
-                    lines="none"
-                    key={organization.name}
-                  >
-                    {organization.name}
+                {myOrganizations && myOrganizations.length > 0 ? (
+                  myOrganizations?.map((organization) => (
+                    <IonItem
+                      fill={
+                        selectedOrganizationName === organization.name
+                          ? "outline"
+                          : undefined
+                      }
+                      onClick={() => {
+                        setSelectedOrganizationName(organization.name);
+                        setIsTezosOrganization(false);
+                      }}
+                      lines="none"
+                      key={organization.name}
+                    >
+                      {organization.name}
+                      <IonThumbnail slot="start">
+                        <IonImg alt="." src={organization.logoUrl} />
+                      </IonThumbnail>
+                      <IonIcon
+                        size="small"
+                        slot="end"
+                        icon={ellipse}
+                        color={getStatusColor(organization)}
+                      />
+                    </IonItem>
+                  ))
+                ) : (
+                  <IonItem>
                     <IonThumbnail slot="start">
-                      <IonImg alt="." src={organization.logoUrl} />
+                      <IonSkeletonText animated={true}></IonSkeletonText>
                     </IonThumbnail>
-                    <IonIcon
-                      size="small"
-                      slot="end"
-                      icon={ellipse}
-                      color={getStatusColor(organization)}
-                    />
+                    <IonLabel>
+                      <h3>
+                        <IonSkeletonText
+                          animated={true}
+                          style={{ width: "80%" }}
+                        ></IonSkeletonText>
+                      </h3>
+                    </IonLabel>
                   </IonItem>
-                ))}
+                )}
               </IonContent>
             </IonMenu>
             <OrganizationScreen
