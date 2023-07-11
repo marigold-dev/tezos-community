@@ -108,11 +108,14 @@ export const Footer: React.FC = () => {
 
       console.log("token stored");
 
-      const up = await getUserProfile(userAddress);
+      //refresh the global storage, as we have an access token now, we can fetch other user profiles
+      await refreshStorage();
+      /*const up = await getUserProfile(userAddress);
       if (up) {
         setUserProfile(up);
+        console.log("FOOTER CALLING setUserProfiles", userProfiles);
         setUserProfiles(userProfiles.set(userAddress as address, up)); //add to cache
-      }
+      }*/
 
       if (
         storageNFT &&
