@@ -166,35 +166,38 @@ export const OrganizationsScreen: React.FC = () => {
                 active: true,
               });
               await localStorage.setWithTTL(url, keys);
-              orgMembers.set(
-                organization.name,
-                Array.from(keys.map((key) => key.key))
-              );
-
-              //cache userprofiles
-              for (const key of keys) {
-                if (await localStorage.get(LocalStorageKeys.access_token)) {
-                  const up = await getUserProfile(key.key);
-                  if (up) {
-                    userProfiles.set(key.key, up);
-
-                    console.log(
-                      "OrgScreen CALLING setUserProfiles",
-                      userProfiles
-                    );
-                    setUserProfiles(userProfiles);
-                  }
-                }
-              }
             } catch (error) {
               console.warn("TZKT call failed", error);
+            }
+          }
+
+          if (keys) {
+            orgMembers.set(
+              organization.name,
+              Array.from(keys.map((key) => key.key))
+            ); //push to React state also
+
+            //cache userprofiles
+            for (const key of keys) {
+              if (await localStorage.get(LocalStorageKeys.access_token)) {
+                const up = await getUserProfile(key.key);
+                if (up) {
+                  userProfiles.set(key.key, up);
+
+                  console.log(
+                    "OrgScreen CALLING setUserProfiles",
+                    userProfiles
+                  );
+                  setUserProfiles(userProfiles);
+                }
+              }
             }
           }
         })
       );
 
       //set on a page cache
-      setOrgMembers(orgMembers); //refresh cache
+      setOrgMembers(orgMembers);
 
       setMyOrganizations(
         storage.organizations.filter((org: Organization) => {

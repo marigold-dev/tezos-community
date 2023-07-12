@@ -86,7 +86,7 @@ export class SlackController {
       ),
     );
 
-    Logger.debug('CALLBACK=>', [...this.siwtService.slackPending.entries()]);
+    // Logger.debug('CALLBACK=>', [...this.siwtService.slackPending.entries()]);
 
     //push on websocket
     this.eg.server.emit('slack', slackAccessToken);

@@ -223,12 +223,12 @@ export const OrganizationScreen = ({
               active: true,
             });
             await localStorage.setWithTTL(url, keys);
-
-            setMembers(Array.from(keys.map((key) => key.key as address))); //take only active keys
           } catch (error) {
             console.warn("TZKT call failed", error);
           }
         }
+
+        if (keys) setMembers(Array.from(keys.map((key) => key.key as address))); //take only active keys
 
         setOrganization(organization!);
       }

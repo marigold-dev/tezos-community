@@ -85,7 +85,7 @@ export class GithubController {
       ),
     );
 
-    Logger.debug('CALLBACK=>', [...this.siwtService.githubPending.entries()]);
+    //Logger.debug('CALLBACK=>', [...this.siwtService.githubPending.entries()]);
 
     //push on websocket
     this.eg.server.emit('github', githubAccessToken);

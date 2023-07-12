@@ -86,7 +86,7 @@ export class TelegramController {
       ),
     );
 
-    Logger.debug('CALLBACK=>', [...this.siwtService.telegramPending.entries()]);
+    //Logger.debug('CALLBACK=>', [...this.siwtService.telegramPending.entries()]);
 
     //push on websocket
     this.eg.server.emit('telegram', telegramAccessToken);

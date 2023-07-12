@@ -86,7 +86,7 @@ export class GitlabController {
       ),
     );
 
-    Logger.debug('CALLBACK=>', [...this.siwtService.gitlabPending.entries()]);
+    // Logger.debug('CALLBACK=>', [...this.siwtService.gitlabPending.entries()]);
 
     //push on websocket
     this.eg.server.emit('gitlab', gitlabAccessToken);
