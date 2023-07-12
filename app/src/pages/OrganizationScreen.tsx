@@ -224,7 +224,7 @@ export const OrganizationScreen = ({
             });
             await localStorage.setWithTTL(url, keys);
           } catch (error) {
-            console.warn("TZKT call failed", error);
+            //console.warn("TZKT call failed", error);
           }
         }
 

@@ -167,7 +167,7 @@ export const OrganizationsScreen: React.FC = () => {
               });
               await localStorage.setWithTTL(url, keys);
             } catch (error) {
-              console.warn("TZKT call failed", error);
+              //console.warn("TZKT call failed", error);
             }
           }
 
@@ -183,11 +183,11 @@ export const OrganizationsScreen: React.FC = () => {
                 const up = await getUserProfile(key.key);
                 if (up) {
                   userProfiles.set(key.key, up);
-
+                  /*
                   console.log(
                     "OrgScreen CALLING setUserProfiles",
                     userProfiles
-                  );
+                  );*/
                   setUserProfiles(userProfiles);
                 }
               }
@@ -269,10 +269,10 @@ export const OrganizationsScreen: React.FC = () => {
     },
     [myOrganizations]
   );
-
+  /*
   useEffect(() => {
     (async () => await refreshStorage())();
-  }, [wallet]);
+  }, [storage]);*/
 
   const joinOrganization = async (
     e: React.MouseEvent<HTMLIonButtonElement, MouseEvent>

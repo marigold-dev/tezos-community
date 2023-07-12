@@ -36,8 +36,10 @@ export const FAQScreen: React.FC = () => {
   const match = useRouteMatch();
 
   useEffect(() => {
-    (async () => await refreshStorage())();
-  }, [wallet]);
+    if (userAddress) {
+      (async () => await refreshStorage())();
+    }
+  }, [userAddress]);
 
   return (
     <IonPage className="container">
