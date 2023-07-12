@@ -157,34 +157,37 @@ export const OrganizationsScreen: React.FC = () => {
           ).id.toNumber();
 
           const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
-          let keys: BigMapKey[] = await localStorage.getCachedRequest(url);
+          let keys: BigMapKey[] = await localStorage.getWithTTL(url);
 
           if (!keys) {
-            keys = await api.bigMapsGetKeys(membersBigMapId, {
-              micheline: "Json",
-            });
-            await localStorage.cacheRequest(url, keys);
-          }
+            try {
+              keys = await api.bigMapsGetKeys(membersBigMapId, {
+                micheline: "Json",
+                active: true,
+              });
+              await localStorage.setWithTTL(url, keys);
+              orgMembers.set(
+                organization.name,
+                Array.from(keys.map((key) => key.key))
+              );
 
-          orgMembers.set(
-            organization.name,
-            Array.from(
-              keys
-                .filter((key) => (key.active ? true : false)) // take only active ones
-                .map((key) => key.key)
-            )
-          );
+              //cache userprofiles
+              for (const key of keys) {
+                if (await localStorage.get(LocalStorageKeys.access_token)) {
+                  const up = await getUserProfile(key.key);
+                  if (up) {
+                    userProfiles.set(key.key, up);
 
-          //cache userprofiles
-          for (const key of keys) {
-            if (await localStorage.get(LocalStorageKeys.access_token)) {
-              const up = await getUserProfile(key.key);
-              if (up) {
-                userProfiles.set(key.key, up);
-
-                console.log("OrgScreen CALLING setUserProfiles", userProfiles);
-                setUserProfiles(userProfiles);
+                    console.log(
+                      "OrgScreen CALLING setUserProfiles",
+                      userProfiles
+                    );
+                    setUserProfiles(userProfiles);
+                  }
+                }
               }
+            } catch (error) {
+              console.warn("TZKT call failed", error);
             }
           }
         })

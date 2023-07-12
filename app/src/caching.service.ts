@@ -19,7 +19,7 @@ export class CachingService {
   }
 
   // Store request data with TTL
-  async cacheRequest(url: string, data: any): Promise<any> {
+  async setWithTTL(url: string, data: any): Promise<any> {
     const validUntil = new Date().getTime() + TTL * 1000;
     url = `${CACHE_KEY}${url}`;
     return this.storage.set(url, { validUntil, data });
@@ -36,7 +36,7 @@ export class CachingService {
   }
 
   // Try to load cached data with TTL
-  async getCachedRequest(url: string): Promise<any> {
+  async getWithTTL(url: string): Promise<any> {
     const currentTime = new Date().getTime();
     url = `${CACHE_KEY}${url}`;
 

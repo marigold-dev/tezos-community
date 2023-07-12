@@ -125,8 +125,10 @@ export type UserContextType = {
   storageNFT: StorageNFT | null;
   userAddress: string;
   setUserAddress: Dispatch<SetStateAction<string>>;
-  userProfiles: Map<address, UserProfile>;
+
+  userProfiles: Map<address, UserProfile>; //cache to avoid to run more queries on userProfiles
   setUserProfiles: Dispatch<SetStateAction<Map<address, UserProfile>>>;
+
   userProfile: UserProfile | null;
   setUserProfile: Dispatch<SetStateAction<UserProfile | null>>;
   userBalance: number;
@@ -577,7 +579,7 @@ const App: React.FC = () => {
       }
       const url =
         process.env.REACT_APP_BACKEND_URL + "/user/" + whateverUserAddress;
-      const up = await localStorage.getCachedRequest(url);
+      const up = await localStorage.getWithTTL(url);
 
       if (up && Object.keys(up).length > 0) {
         //not empty
@@ -596,7 +598,7 @@ const App: React.FC = () => {
         const json = await response.json();
 
         if (response.ok) {
-          await localStorage.cacheRequest(url, json);
+          await localStorage.setWithTTL(url, json);
           return new Promise((resolve, reject) => resolve(json));
         } else if (response.status === 401 || response.status === 403) {
           console.warn("Silently refreshing token", response);
@@ -610,7 +612,7 @@ const App: React.FC = () => {
           return await getUserProfile(whateverUserAddress);
         } else {
           console.warn("User Profile not found", response);
-          await localStorage.cacheRequest(url, {});
+          await localStorage.setWithTTL(url, {});
           return new Promise((resolve, reject) => resolve(null));
         }
       }

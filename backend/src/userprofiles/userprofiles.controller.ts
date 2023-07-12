@@ -81,6 +81,7 @@ export class UserProfilesController {
           const keys: api.BigMapKey[] = Array.from(
             await api.bigMapsGetKeys(membersBigMapId, {
               micheline: 'Json',
+              active: true,
             }),
           );
           await this.cacheManager.store.set(
@@ -105,6 +106,7 @@ export class UserProfilesController {
       const keys: api.BigMapKey[] = Array.from(
         await api.bigMapsGetKeys(membersBigMapId, {
           micheline: 'Json',
+          active: true,
         }),
       );
       await this.cacheManager.store.set(CACHE_PREFIX.MEMBER + org.name, keys);
@@ -213,9 +215,8 @@ export class UserProfilesController {
         }
 
         if (
-          keys!.findIndex((key) => key.active == true && key.key == user1) >=
-            0 &&
-          keys!.findIndex((key) => key.active == true && key.key == user2) >= 0
+          keys!.findIndex((key) => key.key == user1) >= 0 &&
+          keys!.findIndex((key) => key.key == user2) >= 0
         ) {
           isOnSameGroup = true;
           return;
