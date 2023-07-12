@@ -611,7 +611,7 @@ const App: React.FC = () => {
           }
           return await getUserProfile(whateverUserAddress);
         } else {
-          console.warn("User Profile not found", response);
+          //console.warn("User Profile not found", response);
           await localStorage.setWithTTL(url, {});
           return new Promise((resolve, reject) => resolve(null));
         }
