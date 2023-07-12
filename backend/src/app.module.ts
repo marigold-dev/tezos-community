@@ -14,7 +14,7 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
 @Module({
   imports: [
     CacheModule.register({
-      ttl: 7000,
+      ttl: 15000,
       max: 1000,
     }),
     ConfigModule.forRoot(),

@@ -85,9 +85,7 @@ export class MicrosoftController {
       ),
     );
 
-    Logger.debug('CALLBACK=>', [
-      ...this.siwtService.microsoftPending.entries(),
-    ]);
+    // Logger.debug('CALLBACK=>', [      ...this.siwtService.microsoftPending.entries(),    ]);
 
     //push on websocket
     this.eg.server.emit('microsoft', microsoftAccessToken);

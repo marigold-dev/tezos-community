@@ -85,7 +85,7 @@ export class GoogleController {
       ),
     );
 
-    Logger.debug('CALLBACK=>', [...this.siwtService.googlePending.entries()]);
+    // Logger.debug('CALLBACK=>', [...this.siwtService.googlePending.entries()]);
 
     //push on websocket
     this.eg.server.emit('google', googleAccessToken);
