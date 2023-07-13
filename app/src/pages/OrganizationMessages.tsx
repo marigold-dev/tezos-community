@@ -250,7 +250,7 @@ export const OrganizationMessages = ({
       <hr color="danger" style={{ borderWidth: "1px", height: "0" }} />
 
       {!replyId ? (
-        <IonItem style={{ position: "relative" }}>
+        <IonItem key="textareaMessage" style={{ position: "relative" }}>
           <IonTextarea
             ref={textareaRef}
             rows={3}
@@ -285,7 +285,7 @@ export const OrganizationMessages = ({
           </IonButton>
         </IonItem>
       ) : (
-        <IonItem style={{ position: "relative" }}>
+        <IonItem key={replyId} style={{ position: "relative" }}>
           <IonTextarea
             ref={textareaRef}
             rows={3}
