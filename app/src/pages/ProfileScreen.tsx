@@ -109,7 +109,7 @@ export const ProfileScreen: React.FC = () => {
       setUserProfile(null);
       userProfiles.delete(userAddress as address);
 
-      console.log("ProfileScreen CALLING setUserProfiles", userProfiles);
+      // console.log("ProfileScreen CALLING setUserProfiles", userProfiles);
       setUserProfiles(userProfiles); //update cache
     } else {
       console.log("ERROR : " + response.status);

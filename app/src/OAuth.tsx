@@ -60,7 +60,7 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
           console.log("UserProfile registered on backend", up);
           setUserProfile(up!);
 
-          console.log("OAUTH CALLING setUserProfiles", userProfiles);
+          //  console.log("OAUTH CALLING setUserProfiles", userProfiles);
           setUserProfiles(userProfiles.set(userAddress as address, up!)); //update cache
         } else {
           console.log("ERROR : " + response.status);
