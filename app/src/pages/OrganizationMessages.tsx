@@ -40,21 +40,9 @@ export const OrganizationMessages = ({
 
   const [presentAlert] = useIonAlert();
 
-  const {
-    Tezos,
-    wallet,
-    userAddress,
-    userBalance,
-    userProfiles,
-    storage,
-    mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
-    setLoading,
-    loading,
-    refreshStorage,
-  } = React.useContext(UserContext) as UserContextType;
+  const { Tezos, userProfiles, mainWalletType, setLoading } = React.useContext(
+    UserContext
+  ) as UserContextType;
 
   const [contractEvents, setcontractEvents] = useState<
     (api.ContractEvent & { replies: api.ContractEvent[] | undefined })[]

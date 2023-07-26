@@ -72,16 +72,12 @@ export const OrganizationsScreen: React.FC = () => {
 
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     userProfiles,
     setUserProfiles,
     storage,
     mainWalletType,
     setStorage,
-    setUserAddress,
-    setUserBalance,
     setLoading,
     loading,
     refreshStorage,

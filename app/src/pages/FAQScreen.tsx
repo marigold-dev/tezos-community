@@ -17,17 +17,8 @@ import { Header } from "../Header";
 
 export const FAQScreen: React.FC = () => {
   const {
-    Tezos,
-    wallet,
     userAddress,
-    userBalance,
-    storage,
-    mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
-    setLoading,
-    loading,
+
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
 

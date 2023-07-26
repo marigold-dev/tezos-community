@@ -28,10 +28,12 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import jwt_decode from "jwt-decode";
 import "./theme/variables.css";
 
-import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
+import { MichelsonPrimitives } from "@airgap/beacon-types";
 import { MichelineMichelsonV1Expression } from "@airgap/beacon-types/dist/esm/types/tezos/MichelineMichelsonV1Expression";
 import { Storage as LocalStorage } from "@ionic/storage";
+import Transport from "@ledgerhq/hw-transport";
 import { BeaconWallet } from "@taquito/beacon-wallet";
+import { LedgerSigner } from "@taquito/ledger-signer";
 import { TezosToolkit } from "@taquito/taquito";
 import { TokenMetadata, tzip12 } from "@taquito/tzip12";
 import * as api from "@tzkt/sdk-api";
@@ -69,6 +71,12 @@ export type TZIP21TokenMetadata = TokenMetadata & {
   creators?: string[]; //The primary person, people, or organization(s) responsible for creating the intellectual content of the asset.
   isBooleanAmount?: boolean; //Describes whether an account can have an amount of exactly 0 or 1. (The purpose of this field is for wallets to determine whether or not to display balance information and an amount field when transferring.)
 };
+
+export enum PROVIDER {
+  BEACON,
+  LEDGER,
+  UNKNOWN,
+}
 
 export enum SOCIAL_ACCOUNT_TYPE {
   google = "google",
@@ -132,13 +140,12 @@ export type UserContextType = {
 
   userProfiles: Map<address, UserProfile>; //cache to avoid to run more queries on userProfiles
   setUserProfiles: Dispatch<SetStateAction<Map<address, UserProfile>>>;
-
+  transportWebHID: Transport | undefined;
+  setTransportWebHID: Dispatch<SetStateAction<Transport | undefined>>;
   userProfile: UserProfile | null;
   setUserProfile: Dispatch<SetStateAction<UserProfile | null>>;
-  userBalance: number;
-  setUserBalance: Dispatch<SetStateAction<number>>;
   Tezos: TezosToolkit;
-  wallet: BeaconWallet;
+  setTezos: Dispatch<SetStateAction<TezosToolkit>>;
   mainWalletType: MainWalletType | null;
   nftWalletType: NftWalletType | null;
   loading: boolean;
@@ -161,18 +168,12 @@ const App: React.FC = () => {
       "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev"
     )
   );
-  const [wallet, setWallet] = useState<BeaconWallet>(
-    new BeaconWallet({
-      name: "TzCommunity",
-      preferredNetwork: process.env.REACT_APP_NETWORK
-        ? NetworkType[
-            process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
-          ]
-        : NetworkType.GHOSTNET,
-    })
-  );
+
+  const [transportWebHID, setTransportWebHID] = useState<
+    Transport | undefined
+  >();
+
   const [userAddress, setUserAddress] = useState<string>("");
-  const [userBalance, setUserBalance] = useState<number>(0);
   const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
     new Map()
   );
@@ -236,23 +237,24 @@ const App: React.FC = () => {
       userAddress
     );
 
-    Tezos.setWalletProvider(wallet);
-    setTezos(Tezos); //object changed and needs propagation
-
     if (userAddress) {
       (async () => {
         await refreshStorage();
       })();
     } else {
       (async () => {
-        console.log(
-          "We lost userAddress cause of page refresh, reload it from cache"
-        );
-        const activeAccount = await wallet.client.getActiveAccount();
-        var userAddress: string;
-        if (activeAccount) {
-          userAddress = activeAccount.address;
-          setUserAddress(userAddress);
+        if (Tezos.wallet instanceof BeaconWallet) {
+          console.log(
+            "We lost userAddress cause of page refresh, reload it from Beacon cache if possible"
+          );
+          const activeAccount = await Tezos.wallet.client.getActiveAccount();
+          var userAddress: string;
+          if (activeAccount) {
+            userAddress = activeAccount.address;
+            setUserAddress(userAddress);
+          }
+        } else {
+          disconnectWallet();
         }
       })();
     }
@@ -684,30 +686,21 @@ const App: React.FC = () => {
   const refreshStorage = async (
     event?: CustomEvent<RefresherEventDetail>
   ): Promise<void> => {
-    if (wallet) {
-      const activeAccount = await wallet.client.getActiveAccount();
-      var userAddress: string;
-      if (activeAccount) {
-        userAddress = activeAccount.address;
-        setUserAddress(userAddress);
-        const balance = await Tezos.tz.getBalance(userAddress);
-        setUserBalance(balance.toNumber());
+    if (userAddress) {
+      //only refresh userProfile if there is SIWT
+      if (await localStorage.get(LocalStorageKeys.access_token)) {
+        const newUserProfile = await getUserProfile(userAddress);
+        if (newUserProfile) {
+          userProfiles.set(userAddress as address, newUserProfile);
 
-        //only refresh userProfile if there is SIWT
-        if (await localStorage.get(LocalStorageKeys.access_token)) {
-          const newUserProfile = await getUserProfile(userAddress);
-          if (newUserProfile) {
-            userProfiles.set(userAddress as address, newUserProfile);
+          //   console.log("APP CALLING setUserProfiles", userProfiles);
+          setUserProfiles(userProfiles); //cache
 
-            //   console.log("APP CALLING setUserProfiles", userProfiles);
-            setUserProfiles(userProfiles); //cache
-
-            setUserProfile(newUserProfile); //cache
-            /* console.log(
+          setUserProfile(newUserProfile); //cache
+          /* console.log(
               "userProfile refreshed for " + userAddress,
               newUserProfile
             );*/
-          }
         }
       }
 
@@ -745,8 +738,9 @@ const App: React.FC = () => {
       setStorage(storage);
       console.log("Storage refreshed");
     } else {
-      console.log("Not yet a wallet");
+      console.log("No useraddress no need to refresh storage yet");
     }
+
     event?.detail.complete();
   };
 
@@ -782,9 +776,15 @@ const App: React.FC = () => {
   const disconnectWallet = async (): Promise<void> => {
     setUserAddress("");
     setUserProfile(null);
-    setUserBalance(0);
-    console.log("disconnecting wallet");
-    await wallet.clearActiveAccount();
+
+    if (Tezos.wallet instanceof BeaconWallet) {
+      await Tezos.wallet.clearActiveAccount();
+      console.log("disconnecting wallet");
+    } else if (Tezos.signer instanceof LedgerSigner) {
+      await transportWebHID!.close();
+      console.log("disconnecting ledger");
+    }
+
     await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
     await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
     await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
@@ -883,20 +883,19 @@ const App: React.FC = () => {
     <IonApp>
       <UserContext.Provider
         value={{
+          transportWebHID,
+          setTransportWebHID,
           userAddress,
-          userBalance,
           userProfiles,
           setUserProfiles,
           userProfile,
           setUserProfile,
           Tezos,
-          wallet,
           storage,
           storageNFT,
           mainWalletType,
           nftWalletType,
           setUserAddress,
-          setUserBalance,
           setStorage,
           loading,
           setLoading,
@@ -906,6 +905,7 @@ const App: React.FC = () => {
           localStorage,
           disconnectWallet,
           socket,
+          setTezos,
         }}
       >
         <IonReactRouter>

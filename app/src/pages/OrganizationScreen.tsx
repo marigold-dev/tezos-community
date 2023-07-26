@@ -76,16 +76,10 @@ export const OrganizationScreen = ({
 
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     storage,
     mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
     setLoading,
-    loading,
     userProfiles,
     refreshStorage,
     localStorage,

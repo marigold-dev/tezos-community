@@ -65,17 +65,12 @@ export const OrganizationAdministration = ({
 }: OrganizationProps): JSX.Element => {
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     userProfiles,
     storage,
     mainWalletType,
     setStorage,
-    setUserAddress,
-    setUserBalance,
     setLoading,
-    loading,
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
 

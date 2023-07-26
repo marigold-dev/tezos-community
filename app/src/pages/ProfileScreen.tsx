@@ -27,6 +27,7 @@ import {
   returnUpBackOutline,
   timeOutline,
   unlinkOutline,
+  wallet,
   warningOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
@@ -53,18 +54,12 @@ export const ProfileScreen: React.FC = () => {
 
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     nftContratTokenMetadataMap,
     storage,
-    mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
+
     setLoading,
     nftWalletType,
-    loading,
     refreshStorage,
     userProfile,
     disconnectWallet,
@@ -73,7 +68,6 @@ export const ProfileScreen: React.FC = () => {
     setUserProfiles,
 
     storageNFT,
-    getUserProfile,
     localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
