@@ -318,7 +318,7 @@ export const OrganizationsScreen: React.FC = () => {
         .addOrganization(
           autoRegistration,
           business,
-          fundingAddress,
+          fundingAddress ? { Some: fundingAddress } : null,
           ipfsNftUrl,
           logoUrl,
           name,

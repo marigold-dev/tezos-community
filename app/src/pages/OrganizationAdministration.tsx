@@ -248,7 +248,11 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = await mainWalletType!.methods
-        .removeAdmin(adminToRemove, selectedAdmin, organization!.name)
+        .removeAdmin(
+          adminToRemove,
+          selectedAdmin ? { Some: selectedAdmin } : null,
+          organization!.name
+        )
         .send();
       await op?.confirmation();
 

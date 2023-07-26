@@ -107,7 +107,7 @@ export type Organization = {
   admins: Array<address>;
   autoRegistration: boolean;
   business: string;
-  fundingAddress: address | null;
+  fundingAddress: { Some: address } | null;
   ipfsNftUrl: string;
   logoUrl: string;
   memberRequests: Array<{
