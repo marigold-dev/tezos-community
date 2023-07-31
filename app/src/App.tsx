@@ -785,9 +785,11 @@ const App: React.FC = () => {
       console.log("disconnecting ledger");
     }
 
-    await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
-    await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
-    await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
+    if (localStorage.initialized) {
+      await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
+      await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
+      await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
+    }
   };
 
   const getUserProfile = async (

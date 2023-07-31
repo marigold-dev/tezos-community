@@ -100,7 +100,12 @@ export const Footer: React.FC = () => {
 
       setUserAddress(userAddress);
 
-      await connectToWeb2Backend(await Tezos.signer.publicKey());
+      await connectToWeb2Backend(
+        (
+          await wallet.client.getActiveAccount()
+        )?.publicKey!,
+        wallet
+      );
     } catch (error) {
       console.error("error connectWallet", error);
     }
@@ -129,7 +134,7 @@ export const Footer: React.FC = () => {
         derivationPath,
         true,
         derivationType
-      ); //FIXME with popup
+      );
 
       Tezos.setSignerProvider(ledgerSigner);
       setTezos(Tezos); //object changed and needs propagation
@@ -145,7 +150,10 @@ export const Footer: React.FC = () => {
     }
   };
 
-  const connectToWeb2Backend = async (publicKey: string) => {
+  const connectToWeb2Backend = async (
+    publicKey: string,
+    beaconWallet?: BeaconWallet
+  ) => {
     // create the message to be signed
     const messagePayload = createMessagePayload({
       dappUrl: "tezos-community.com",
@@ -154,12 +162,14 @@ export const Footer: React.FC = () => {
 
     // request the signature
     let signedPayload: SignPayloadResponse | undefined = undefined;
-    if (Tezos.wallet instanceof BeaconWallet) {
-      signedPayload = await Tezos.wallet.client.requestSignPayload({
-        ...messagePayload,
-        signingType: SigningType.MICHELINE,
-      });
-    } else if (Tezos.signer instanceof LedgerSigner) {
+
+    console.log(
+      "*************************************",
+      Tezos.wallet.constructor,
+      Tezos.wallet
+    );
+
+    if (Tezos.signer instanceof LedgerSigner) {
       let signed: {
         bytes: string;
         sig: string;
@@ -176,6 +186,11 @@ export const Footer: React.FC = () => {
       };
 
       console.log("signed", signed);
+    } else if (beaconWallet) {
+      signedPayload = await beaconWallet.client.requestSignPayload({
+        ...messagePayload,
+        signingType: SigningType.MICHELINE,
+      });
     }
 
     // sign in the user to our app
