@@ -58,7 +58,6 @@ export const Footer: React.FC = () => {
     setUserAddress,
     setLoading,
     refreshStorage,
-    getUserProfile,
     disconnectWallet,
     setTransportWebHID,
     nftContratTokenMetadataMap,
@@ -93,6 +92,7 @@ export const Footer: React.FC = () => {
       console.log("after requestPermissions");
 
       Tezos.setWalletProvider(wallet);
+      Tezos.beaconWallet = wallet;
       setTezos(Tezos); //object changed and needs propagation
 
       // gets user's address
@@ -103,8 +103,7 @@ export const Footer: React.FC = () => {
       await connectToWeb2Backend(
         (
           await wallet.client.getActiveAccount()
-        )?.publicKey!,
-        wallet
+        )?.publicKey!
       );
     } catch (error) {
       console.error("error connectWallet", error);
@@ -145,15 +144,12 @@ export const Footer: React.FC = () => {
       await connectToWeb2Backend(await Tezos.signer.publicKey());
     } catch (error) {
       console.error("error connectLedger", error);
-      disconnectWallet();
+      await disconnectWallet();
       alert("unlock your Ledger and try again");
     }
   };
 
-  const connectToWeb2Backend = async (
-    publicKey: string,
-    beaconWallet?: BeaconWallet
-  ) => {
+  const connectToWeb2Backend = async (publicKey: string) => {
     // create the message to be signed
     const messagePayload = createMessagePayload({
       dappUrl: "tezos-community.com",
@@ -162,12 +158,6 @@ export const Footer: React.FC = () => {
 
     // request the signature
     let signedPayload: SignPayloadResponse | undefined = undefined;
-
-    console.log(
-      "*************************************",
-      Tezos.wallet.constructor,
-      Tezos.wallet
-    );
 
     if (Tezos.signer instanceof LedgerSigner) {
       let signed: {
@@ -186,8 +176,8 @@ export const Footer: React.FC = () => {
       };
 
       console.log("signed", signed);
-    } else if (beaconWallet) {
-      signedPayload = await beaconWallet.client.requestSignPayload({
+    } else if (Tezos.beaconWallet) {
+      signedPayload = await Tezos.beaconWallet.client.requestSignPayload({
         ...messagePayload,
         signingType: SigningType.MICHELINE,
       });

@@ -39,7 +39,7 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
         );
         if (!accessToken) {
           console.warn("You lost your SIWT accessToken");
-          disconnectWallet();
+          await disconnectWallet();
           history.push(PAGES.ORGANIZATIONS);
         }
 

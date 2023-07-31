@@ -163,7 +163,7 @@ export const OrganizationsScreen: React.FC = () => {
               });
               await localStorage.setWithTTL(url, keys);
             } catch (error) {
-              //console.warn("TZKT call failed", error);
+              console.warn("TZKT call failed", error);
             }
           }
 
@@ -173,18 +173,16 @@ export const OrganizationsScreen: React.FC = () => {
               Array.from(keys.map((key) => key.key))
             ); //push to React state also
 
-            //cache userprofiles
-            for (const key of keys) {
-              if (await localStorage.get(LocalStorageKeys.access_token)) {
-                const up = await getUserProfile(key.key);
-                if (up) {
-                  userProfiles.set(key.key, up);
-                  /*
-                  console.log(
-                    "OrgScreen CALLING setUserProfiles",
-                    userProfiles
-                  );*/
-                  setUserProfiles(userProfiles);
+            //if I am member of it
+            if (keys.findIndex((key) => key.key === userAddress) >= 0) {
+              //cache userprofiles
+              for (const key of keys) {
+                if (await localStorage.get(LocalStorageKeys.access_token)) {
+                  const up = await getUserProfile(key.key);
+                  if (up) {
+                    userProfiles.set(key.key, up);
+                    setUserProfiles(userProfiles);
+                  }
                 }
               }
             }

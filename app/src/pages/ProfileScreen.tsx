@@ -84,7 +84,7 @@ export const ProfileScreen: React.FC = () => {
 
     if (!accessToken) {
       console.warn("You lost your SIWT accessToken");
-      disconnectWallet();
+      await disconnectWallet();
       history.push(PAGES.ORGANIZATIONS);
     }
 
@@ -224,9 +224,9 @@ export const ProfileScreen: React.FC = () => {
               <IonLabel>Membership</IonLabel>
             </IonSegmentButton>
             <IonSegmentButton
-              onClick={() => {
-                disconnectWallet();
-                history.replace(PAGES.ORGANIZATIONS);
+              onClick={async () => {
+                await disconnectWallet();
+                history.push(PAGES.ORGANIZATIONS);
               }}
             >
               <IonButton color="dark">
