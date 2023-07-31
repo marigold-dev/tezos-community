@@ -8,20 +8,39 @@ import {
 import { Clipboard } from "@capacitor/clipboard";
 import {
   IonButton,
+  IonButtons,
   IonCol,
+  IonContent,
   IonFooter,
   IonGrid,
+  IonHeader,
   IonIcon,
+  IonInput,
+  IonItem,
+  IonModal,
   IonRow,
+  IonSelect,
+  IonSelectOption,
+  IonTitle,
+  IonToggle,
   IonToolbar,
 } from "@ionic/react";
 import TransportWebHID from "@ledgerhq/hw-transport-webhid";
 import { createMessagePayload, signIn } from "@siwt/sdk";
 import { BeaconWallet } from "@taquito/beacon-wallet";
-import { LedgerSigner } from "@taquito/ledger-signer";
-import { helpCircleOutline, home, personCircle } from "ionicons/icons";
+import {
+  DerivationType,
+  HDPathTemplate,
+  LedgerSigner,
+} from "@taquito/ledger-signer";
+import {
+  helpCircleOutline,
+  home,
+  informationCircleOutline,
+  personCircle,
+} from "ionicons/icons";
 import jwt_decode from "jwt-decode";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "./App";
 export const Footer: React.FC = () => {
   const {
@@ -87,6 +106,16 @@ export const Footer: React.FC = () => {
     }
   };
 
+  /** LEDGER */
+  const ledgerModal = useRef<HTMLIonModalElement>(null);
+  const [useLedgerCustom, setUseLedgerCustom] = useState<boolean>(false);
+  const [derivationType, setDerivationType] = useState<DerivationType>(
+    DerivationType.ED25519
+  );
+  const [derivationPath, setDerivationPath] = useState<string>(
+    HDPathTemplate(0)
+  );
+
   const connectLedger = async (): Promise<void> => {
     console.log("connectLedger before requestPermissions");
 
@@ -94,7 +123,13 @@ export const Footer: React.FC = () => {
       //Ledger init
       const transportWebHID = await TransportWebHID.create();
       setTransportWebHID(transportWebHID);
-      const ledgerSigner = new LedgerSigner(transportWebHID);
+
+      const ledgerSigner = new LedgerSigner(
+        transportWebHID,
+        derivationPath,
+        true,
+        derivationType
+      ); //FIXME with popup
 
       Tezos.setSignerProvider(ledgerSigner);
       setTezos(Tezos); //object changed and needs propagation
@@ -211,10 +246,112 @@ export const Footer: React.FC = () => {
                   <IonIcon slot="start" src={"/assets/beacon.svg"}></IonIcon>
                   Connect your wallet
                 </IonButton>
-                <IonButton color="dark" onClick={connectLedger}>
+                <IonButton id="open-ledger-modal" color="dark">
                   <IonIcon slot="start" src={"/assets/ledger.svg"}></IonIcon>
                   Connect your ledger
                 </IonButton>
+
+                <IonModal ref={ledgerModal} trigger="open-ledger-modal">
+                  <IonHeader>
+                    <IonToolbar>
+                      <IonButtons slot="start">
+                        <IonButton
+                          onClick={() => ledgerModal.current?.dismiss()}
+                        >
+                          Cancel
+                        </IonButton>
+                      </IonButtons>
+                      <IonTitle>Connect your Ledger</IonTitle>
+                      <IonButtons slot="end">
+                        <IonButton
+                          strong={true}
+                          onClick={() => connectLedger()}
+                        >
+                          Connect
+                        </IonButton>
+                      </IonButtons>
+                    </IonToolbar>
+                  </IonHeader>
+                  <IonContent className="ion-padding">
+                    <IonItem>
+                      <IonToggle
+                        checked={useLedgerCustom}
+                        enableOnOffLabels={true}
+                        aria-label="approve/reject"
+                        onIonChange={() => {
+                          setUseLedgerCustom(!useLedgerCustom);
+                        }}
+                      >
+                        Use custom HD derivation path ?
+                      </IonToggle>
+                    </IonItem>
+                    {useLedgerCustom ? (
+                      <>
+                        <IonItem>
+                          <IonSelect
+                            label="Derivation type"
+                            labelPlacement="floating"
+                            value={derivationType}
+                            defaultValue={DerivationType.ED25519}
+                            onIonChange={(str) => {
+                              if (
+                                !(
+                                  str.detail.value === undefined ||
+                                  !str.target.value ||
+                                  str.target.value === ""
+                                )
+                              ) {
+                                setDerivationType(str.target.value);
+                              }
+                            }}
+                          >
+                            <IonSelectOption value={DerivationType.ED25519}>
+                              ED25519
+                            </IonSelectOption>
+                            <IonSelectOption
+                              value={DerivationType.BIP32_ED25519}
+                            >
+                              BIP32_ED25519
+                            </IonSelectOption>
+                            <IonSelectOption value={DerivationType.P256}>
+                              P256
+                            </IonSelectOption>
+                            <IonSelectOption value={DerivationType.SECP256K1}>
+                              SECP256K1
+                            </IonSelectOption>
+                          </IonSelect>
+                        </IonItem>
+
+                        <IonItem>
+                          <IonInput
+                            labelPlacement="floating"
+                            label="Derivation path"
+                            value={derivationPath}
+                            onIonChange={(str) => {
+                              if (
+                                !(
+                                  str.detail.value === undefined ||
+                                  !str.target.value ||
+                                  str.target.value === ""
+                                )
+                              ) {
+                                setDerivationPath(str.target.value as string);
+                              }
+                            }}
+                          ></IonInput>
+                        </IonItem>
+                      </>
+                    ) : (
+                      ""
+                    )}
+
+                    <IonItem lines="none">
+                      <IonIcon icon={informationCircleOutline}></IonIcon>
+                      Don't forget to confirm 2 times on the Ledger, one for the
+                      wallet connection, and one for the web2 backend connection
+                    </IonItem>
+                  </IonContent>
+                </IonModal>
               </IonCol>
               <IonCol sizeSm="12" sizeXs="12" sizeMd="2" sizeXl="2">
                 <a
