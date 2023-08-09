@@ -355,6 +355,10 @@ export const Footer: React.FC = () => {
                       Don't forget to confirm 2 times on the Ledger, one for the
                       wallet connection, and one for the web2 backend connection
                     </IonItem>
+                    <IonItem lines="none">
+                      <IonIcon icon={informationCircleOutline}></IonIcon>
+                      Use a HID compatible browser like Chrome or Opera
+                    </IonItem>
                   </IonContent>
                 </IonModal>
               </IonCol>
