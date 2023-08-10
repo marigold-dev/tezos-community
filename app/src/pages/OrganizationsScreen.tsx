@@ -63,7 +63,7 @@ import { address } from "../type-aliases";
 import { OrganizationScreen, TABS } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -173,8 +173,13 @@ export const OrganizationsScreen: React.FC = () => {
               Array.from(keys.map((key) => key.key))
             ); //push to React state also
 
-            //if I am member of it
-            if (keys.findIndex((key) => key.key === userAddress) >= 0) {
+            //if I am member of it OR super admin
+            if (
+              keys.findIndex((key) => key.key === userAddress) >= 0 ||
+              storage.tezosOrganization.admins.indexOf(
+                userAddress as address
+              ) >= 0
+            ) {
               //cache userprofiles
               for (const key of keys) {
                 if (await localStorage.get(LocalStorageKeys.access_token)) {
@@ -384,8 +389,7 @@ export const OrganizationsScreen: React.FC = () => {
           <IonContent
             style={{
               "--background": "none",
-              backgroundImage:
-                "url(" + process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg)",
+              backgroundImage: "url(/assets/TeamTezosPark.jpg)",
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundBlendMode: "overlay",

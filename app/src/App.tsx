@@ -161,13 +161,13 @@ export let UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [Tezos, setTezos] = useState<
     TezosToolkit & { beaconWallet?: BeaconWallet }
   >(
     new TezosToolkit(
-      "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev"
+      "https://" + import.meta.env.VITE_NETWORK + ".tezos.marigold.dev"
     )
   );
 
@@ -199,31 +199,31 @@ const App: React.FC = () => {
   const [subscriptionsDone, setSubscriptionsDone] = useState<boolean>(false); //do registration only once
   const organizationActivatedSubscription = Tezos.stream.subscribeEvent({
     tag: "organizationActivated",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
   const organizationFrozenSubscription = Tezos.stream.subscribeEvent({
     tag: "organizationFrozen",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
   const organizationAddedSubscription = Tezos.stream.subscribeEvent({
     tag: "organizationAdded",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
   const joinOrganizationRequestSubscription = Tezos.stream.subscribeEvent({
     tag: "joinOrganizationRequest",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
   const orgMemberRequestsUpdatedSubscription = Tezos.stream.subscribeEvent({
     tag: "orgMemberRequestsUpdated",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
   const orgMessagesSubscription = Tezos.stream.subscribeEvent({
     tag: "message",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
   const repliesSubscription = Tezos.stream.subscribeEvent({
     tag: "reply",
-    address: process.env.REACT_APP_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
   });
 
   const [notificationId, setNotificationId] = useState<number>(0);
@@ -254,9 +254,9 @@ const App: React.FC = () => {
           //we need to recreate the wallet completely because of page reload
           let wallet = new BeaconWallet({
             name: "TzCommunity",
-            preferredNetwork: process.env.REACT_APP_NETWORK
+            preferredNetwork: import.meta.env.VITE_NETWORK
               ? NetworkType[
-                  process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
+                  import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
                 ]
               : NetworkType.GHOSTNET,
           });
@@ -527,6 +527,7 @@ const App: React.FC = () => {
                 let keys: BigMapKey[] = await localStorage.getWithTTL(url);
 
                 if (!keys) {
+                  //console.warn("cache is empty for key : ", url);
                   try {
                     keys = await api.bigMapsGetKeys(membersBigMapId, {
                       micheline: "Json",
@@ -534,13 +535,18 @@ const App: React.FC = () => {
                     });
                     await localStorage.setWithTTL(url, keys);
                   } catch (error) {
-                    console.warn("TZKT call failed", error);
+                    console.error("TZKT call failed", error);
                   }
                 }
 
                 if (keys) {
-                  //check if member is part of it
-                  if (keys.findIndex((key) => key.key === userAddress) >= 0) {
+                  //check if member is part of it OR super admin
+                  if (
+                    keys.findIndex((key) => key.key === userAddress) >= 0 ||
+                    storage.tezosOrganization.admins.indexOf(
+                      userAddress as address
+                    ) >= 0
+                  ) {
                     myOrganizationsAsMember.push(orgItem);
 
                     //cache userprofiles
@@ -710,6 +716,8 @@ const App: React.FC = () => {
   const refreshStorage = async (
     event?: CustomEvent<RefresherEventDetail>
   ): Promise<void> => {
+    console.log("************  Calling refreshStorage");
+
     if (userAddress) {
       //only refresh userProfile if there is SIWT
       if (await localStorage.get(LocalStorageKeys.access_token)) {
@@ -726,17 +734,22 @@ const App: React.FC = () => {
               newUserProfile
             );*/
         }
+      } else {
+        console.error(
+          "************  cannot find access_token ...",
+          localStorage
+        );
       }
 
       console.log(
-        "REACT_APP_CONTRACT_ADDRESS:",
-        process.env.REACT_APP_CONTRACT_ADDRESS!
+        "VITE_CONTRACT_ADDRESS:",
+        import.meta.env.VITE_CONTRACT_ADDRESS!
       );
-      console.log("REACT_APP_BACKEND_URL:", process.env.REACT_APP_BACKEND_URL!);
+      console.log("VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL!);
 
       const mainWalletType: MainWalletType =
         await Tezos.wallet.at<MainWalletType>(
-          process.env.REACT_APP_CONTRACT_ADDRESS!
+          import.meta.env.VITE_CONTRACT_ADDRESS!
         );
       const storage: Storage = await mainWalletType.storage();
       setMainWalletType(mainWalletType);
@@ -817,9 +830,12 @@ const App: React.FC = () => {
     }
 
     if (localStorage.initialized) {
+      console.log("localStorage is initialized, removing access tokens");
       await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
       await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
       await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
+    } else {
+      console.warn("localStorage not initialized, cannot remove access tokens");
     }
   };
 
@@ -835,7 +851,7 @@ const App: React.FC = () => {
         return null;
       }
       const url =
-        process.env.REACT_APP_BACKEND_URL + "/user/" + whateverUserAddress;
+        import.meta.env.VITE_BACKEND_URL + "/user/" + whateverUserAddress;
       const up = await localStorage.getWithTTL(url);
 
       if (up && Object.keys(up).length > 0) {
@@ -861,12 +877,12 @@ const App: React.FC = () => {
           console.warn("Silently refreshing token", response);
           try {
             await refreshToken(userAddress);
+            return await getUserProfile(whateverUserAddress);
           } catch (error) {
             console.error("Cannot refresh token, disconnect");
             disconnectWallet();
             return null;
           }
-          return await getUserProfile(whateverUserAddress);
         } else {
           //console.warn("User Profile not found", response);
           await localStorage.setWithTTL(url, {});
@@ -882,7 +898,7 @@ const App: React.FC = () => {
   const refreshToken = async (userAddress: string) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "/siwt/refreshToken",
+        import.meta.env.VITE_BACKEND_URL + "/siwt/refreshToken",
         {
           method: "POST",
           headers: {
@@ -899,9 +915,14 @@ const App: React.FC = () => {
         const { accessToken, idToken, refreshToken } = data;
         console.log("SIWT reconnected to web2 backend", jwt_decode(idToken));
 
-        localStorage.set(LocalStorageKeys.access_token, accessToken);
-        localStorage.set(LocalStorageKeys.refresh_token, refreshToken);
-        localStorage.set(LocalStorageKeys.id_token, idToken);
+        await localStorage.set(LocalStorageKeys.access_token, accessToken);
+        await localStorage.set(LocalStorageKeys.refresh_token, refreshToken);
+        await localStorage.set(LocalStorageKeys.id_token, idToken);
+
+        console.log(
+          "tokens stored",
+          await localStorage.get(LocalStorageKeys.id_token)
+        );
       } else {
         console.error("error trying to refresh token", response);
         return new Promise((resolve, reject) => resolve(null));

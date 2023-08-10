@@ -71,22 +71,22 @@ export const Footer: React.FC = () => {
 
       const wallet = new BeaconWallet({
         name: "TzCommunity",
-        preferredNetwork: process.env.REACT_APP_NETWORK
+        preferredNetwork: import.meta.env.VITE_NETWORK
           ? NetworkType[
-              process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
+              import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
             ]
           : NetworkType.GHOSTNET,
       });
 
       await wallet.requestPermissions({
         network: {
-          type: process.env.REACT_APP_NETWORK
+          type: import.meta.env.VITE_NETWORK
             ? NetworkType[
-                process.env.REACT_APP_NETWORK.toUpperCase() as keyof typeof NetworkType
+                import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
               ]
             : NetworkType.GHOSTNET,
           rpcUrl:
-            "https://" + process.env.REACT_APP_NETWORK + ".tezos.marigold.dev",
+            "https://" + import.meta.env.VITE_NETWORK + ".tezos.marigold.dev",
         },
       });
       console.log("after requestPermissions");
@@ -184,7 +184,7 @@ export const Footer: React.FC = () => {
     }
 
     // sign in the user to our app
-    const res = (await signIn(process.env.REACT_APP_BACKEND_URL! + "/siwt")({
+    const res = (await signIn(import.meta.env.VITE_BACKEND_URL! + "/siwt")({
       pk: publicKey,
       pkh: userAddress,
       message: messagePayload.payload,
@@ -206,7 +206,10 @@ export const Footer: React.FC = () => {
     await localStorage.set(LocalStorageKeys.refresh_token, refreshToken);
     await localStorage.set(LocalStorageKeys.id_token, idToken);
 
-    console.log("token stored");
+    console.log(
+      "tokens stored",
+      await localStorage.get(LocalStorageKeys.id_token)
+    );
 
     //refresh the global storage, as we have an access token now, we can fetch other user profiles
     await refreshStorage();

@@ -22,11 +22,12 @@ export class CachingService {
     return this.initialized;
   }
 
-  // Store request data with TTL
+  // Store request data without TTL
   async set(key: string, data: any): Promise<any> {
     if (!this.isInitialized) await this.initStorage();
 
-    return this.storage.set(key, data);
+    //console.log("set - adding key : ", key);
+    return await this.storage.set(key, data);
   }
 
   // Store request data with TTL
@@ -35,7 +36,9 @@ export class CachingService {
 
     const validUntil = new Date().getTime() + TTL * 1000;
     url = `${CACHE_KEY}${url}`;
-    return this.storage.set(url, { validUntil, data });
+
+    //console.log("setWithTTL - adding key : ", url);
+    return await this.storage.set(url, { validUntil, data });
   }
 
   //no TTL
@@ -63,7 +66,7 @@ export class CachingService {
       //console.log("*** NOT FOUND ON CACHE ***", storedValue);
       return null;
     } else if (storedValue.validUntil < currentTime) {
-      //console.log("*** REMOVE ON CACHE ***", storedValue);
+      //console.log("getWithTTL - removing key : ", url);
       await this.storage.remove(url);
       return null;
     } else {
@@ -75,7 +78,7 @@ export class CachingService {
   async keys(): Promise<string[]> {
     if (!this.isInitialized) await this.initStorage();
 
-    return this.storage.keys();
+    return await this.storage.keys();
   }
 
   // Remove all cached data & files with TTL
@@ -86,6 +89,7 @@ export class CachingService {
 
     keys.map(async (key) => {
       if (key.startsWith(CACHE_KEY)) {
+        //console.log("clearCachedData - removing key : ", key);
         await this.storage.remove(key);
       }
     });
@@ -96,11 +100,14 @@ export class CachingService {
     if (!this.isInitialized) await this.initStorage();
 
     url = `${CACHE_KEY}${url}`;
+
+    //console.log("invalidateCacheEntry - removing key : ", url);
     await this.storage.remove(url);
   }
 
   async remove(key: string) {
     if (!this.isInitialized) await this.initStorage();
+    //console.log("remove - removing key : ", key);
 
     await this.storage.remove(key);
   }

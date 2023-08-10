@@ -86,7 +86,7 @@ export const OrganizationScreen = ({
   } = React.useContext(UserContext) as UserContextType;
 
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
 
