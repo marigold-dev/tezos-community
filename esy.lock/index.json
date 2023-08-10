@@ -1,5 +1,5 @@
 {
-  "checksum": "899f0e4782096ccf045b6c9794276e2c",
+  "checksum": "7314cf8f7a11738769619a74cb8b3925",
   "root": "project@link-dev:./esy.json",
   "node": {
     "project@link-dev:./esy.json": {
@@ -8,17 +8,17 @@
       "version": "link-dev:./esy.json",
       "source": { "type": "link-dev", "path": ".", "manifest": "esy.json" },
       "overrides": [],
-      "dependencies": [ "@ligo/fa@1.0.5@d41d8cd9" ],
+      "dependencies": [ "@ligo/fa@1.0.6@d41d8cd9" ],
       "devDependencies": []
     },
-    "@ligo/fa@1.0.5@d41d8cd9": {
-      "id": "@ligo/fa@1.0.5@d41d8cd9",
+    "@ligo/fa@1.0.6@d41d8cd9": {
+      "id": "@ligo/fa@1.0.6@d41d8cd9",
       "name": "@ligo/fa",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://packages.ligolang.org/-/api/@ligo/fa/-/@ligo/fa-1.0.5.tgz#sha1:24fdfc2a513f67e0a3b2707984ae67b58cecfb3d"
+          "archive:https://packages.ligolang.org/-/api/@ligo/fa/-/@ligo/fa-1.0.6.tgz#sha1:5dfe4bc9d859b58f46c4d89b3242b178af927abf"
         ]
       },
       "overrides": [],
