@@ -4,7 +4,10 @@ const tezosLower = "tezos";
 
 type organizationStatus = ["PendingApproval"] | ["Active"] | ["Frozen"];
 
-type removeMemberParameters = { member: address, orgName: string };
+type removeMemberParameters = {
+  member: address,
+  orgName: string
+};
 
 type removeAdminParameters = {
   admin: address,
@@ -19,17 +22,23 @@ type updateOrganizationParameters = {
   logoUrl: string,
   ipfsNftUrl: string,
   fundingAddress: option<address>,
-  autoRegistration : bool
+  autoRegistration: bool
 };
 
-type addAdminParameters = { admin: address, orgName: string };
+type addAdminParameters = {
+  admin: address,
+  orgName: string
+};
 
 type joinRequest = {
   orgName: string,
   reason: string
 };
 
-type joinOrganizationRequest = { user: address, joinRequest };
+type joinOrganizationRequest = {
+  user: address,
+  joinRequest
+};
 
 type joinOrganizationResponse = {
   membersToApprove: set<address>,
@@ -44,7 +53,7 @@ type addOrganizationRequest = {
   logoUrl: string,
   ipfsNftUrl: string,
   fundingAddress: option<address>,
-  autoRegistration : bool
+  autoRegistration: bool
 };
 
 type organization = {
@@ -58,10 +67,14 @@ type organization = {
   status: organizationStatus,
   memberRequests: set<joinOrganizationRequest>,
   fundingAddress: option<address>,
-  autoRegistration : bool
+  autoRegistration: bool
 };
 
-type limits = { organizationMax: nat, adminsMax: nat, memberRequestMax: nat };
+type limits = {
+  organizationMax: nat,
+  adminsMax: nat,
+  memberRequestMax: nat
+};
 
 type storage = {
   tezosOrganization: organization,
@@ -72,7 +85,7 @@ type storage = {
 
 type _return = [list<operation>, storage];
 
-// @entry
+@entry
 const changeLimits = (limits: limits, store: storage): _return => {
   return Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
       list([]),
@@ -80,7 +93,7 @@ const changeLimits = (limits: limits, store: storage): _return => {
     ] : failwith("you need to be super-administrator to change limits")
 };
 
-// @entry
+@entry
 const updateOrganization = (
   orgToUpdate: updateOrganizationParameters,
   store: storage
@@ -141,7 +154,7 @@ const updateOrganization = (
   }
 };
 
-// @entry
+@entry
 const activateOrganization = (orgName: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -171,7 +184,7 @@ const activateOrganization = (orgName: string, store: storage): _return => {
   )
 };
 
-// @entry
+@entry
 const freezeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -199,13 +212,13 @@ const freezeOrganization = (name: string, store: storage): _return => {
   )
 };
 
-// @entry
+@entry
 const addOrganization = (org: addOrganizationRequest, store: storage): _return => {
   //check no one can take TEZOS name
 
   if (String.length(org.name) == (5 as nat)) {
     let isTezosName: bool = true;
-    for (let i = (0 as nat);i < (5 as nat);i = i + (1 as nat)) {
+    for (let i = (0 as nat); i < (5 as nat); i = i + (1 as nat)) {
       const letter = String.sub(i, 1 as nat, org.name);
       if (
         letter != String.sub(i, (1 as nat), tezosUpper) &&
@@ -229,7 +242,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
         big_map<address, unit>,
       memberRequests: Set.empty as set<joinOrganizationRequest>,
       fundingAddress: org.fundingAddress,
-      autoRegistration : org.autoRegistration
+      autoRegistration: org.autoRegistration
     };
   if (List.size(store.organizations) >= store.limits.organizationMax) {
     return failwith(
@@ -267,7 +280,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
   }
 };
 
-// @entry
+@entry
 const removeOrganization = (name: string, store: storage): _return => {
   return match(
     List.find_opt(
@@ -325,7 +338,6 @@ const leaveOrganizationAsAdmin = (
           }
         },
         Some: (lastAdmin) => {
-
           if (Set.cardinal(org.admins) != (1 as nat)) return failwith(
             "Don't name another admin to replace you if there are enough admins on the organization"
           ) else if (
@@ -346,12 +358,12 @@ const leaveOrganizationAsAdmin = (
               ...store,
               organizations: List.update(
                 (orgItem: organization) =>
-                  (orgItem.name == org.name) ? 
-                     Some({
+                  (orgItem.name == org.name) ? Some(
+                      {
                         ...org,
                         admins: Set.remove(Tezos.get_sender(), newAdmins)
-                      }) : Some(org)
-                   ,
+                      }
+                    ) : Some(org),
                 store.organizations
               )
             }
@@ -362,7 +374,7 @@ const leaveOrganizationAsAdmin = (
   }
 };
 
-// @entry
+@entry
 const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -402,7 +414,7 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
   )
 };
 
-// @entry
+@entry
 const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -426,9 +438,8 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
             {
               ...store,
               organizations: List.update_with(
-                (orgItem: organization) =>
-                  orgItem.name == org.name , 
-                  { ...org, admins: Set.remove(rap.admin, org.admins) },
+                (orgItem: organization) => orgItem.name == org.name,
+                { ...org, admins: Set.remove(rap.admin, org.admins) },
                 store.organizations
               )
             }
@@ -443,7 +454,7 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
   )
 };
 
-// @entry
+@entry
 const addAdmin = (aap: addAdminParameters, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -485,7 +496,7 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
   )
 };
 
-// @entry
+@entry
 const addTezosAdmin = (admin: address, store: storage): _return => {
   if (Set.cardinal(store.tezosOrganization.admins) == store.limits.adminsMax) failwith(
     "We have reached admin size limit"
@@ -508,7 +519,7 @@ const addTezosAdmin = (admin: address, store: storage): _return => {
   }
 };
 
-// @entry
+@entry
 const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => {
   const orgOpt =
     List.find_opt(
@@ -525,30 +536,37 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
           "You cannot receive requests until your organization is activated"
         ) else if (
           Set.cardinal(org.memberRequests) == store.limits.memberRequestMax
-        ) return failwith("We have reached member request size limit") 
-        else if (org.autoRegistration == true){
-          const newOrg = {
-                  ...org,
-                  members: Big_map.add(Tezos.get_sender(), unit, org.members)
-                };
-          return  [
-            list([Tezos.emit(
+        ) return failwith("We have reached member request size limit") else if (
+          org.autoRegistration == true
+        ) {
+          const newOrg =
+            {
+              ...org,
+              members: Big_map.add(Tezos.get_sender(), unit, org.members)
+            };
+          return [
+            list(
+              [
+                Tezos.emit(
                   "%orgMemberRequestsUpdated",
-                  [Set.literal(list([Tezos.get_sender()])),Set.empty as set<address> , org.name]
-                )]),
+                  [
+                    Set.literal(list([Tezos.get_sender()])),
+                    Set.empty as set<address>,
+                    org.name
+                  ]
+                )
+              ]
+            ),
             {
               ...store,
               organizations: List.update_with(
                 (orgItem: organization) => (orgItem.name == org.name),
-                newOrg
-                ,
+                newOrg,
                 store.organizations
               )
             }
           ]
-
-        } 
-        else {
+        } else {
           const newOrg =
             {
               ...org,
@@ -574,7 +592,7 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
   )
 };
 
-// @entry
+@entry
 const responseToJoinOrganization = (
   jor: joinOrganizationResponse,
   store: storage
@@ -635,7 +653,7 @@ const responseToJoinOrganization = (
   )
 };
 
-// @entry
+@entry
 const sendMessage = ([to, message]: [string, string], store: storage): _return => {
   return [
     list([Tezos.emit("%message", [Tezos.get_source(), to, message])]),
@@ -643,10 +661,15 @@ const sendMessage = ([to, message]: [string, string], store: storage): _return =
   ]
 };
 
-// @entry
-const replyToMessage = ([replyId,replyUser, message]: [nat,string, string], store: storage): _return => {
+@entry
+const replyToMessage = (
+  [replyId, replyUser, message]: [nat, string, string],
+  store: storage
+): _return => {
   return [
-    list([Tezos.emit("%reply", [Tezos.get_source(), replyUser,replyId, message])]),
+    list(
+      [Tezos.emit("%reply", [Tezos.get_source(), replyUser, replyId, message])]
+    ),
     store
   ]
 };
