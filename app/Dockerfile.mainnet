@@ -17,6 +17,9 @@ RUN npm ci && taq init
 #RUN taq generate types ./src
 RUN cd app && npm ci 
 
+# Install serve globally
+RUN npm install -g serve
+
 WORKDIR /tezos-community/app
 
 ENTRYPOINT ["npm", "run", "start:prod"]
