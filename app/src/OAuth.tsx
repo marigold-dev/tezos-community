@@ -39,12 +39,12 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
         );
         if (!accessToken) {
           console.warn("You lost your SIWT accessToken");
-          disconnectWallet();
+          await disconnectWallet();
           history.push(PAGES.ORGANIZATIONS);
         }
 
         const response = await fetch(
-          process.env.REACT_APP_BACKEND_URL + "/" + provider + "/claim",
+          import.meta.env.VITE_BACKEND_URL + "/" + provider + "/claim",
           {
             method: "POST",
             headers: {
@@ -72,7 +72,7 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
   }, [socket]);
 
   const openPopup = async () => {
-    const url = `${process.env.REACT_APP_BACKEND_URL}/${provider}?socketId=${
+    const url = `${import.meta.env.VITE_BACKEND_URL}/${provider}?socketId=${
       socket!.id
     }`;
     await Browser.open({

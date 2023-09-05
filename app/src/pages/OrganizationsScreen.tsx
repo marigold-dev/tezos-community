@@ -63,7 +63,7 @@ import { address } from "../type-aliases";
 import { OrganizationScreen, TABS } from "./OrganizationScreen";
 export const OrganizationsScreen: React.FC = () => {
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -72,16 +72,12 @@ export const OrganizationsScreen: React.FC = () => {
 
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     userProfiles,
     setUserProfiles,
     storage,
     mainWalletType,
     setStorage,
-    setUserAddress,
-    setUserBalance,
     setLoading,
     loading,
     refreshStorage,
@@ -167,7 +163,7 @@ export const OrganizationsScreen: React.FC = () => {
               });
               await localStorage.setWithTTL(url, keys);
             } catch (error) {
-              //console.warn("TZKT call failed", error);
+              console.warn("TZKT call failed", error);
             }
           }
 
@@ -177,18 +173,21 @@ export const OrganizationsScreen: React.FC = () => {
               Array.from(keys.map((key) => key.key))
             ); //push to React state also
 
-            //cache userprofiles
-            for (const key of keys) {
-              if (await localStorage.get(LocalStorageKeys.access_token)) {
-                const up = await getUserProfile(key.key);
-                if (up) {
-                  userProfiles.set(key.key, up);
-                  /*
-                  console.log(
-                    "OrgScreen CALLING setUserProfiles",
-                    userProfiles
-                  );*/
-                  setUserProfiles(userProfiles);
+            //if I am member of it OR super admin
+            if (
+              keys.findIndex((key) => key.key === userAddress) >= 0 ||
+              storage.tezosOrganization.admins.indexOf(
+                userAddress as address
+              ) >= 0
+            ) {
+              //cache userprofiles
+              for (const key of keys) {
+                if (await localStorage.get(LocalStorageKeys.access_token)) {
+                  const up = await getUserProfile(key.key);
+                  if (up) {
+                    userProfiles.set(key.key, up);
+                    setUserProfiles(userProfiles);
+                  }
                 }
               }
             }
@@ -318,7 +317,7 @@ export const OrganizationsScreen: React.FC = () => {
         .addOrganization(
           autoRegistration,
           business,
-          fundingAddress,
+          fundingAddress ? { Some: fundingAddress } : null,
           ipfsNftUrl,
           logoUrl,
           name,
@@ -390,8 +389,7 @@ export const OrganizationsScreen: React.FC = () => {
           <IonContent
             style={{
               "--background": "none",
-              backgroundImage:
-                "url(" + process.env.PUBLIC_URL + "/assets/TeamTezosPark.jpg)",
+              backgroundImage: "url(/assets/TeamTezosPark.jpg)",
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundBlendMode: "overlay",

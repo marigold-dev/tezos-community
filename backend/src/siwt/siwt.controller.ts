@@ -44,6 +44,8 @@ export class SiwtController {
           idToken,
           tokenType: 'Bearer',
         });
+      } else {
+        Logger.warn('refreshToken invalid signature !');
       }
 
       return res.status(403).send('Forbidden');
@@ -65,6 +67,8 @@ export class SiwtController {
     try {
       const isValidSignature = taquitoVerifySignature(message, pk, signature);
       if (isValidSignature) {
+        //Logger.warn('signin signature ok ', { message, pk, signature });
+
         // when a user provided a valid signature, we can obtain and
         // return the required information about the user.
 
@@ -98,6 +102,8 @@ export class SiwtController {
           idToken,
           tokenType: 'Bearer',
         });
+      } else {
+        // Logger.warn('signin invalidSignature ', { message, pk, signature });
       }
       return res.status(403).send('Forbidden');
     } catch (e) {

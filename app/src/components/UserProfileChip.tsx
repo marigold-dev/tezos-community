@@ -32,7 +32,6 @@ export const UserProfileChip = ({
               alt="social network"
               style={{ objectFit: "contain", padding: "0.2em" }}
               src={
-                process.env.PUBLIC_URL +
                 "/assets/" +
                 userProfiles.get(address)?.socialAccountType +
                 ".png"

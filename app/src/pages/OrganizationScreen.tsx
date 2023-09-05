@@ -76,23 +76,17 @@ export const OrganizationScreen = ({
 
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     storage,
     mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
     setLoading,
-    loading,
     userProfiles,
     refreshStorage,
     localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
 
@@ -171,13 +165,13 @@ export const OrganizationScreen = ({
   };
 
   const transfer = async () => {
-    console.log("transfer", Tezos);
+    console.log("transfer");
 
     try {
       setLoading(true);
       const op = await Tezos.wallet
         .transfer({
-          to: organization?.fundingAddress!,
+          to: organization!.fundingAddress!.Some,
           amount: amount * Math.pow(10, 6),
           mutez: true,
         })
@@ -436,7 +430,7 @@ export const OrganizationScreen = ({
                 <IonItem>
                   <IonInput
                     label-placement="stacked"
-                    value={organization.fundingAddress}
+                    value={organization.fundingAddress?.Some}
                     counter={
                       organization.admins.indexOf(userAddress as address) >= 0
                         ? true
@@ -462,8 +456,9 @@ export const OrganizationScreen = ({
                     }
                     onIonChange={(str) => {
                       if (str.detail.value === undefined) return;
-                      organization.fundingAddress = str.target
-                        .value! as unknown as address;
+                      organization.fundingAddress = {
+                        "Some": str.target.value! as unknown as address,
+                      };
                       setOrganization(organization);
                     }}
                   />

@@ -16,8 +16,8 @@ COPY app/.env.ghostnet app/.env
 RUN npm ci && taq init
 #RUN taq install @taqueria/plugin-contract-types@next
 #RUN taq generate types ./src
-RUN cd app && npm ci && npm run postinstall
+RUN cd app && npm ci 
 
 WORKDIR /tezos-community/app
 
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["npm", "run" , "dev"]

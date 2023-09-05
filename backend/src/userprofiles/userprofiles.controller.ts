@@ -41,10 +41,16 @@ type Organization = {
   admins: Array<address>;
   autoRegistration: boolean;
   business: string;
-  fundingAddress?: address;
+  fundingAddress: { Some: address } | null;
   ipfsNftUrl: string;
   logoUrl: string;
-  memberRequests: Array<MemberRequest>;
+  memberRequests: Array<{
+    joinRequest: {
+      orgName: string;
+      reason: string;
+    };
+    user: address;
+  }>;
   members: BigMap<address, unit>;
   name: string;
   siteUrl: string;

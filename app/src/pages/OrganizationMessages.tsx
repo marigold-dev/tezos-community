@@ -36,25 +36,13 @@ export const OrganizationMessages = ({
   organizationName,
 }: OrganizationProps): JSX.Element => {
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
 
-  const {
-    Tezos,
-    wallet,
-    userAddress,
-    userBalance,
-    userProfiles,
-    storage,
-    mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
-    setLoading,
-    loading,
-    refreshStorage,
-  } = React.useContext(UserContext) as UserContextType;
+  const { Tezos, userProfiles, mainWalletType, setLoading } = React.useContext(
+    UserContext
+  ) as UserContextType;
 
   const [contractEvents, setcontractEvents] = useState<
     (api.ContractEvent & { replies: api.ContractEvent[] | undefined })[]
@@ -76,7 +64,7 @@ export const OrganizationMessages = ({
     })[] = [];
     const contractEvents: api.ContractEvent[] =
       await api.eventsGetContractEvents({
-        contract: { eq: process.env.REACT_APP_CONTRACT_ADDRESS! },
+        contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
         tag: { eq: "message" },
         payload: { eq: { jsonValue: organizationName!, jsonPath: "string_0" } },
       });
@@ -84,7 +72,7 @@ export const OrganizationMessages = ({
     await Promise.all(
       contractEvents.map(async (ce) => {
         const replies = await api.eventsGetContractEvents({
-          contract: { eq: process.env.REACT_APP_CONTRACT_ADDRESS! },
+          contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
           tag: { eq: "reply" },
           payload: { eq: { jsonValue: ce.id + "", jsonPath: "nat" } },
           sort: { asc: "id" },

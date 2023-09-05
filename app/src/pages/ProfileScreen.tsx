@@ -27,6 +27,7 @@ import {
   returnUpBackOutline,
   timeOutline,
   unlinkOutline,
+  wallet,
   warningOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
@@ -49,22 +50,16 @@ import { address } from "../type-aliases";
 export const ProfileScreen: React.FC = () => {
   const [presentAlert] = useIonAlert();
   api.defaults.baseUrl =
-    "https://api." + process.env.REACT_APP_NETWORK + ".tzkt.io";
+    "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const {
     Tezos,
-    wallet,
     userAddress,
-    userBalance,
     nftContratTokenMetadataMap,
     storage,
-    mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
+
     setLoading,
     nftWalletType,
-    loading,
     refreshStorage,
     userProfile,
     disconnectWallet,
@@ -73,7 +68,6 @@ export const ProfileScreen: React.FC = () => {
     setUserProfiles,
 
     storageNFT,
-    getUserProfile,
     localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
@@ -90,12 +84,12 @@ export const ProfileScreen: React.FC = () => {
 
     if (!accessToken) {
       console.warn("You lost your SIWT accessToken");
-      disconnectWallet();
+      await disconnectWallet();
       history.push(PAGES.ORGANIZATIONS);
     }
 
     const response = await fetch(
-      process.env.REACT_APP_BACKEND_URL + "/user" + "/unlink",
+      import.meta.env.VITE_BACKEND_URL + "/user" + "/unlink",
       {
         method: "POST",
         headers: {
@@ -158,7 +152,7 @@ export const ProfileScreen: React.FC = () => {
     })[] = [];
 
     const replies: api.ContractEvent[] = await api.eventsGetContractEvents({
-      contract: { eq: process.env.REACT_APP_CONTRACT_ADDRESS! },
+      contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
       tag: { eq: "reply" },
       payload: { eq: { jsonValue: userAddress, jsonPath: "string_0" } },
       sort: { desc: "id" },
@@ -170,7 +164,7 @@ export const ProfileScreen: React.FC = () => {
       replies.map(async (r) => {
         const originalMessages: api.ContractEvent[] =
           await api.eventsGetContractEvents({
-            contract: { eq: process.env.REACT_APP_CONTRACT_ADDRESS! },
+            contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
             tag: { eq: "message" },
             id: { eq: r.payload.nat },
           });
@@ -230,9 +224,9 @@ export const ProfileScreen: React.FC = () => {
               <IonLabel>Membership</IonLabel>
             </IonSegmentButton>
             <IonSegmentButton
-              onClick={() => {
-                disconnectWallet();
-                history.replace(PAGES.ORGANIZATIONS);
+              onClick={async () => {
+                await disconnectWallet();
+                history.push(PAGES.ORGANIZATIONS);
               }}
             >
               <IonButton color="dark">
@@ -354,7 +348,7 @@ export const ProfileScreen: React.FC = () => {
               <a
                 href={
                   "https://" +
-                  process.env.REACT_APP_NETWORK +
+                  import.meta.env.VITE_NETWORK +
                   ".tzkt.io/" +
                   storage?.nftAddress
                 }

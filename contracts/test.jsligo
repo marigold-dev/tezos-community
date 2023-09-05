@@ -43,7 +43,7 @@ const tezosOrganization: CONTRACT.organization =
     status: Active(),
     memberRequests: Set.empty as set<CONTRACT.joinOrganizationRequest>,
     fundingAddress: None() as option<address>,
-    autoRegistration : false
+    autoRegistration: false
   };
 
 const token_info: map<string, bytes> =
@@ -95,9 +95,9 @@ const initial_storageNFT: NFT.storage =
     operators: Big_map.empty as MULTIASSET.Operators.t,
     owner_token_ids: Set.add(
       [tezosAdmin, 0 as nat],
-      Set.empty as set<[MULTIASSET.Storage.owner, MULTIASSET.Storage.token_id]>
+      Set.empty as set<[MULTIASSET.owner, MULTIASSET.token_id]>
     ),
-    token_ids: Set.add(0 as nat, Set.empty as set<MULTIASSET.Storage.token_id>)
+    token_ids: Set.add(0 as nat, Set.empty as set<MULTIASSET.token_id>)
   };
 
 const [taddrNFT, _, _] =
@@ -133,10 +133,9 @@ const _testClaimNFT = (sender: address, ledgerSize: nat): bool => {
     Set.cardinal(store.owner_token_ids) == ledgerSize,
     "Wrong size on ledger"
   );
-  const ownerTokenIds
-    : set<[MULTIASSET.Storage.owner, MULTIASSET.Storage.token_id]> =
+  const ownerTokenIds: set<[MULTIASSET.owner, MULTIASSET.token_id]> =
     Set.filter_map(
-      (tupleItem: [MULTIASSET.Storage.owner, MULTIASSET.Storage.token_id]) =>
+      (tupleItem: [MULTIASSET.owner, MULTIASSET.token_id]) =>
         tupleItem[0] == sender ? Some(tupleItem) : None(),
       store.owner_token_ids
     );
@@ -463,7 +462,7 @@ const newOrganization: CONTRACT.addOrganizationRequest =
     logoUrl: "https://",
     ipfsNftUrl: "https://",
     fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
-    autoRegistration : false
+    autoRegistration: false
   };
 
 const testAddOrganizationNotAdmin =
@@ -504,11 +503,7 @@ const testActivateOrganization =
 
 //requestToJoinOrganization
 
-const user2joinRequest =
-  {
-    orgName: newOrganization.name,
-    reason: "reason"
-  };
+const user2joinRequest = { orgName: newOrganization.name, reason: "reason" };
 
 const testRequestToJoinOrganization =
   _testRequestToJoinOrganization(user2, user2joinRequest, 1 as nat);
@@ -547,7 +542,7 @@ const newOrganization2: CONTRACT.addOrganizationRequest =
     logoUrl: "https://",
     ipfsNftUrl: "https://",
     fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
-    autoRegistration : true
+    autoRegistration: true
   };
 
 const testAddOrganizationNotAdmin2 =
@@ -573,5 +568,3 @@ const testActivateOrganization2 =
 const addAdminParameters = { admin: user2, orgName: newOrganization.name };
 
 const testAddAdmin = _testAddAdmin(user, addAdminParameters, 2 as nat, 2 as nat);
-
-

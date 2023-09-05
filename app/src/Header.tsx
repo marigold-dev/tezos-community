@@ -7,20 +7,9 @@ import { UserContext, UserContextType } from "./App";
 interface Props extends RouteComponentProps {}
 
 export const Header: React.FC<Props> = ({ match }) => {
-  const {
-    Tezos,
-    wallet,
-    userAddress,
-    userBalance,
-    storage,
-    mainWalletType,
-    setStorage,
-    setUserAddress,
-    setUserBalance,
-    setLoading,
-    loading,
-    refreshStorage,
-  } = React.useContext(UserContext) as UserContextType;
+  const { Tezos, userAddress } = React.useContext(
+    UserContext
+  ) as UserContextType;
 
   return (
     <IonHeader>
