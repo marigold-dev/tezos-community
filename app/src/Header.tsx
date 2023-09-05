@@ -7,9 +7,7 @@ import { UserContext, UserContextType } from "./App";
 interface Props extends RouteComponentProps {}
 
 export const Header: React.FC<Props> = ({ match }) => {
-  const { Tezos, userAddress } = React.useContext(
-    UserContext
-  ) as UserContextType;
+  const { userAddress } = React.useContext(UserContext) as UserContextType;
 
   return (
     <IonHeader>

@@ -29,7 +29,6 @@ import jwt_decode from "jwt-decode";
 import "./theme/variables.css";
 
 import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
-import { MichelineMichelsonV1Expression } from "@airgap/beacon-types/dist/esm/types/tezos/MichelineMichelsonV1Expression";
 import { Storage as LocalStorage } from "@ionic/storage";
 import Transport from "@ledgerhq/hw-transport";
 import { BeaconWallet } from "@taquito/beacon-wallet";
@@ -50,6 +49,24 @@ import { OrganizationsScreen } from "./pages/OrganizationsScreen";
 import { ProfileScreen } from "./pages/ProfileScreen";
 import { socket } from "./socket";
 import { BigMap, address, nat, unit } from "./type-aliases";
+
+//FIXME waiting fix for https://github.com/airgap-it/beacon-sdk/issues/576
+export declare type MichelineMichelsonV1Expression =
+  | {
+      int: string;
+    }
+  | {
+      string: string;
+    }
+  | {
+      bytes: string;
+    }
+  | MichelineMichelsonV1Expression[]
+  | {
+      prim: MichelsonPrimitives;
+      args?: MichelineMichelsonV1Expression[];
+      annots?: string[];
+    };
 
 setupIonicReact();
 
@@ -856,10 +873,10 @@ const App: React.FC = () => {
 
       if (up && Object.keys(up).length > 0) {
         //not empty
-        return new Promise((resolve, reject) => resolve(up));
+        return new Promise((resolve, _) => resolve(up));
       } else if (up && Object.keys(up).length === 0) {
         //empty
-        return new Promise((resolve, reject) => resolve(null));
+        return new Promise((resolve, _) => resolve(null));
       } else {
         const response = await fetch(url, {
           method: "GET",
@@ -872,7 +889,7 @@ const App: React.FC = () => {
 
         if (response.ok) {
           await localStorage.setWithTTL(url, json);
-          return new Promise((resolve, reject) => resolve(json));
+          return new Promise((resolve, _) => resolve(json));
         } else if (response.status === 401 || response.status === 403) {
           console.warn("Silently refreshing token", response);
           try {
@@ -886,12 +903,12 @@ const App: React.FC = () => {
         } else {
           //console.warn("User Profile not found", response);
           await localStorage.setWithTTL(url, {});
-          return new Promise((resolve, reject) => resolve(null));
+          return new Promise((resolve, _) => resolve(null));
         }
       }
     } catch (error) {
       console.error("error", error);
-      return new Promise((resolve, reject) => resolve(null));
+      return new Promise((resolve, _) => resolve(null));
     }
   };
 
@@ -925,7 +942,7 @@ const App: React.FC = () => {
         );
       } else {
         console.error("error trying to refresh token", response);
-        return new Promise((resolve, reject) => resolve(null));
+        return new Promise((resolve, _) => resolve(null));
       }
     } catch (error) {
       console.error("error", error); //cannot do more because session is dead

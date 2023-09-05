@@ -82,7 +82,7 @@
     "iOS >=14"
   ],
   "devDependencies": {
-    "@airgap/beacon-types": "^4.0.6",
+    "@airgap/beacon-types": "^4.0.9",
     "@capacitor/cli": "4.7.3",
     "@types/node": "^20.4.9",
     "@types/react": "^18.2.20",

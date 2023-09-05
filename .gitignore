@@ -8,3 +8,4 @@ book
 backend/.env
 backend/dist
 backend/node_modules
+/app/dist
