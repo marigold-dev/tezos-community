@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Developer Guide - Tezos-Community Documentation</title>
+        <title>Incentive - Tezos-Community Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html" class="active"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Incentive.html"><strong aria-hidden="true">2.1.</strong> Incentive</a></li><li class="chapter-item expanded "><a href="PreRequisites.html"><strong aria-hidden="true">2.2.</strong> PreRequisites</a></li><li class="chapter-item expanded "><a href="Install.html"><strong aria-hidden="true">2.3.</strong> Install</a></li><li class="chapter-item expanded "><a href="Example.html"><strong aria-hidden="true">2.4.</strong> Example</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="contributors.html">Contributors</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Incentive.html" class="active"><strong aria-hidden="true">2.1.</strong> Incentive</a></li><li class="chapter-item expanded "><a href="PreRequisites.html"><strong aria-hidden="true">2.2.</strong> PreRequisites</a></li><li class="chapter-item expanded "><a href="Install.html"><strong aria-hidden="true">2.3.</strong> Install</a></li><li class="chapter-item expanded "><a href="Example.html"><strong aria-hidden="true">2.4.</strong> Example</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="contributors.html">Contributors</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -171,23 +171,33 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="developer-guide"><a class="header" href="#developer-guide">Developer Guide</a></h1>
-<h2 id="incentive"><a class="header" href="#incentive"><a href="./Incentive.html">Incentive</a></a></h2>
-<p>Why to integrate TzCommunity and how it is different to other name resolvers</p>
-<h2 id="prerequisites"><a class="header" href="#prerequisites"><a href="./PreRequisites.html">PreRequisites</a></a></h2>
-<p>What do you need to integrate TzCommunity</p>
-<h2 id="install"><a class="header" href="#install"><a href="./Install.html">Install</a></a></h2>
-<p>Explanation step by step</p>
-
+                        <h1 id="incentives"><a class="header" href="#incentives">Incentives</a></h1>
+<p>All applications manage their own identities or delegate it to a kinda LDAP system. What is important to figure out is that end <strong>users don't want to face non human readable identifiers</strong> (unless pseudonymity is the main purpose).</p>
+<p><strong>TzCommunity offers you, for free, a way to convert identifiers to trustable human readable names, and leverage your role based access system</strong></p>
+<ul>
+<li>linking your Tezos address is free, no hidden fees, no need to renew, no naming spoilation</li>
+<li>unlinking too</li>
+<li>social account link is trustable, it is based on OAUTH2, noone can impersonate you as we provide you the real provider alias identifier</li>
+<li>you can organize groups and manage your role based access system in your application based TzCommunity organizations</li>
+</ul>
+<p>Compared to other solutions :</p>
+<div class="table-wrapper"><table><thead><tr><th>Feature/Solution</th><th>Tezos Domains</th><th>Wallet contact book</th><th>TzCommunity</th></tr></thead><tbody>
+<tr><td>publicly available</td><td>yes</td><td>no</td><td>yes, only people from same organizations</td></tr>
+<tr><td>cost</td><td>from 1 to 100tz</td><td>0</td><td>0</td></tr>
+<tr><td>dapp integration</td><td>yes</td><td>no</td><td>yes</td></tr>
+<tr><td>reuse your name (even if it is already taken)</td><td>no</td><td>x</td><td>yes</td></tr>
+<tr><td>preserve pseudnomity</td><td>no</td><td>yes</td><td>yes (just don't link your account)</td></tr>
+</tbody></table>
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="WriteToAnOrganization.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="DEVELOPER.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="Incentive.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="PreRequisites.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -197,11 +207,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="WriteToAnOrganization.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="DEVELOPER.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="Incentive.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="PreRequisites.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

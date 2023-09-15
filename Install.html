@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Tezos-Community Documentation</title>
-        <meta name="robots" content="noindex" />
+        <title>Install - Tezos-Community Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -86,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Incentive.html"><strong aria-hidden="true">2.1.</strong> Incentive</a></li><li class="chapter-item expanded "><a href="PreRequisites.html"><strong aria-hidden="true">2.2.</strong> PreRequisites</a></li><li class="chapter-item expanded "><a href="Install.html"><strong aria-hidden="true">2.3.</strong> Install</a></li><li class="chapter-item expanded "><a href="Example.html"><strong aria-hidden="true">2.4.</strong> Example</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="contributors.html">Contributors</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Tezos Community</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Login.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CreateAnOrganization.html"><strong aria-hidden="true">1.2.</strong> Create an organization</a></li><li class="chapter-item expanded "><a href="ManageAnOrganization.html"><strong aria-hidden="true">1.3.</strong> Manage an organization</a></li><li class="chapter-item expanded "><a href="JoinAnOrganization.html"><strong aria-hidden="true">1.4.</strong> Join an organization</a></li><li class="chapter-item expanded "><a href="WriteToAnOrganization.html"><strong aria-hidden="true">1.5.</strong> Write to an organization</a></li></ol></li><li class="chapter-item expanded "><a href="DEVELOPER.html"><strong aria-hidden="true">2.</strong> Developer Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="Incentive.html"><strong aria-hidden="true">2.1.</strong> Incentive</a></li><li class="chapter-item expanded "><a href="PreRequisites.html"><strong aria-hidden="true">2.2.</strong> PreRequisites</a></li><li class="chapter-item expanded "><a href="Install.html" class="active"><strong aria-hidden="true">2.3.</strong> Install</a></li><li class="chapter-item expanded "><a href="Example.html"><strong aria-hidden="true">2.4.</strong> Example</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="contributors.html">Contributors</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -172,200 +171,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<h2 id="the-problem"><a class="header" href="#the-problem">The problem</a></h2>
-<ul>
-<li>Lot of decentralized groups : the community is scattered and very diverse from core developers to artist and gamers</li>
-<li>No single entrypoint : There are plenty of tools, social networks and user registries</li>
-<li>No effective information broadcast to all members : lot of scams, spams, bots or trollers</li>
-<li>No global company/member directory : each application reimplements its own user registry bringing either duplication or separated worlds</li>
-</ul>
-<h2 id="tezos-pseudonym-social-graph"><a class="header" href="#tezos-pseudonym-social-graph">Tezos pseudonym social graph</a></h2>
-<p><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fbrewminate.com%2Fwp-content%2Fuploads%2F2018%2F03%2F030218-62-Sociology-Groups.jpg&amp;f=1&amp;nofb=1&amp;ipt=cc57ae859b81d6de42b7468249a2ff771a143343104785beb3d0a3f362cb226c&amp;ipo=images" alt="" /></p>
-<p>We are not going to tackle the problem of the unique identity like <a href="https://www.brightid.org/">BrightID</a>, instead we concentrate our effort on the <strong>pseudonymity</strong> already provided by <strong>Tezos addresses</strong> combined with <strong>grouping</strong> feature and restricted <strong>social media linking</strong></p>
-<ul>
-<li><strong>Identity</strong> :
-<ol>
-<li>strictly pseudonymous Tezos addresses</li>
-<li>(optional) restricted display name, alias and picture from different social networks available for people from same organization</li>
-</ol>
-</li>
-<li><strong>Organizations</strong> : a way to regroup people inside a cluster</li>
-<li><strong>Internal alerting system</strong> : a non gas-free way to send important message to other clusters and get alerted on real time</li>
-</ul>
-<h2 id="final-goal"><a class="header" href="#final-goal">Final goal</a></h2>
-<p>This application :</p>
-<ul>
-<li>should not be seen as a final product but as a <strong>base layer for other application to integrate with</strong>. Example : providing a list of player for a mobile game where it is hard to type and remember a tz1 address</li>
-<li>does not require high presence. It has to be seen <strong>as a configuration tool</strong> like a contact list, a LDAP or other user registries running in background</li>
-</ul>
-<h2 id="links"><a class="header" href="#links">Links</a></h2>
-<ul>
-<li><a href="https://tezos-community.com/">TEZOS COMMUNITY DAPP (Web based)</a></li>
-<li>TEZOS COMMUNITY DAPP (Android) Soon</li>
-<li>TEZOS COMMUNITY DAPP (iOS) Soon</li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
-<h2 id="login"><a class="header" href="#login"><a href="./Login.html">Login</a></a></h2>
-<p>Login with your preferred wallet, configure your social account link, claim your NFT membership card</p>
-<h2 id="create-an-organization"><a class="header" href="#create-an-organization"><a href="./CreateAnOrganization.html">Create an organization</a></a></h2>
-<p>Create an organization, be the administrator and start to manage it</p>
-<h2 id="manage-an-organization"><a class="header" href="#manage-an-organization"><a href="./ManageAnOrganization.html">Manage an organization</a></a></h2>
-<p>Manage an organization, approve/refuse members and add more administrators</p>
-<h2 id="join-an-organization"><a class="header" href="#join-an-organization"><a href="./JoinAnOrganization.html">Join an organization</a></a></h2>
-<p>Join an existing organization</p>
-<h2 id="write-to-an-organization"><a class="header" href="#write-to-an-organization"><a href="./WriteToAnOrganization.html">Write to an organization</a></a></h2>
-<p>Write to an organization and receive replies and notifications</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="login-1"><a class="header" href="#login-1">Login</a></h1>
-<p>Open/Connect to <a href="https://tezos-community.com">Tezos community</a></p>
-<p>Your identity is your wallet account</p>
-<p><img src="images/tzcommunity.png" alt="" /></p>
-<p>Click on <strong>Connect your wallet</strong> and select your preferred wallet and account</p>
-<p><img src="images/wallet.png" alt="" /></p>
-<p><img src="images/emptyOrganizations.png" alt="" /></p>
-<h1 id="link"><a class="header" href="#link">Link</a></h1>
-<p>You can choose to link your profile with one of the listed social account. If you do so, other people from same group are able to see your real name and picture. It will improve human readable identities for others third party applications, messaging, etc ...</p>
-<blockquote>
-<p>Note : if you want to stay totally pseudonymous, don't do this step</p>
-</blockquote>
-<p>Click on bottom button <strong>Profile</strong> and select of the social account you have</p>
-<p><img src="images/profile.png" alt="" /></p>
-<blockquote>
-<p>Note : if your social account does not exist on the list , please send an email to <a href="mailto:benjamin.fuentes@marigold.dev">benjamin.fuentes@marigold.dev</a></p>
-</blockquote>
-<p>Once you confirm all intermediate popups, your Tezos address will now appear with the social account information</p>
-<p><img src="images/linked.png" alt="" /></p>
-<p>You can unlink social account at any time clicking on button <strong>UNLINK SOCIAL ACCOUNT</strong></p>
-<h1 id="claim-nft-membership-card"><a class="header" href="#claim-nft-membership-card">Claim NFT membership card</a></h1>
-<p>On MEMBERSHIP tab, you can claim your Tezos NFT membership card for free</p>
-<p>It can be used later for loyalty programs, access token, etc ...</p>
-<p><img src="images/membership.png" alt="" /></p>
-<p>Click on <strong>CLAIM NFT</strong> button</p>
-<p><img src="images/nft.png" alt="" /></p>
-<h1 id="logout"><a class="header" href="#logout">Logout</a></h1>
-<p>On top right corner of Profile menu, click on <strong>LOGOUT</strong> button to disconnect your wallet</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="create-an-organization-1"><a class="header" href="#create-an-organization-1">Create an organization</a></h1>
-<p>On <strong>Home/Organizations</strong> menu, click on <strong>CREATE AN ORGANIZATION</strong> and fill the form then click on <strong>DONE</strong> button</p>
-<p><img src="images/addOrganization.png" alt="" /></p>
-<p>Confirm the transaction with your wallet, and wait few seconds for refresh</p>
-<ul>
-<li>name : The name of your organization</li>
-<li>business : The goal or business of your org</li>
-<li>IPFS NFT url (optional): the link to your org NFT</li>
-<li>Logo url (optional): the picture / logo</li>
-<li>Website (optional): the link to your website</li>
-<li>Funding address (optional): the address to your DAO or a user wallet address for sending funds</li>
-<li>AutoRegistration (optional): if you authorize or not member to join automatically without manual approval. Default is false</li>
-</ul>
-<p><img src="images/created.png" alt="" /></p>
-<p>If you click on it, it is selected and you have access to different tabs</p>
-<blockquote>
-<p>Note : your organization is still on pending mode until a super admin will look at it and do a short KYC with you. When this process is accepted, you will be able to accept new members, etc ...
-Note : You will have to behave as a good father/mother and not have an unappropriated behavior. If members reports so, your organization might be frozen during a certain time. Apart of this, super admins have no control on what you do on your organization.</p>
-</blockquote>
-<p><img src="images/myorg.png" alt="" /></p>
-<h2 id="update"><a class="header" href="#update">Update</a></h2>
-<p>As administrator of your org, you can update all the fields and click <strong>UPDATE ORGANIZATION</strong></p>
-<h2 id="messages"><a class="header" href="#messages">Messages</a></h2>
-<p>You can vizualize here all alerts/messages sent to your organization</p>
-<p><img src="images/messages.png" alt="" /></p>
-<p>For more information on how to send message, got to this <a href="WriteToAnOrganization.html">chapter</a></p>
-<h2 id="administration"><a class="header" href="#administration">Administration</a></h2>
-<p>The last tab is where you manage your organization, go to this <a href="ManageAnOrganization.html">chapter</a> to know more about it</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="manage-an-organization-1"><a class="header" href="#manage-an-organization-1">Manage an organization</a></h1>
-<p>If you are administrator, on your Organization page, the last tab lets you manage your org</p>
-<p><img src="images/manage.png" alt="" /></p>
-<h2 id="administrators"><a class="header" href="#administrators">Administrators</a></h2>
-<h3 id="add-administrator"><a class="header" href="#add-administrator">Add administrator</a></h3>
-<p>Enter the address of someone you want to invite as administrator and click on <strong>ADD ADMIN</strong></p>
-<p><img src="images/addadmin.png" alt="" /></p>
-<p>Once confirmed he/she will appear on both admin and member</p>
-<p><img src="images/adminadded.png" alt="" /></p>
-<h2 id="delete-admin"><a class="header" href="#delete-admin">Delete admin</a></h2>
-<p>Click on the trash to delete an admin</p>
-<p><img src="images/admindelete.png" alt="" /></p>
-<p>Now you are the only admin.</p>
-<blockquote>
-<p>Note : as there is at least 1 member on your organization (that is not you), you can pass the admin flag to another member or either decide to delete your organization</p>
-</blockquote>
-<h2 id="members"><a class="header" href="#members">Members</a></h2>
-<p>Users can be added only if :</p>
-<ul>
-<li>they send a request to join and are accepted (with AutoRegistration to false)</li>
-<li>they send a request to join (with AutoRegistration to true)</li>
-<li>they are no more admins</li>
-</ul>
-<p>You can only remove a user from organization, no other action are possible.</p>
-<h2 id="to-remove-a-user"><a class="header" href="#to-remove-a-user">To remove a user</a></h2>
-<p>Click on the trash icon</p>
-<p><img src="images/removeuser.png" alt="" /></p>
-<p><img src="images/userremoved.png" alt="" /></p>
-<h2 id="member-requests"><a class="header" href="#member-requests">Member requests</a></h2>
-<p>To have member requests, you need someone to send a join request, see <a href="JoinAnOrganization.html">this chapter for more details</a></p>
-<p>When you have user, you can approve/decline in batch</p>
-<p><img src="images/approveMember.png" alt="" /></p>
-<p>For each user, approve or remove it from selection clicking on each checkbox.
-When you are done, click on <strong>APPLY ALL</strong> button to confirm all</p>
-<p>If you accepted users, they will be part of member list now</p>
-<p><img src="images/userapproved.png" alt="" /></p>
-<p>Otherwise, they are discarded</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="join-an-organization-1"><a class="header" href="#join-an-organization-1">Join an organization</a></h1>
-<p>Any user can request to join an organization</p>
-<p>On home/Organization menu, click on <strong>JOIN AN ORGANIZATION</strong></p>
-<p><img src="images/join.png" alt="" /></p>
-<p>Fill the reason and select the organization you want to join, then click on <strong>DONE</strong></p>
-<p>Your request is sent to the administrator of this organization</p>
-<p>To see what an administrator can do with your request , <a href="ManageAnOrganization.html#member-requests">click here</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="write-to-an-organization-1"><a class="header" href="#write-to-an-organization-1">Write to an organization</a></h1>
-<p>Any user can write to an organization, being part of it or not but ... he/she will have to pay gas fees. The reason is that we want to avoid spammers and we want to make these alerts/messages appearing as important information</p>
-<h1 id="write"><a class="header" href="#write">Write</a></h1>
-<p>You can either click on the button <strong>WRITE TO ORGANIZATION</strong> on Home/Organization page or on the <strong>MESSAGES</strong> tab of your organization</p>
-<p><img src="images/write.png" alt="" /></p>
-<p>Write your message (respecting ASCII characters) and click on <strong>SEND</strong> button</p>
-<p><img src="images/message.png" alt="" /></p>
-<p><img src="images/thread.png" alt="" /></p>
-<h1 id="reply"><a class="header" href="#reply">Reply</a></h1>
-<p>If someone send a message and is not part of the organization, he/she cannot see the answers. To tackle this issue, any user can decide to <strong>reply</strong> to a message.</p>
-<p>Click on <strong>REPLY</strong> on a specific message and add your text there, then click on <strong>REPLY</strong> button</p>
-<p><img src="images/reply.png" alt="" /></p>
-<h2 id="watch-replies-in-thread"><a class="header" href="#watch-replies-in-thread">Watch replies in thread</a></h2>
-<p>If you are part of the organization, you can vizualize all thread and replies</p>
-<p><img src="images/watchreplies.png" alt="" /></p>
-<h2 id="watch-replies-on-inbox"><a class="header" href="#watch-replies-on-inbox">Watch replies on inbox</a></h2>
-<p>If you are not part of the organization, you can vizualize replies to your messages on your Profile &gt; Inbox tab</p>
-<p><img src="images/inbox.png" alt="" /></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="developer-guide"><a class="header" href="#developer-guide">Developer Guide</a></h1>
-<h2 id="incentive"><a class="header" href="#incentive"><a href="./Incentive.html">Incentive</a></a></h2>
-<p>Why to integrate TzCommunity and how it is different to other name resolvers</p>
-<h2 id="prerequisites"><a class="header" href="#prerequisites"><a href="./PreRequisites.html">PreRequisites</a></a></h2>
-<p>What do you need to integrate TzCommunity</p>
-<h2 id="install"><a class="header" href="#install"><a href="./Install.html">Install</a></a></h2>
-<p>Explanation step by step</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="incentives"><a class="header" href="#incentives">Incentives</a></h1>
-<p>All applications manage their own identities or delegate it to a kinda LDAP system. What is important to figure out is that end <strong>users don't want to face non human readable identifiers</strong> (unless pseudonymity is the main purpose).</p>
-<p><strong>TzCommunity offers you, for free, a way to convert identifiers to trustable human readable names, and leverage your role based access system</strong></p>
-<ul>
-<li>linking your Tezos address is free, no hidden fees, no need to renew, no naming spoilation</li>
-<li>unlinking too</li>
-<li>social account link is trustable, it is based on OAUTH2, noone can impersonate you as we provide you the real provider alias identifier</li>
-<li>you can organize groups and manage your role based access system in your application based TzCommunity organizations</li>
-</ul>
-<p>Compared to other solutions :</p>
-<div class="table-wrapper"><table><thead><tr><th>Feature/Solution</th><th>Tezos Domains</th><th>Wallet contact book</th><th>TzCommunity</th></tr></thead><tbody>
-<tr><td>publicly available</td><td>yes</td><td>no</td><td>yes, only people from same organizations</td></tr>
-<tr><td>cost</td><td>from 1 to 100tz</td><td>0</td><td>0</td></tr>
-<tr><td>dapp integration</td><td>yes</td><td>no</td><td>yes</td></tr>
-<tr><td>reuse your name (even if it is already taken)</td><td>no</td><td>x</td><td>yes</td></tr>
-<tr><td>preserve pseudnomity</td><td>no</td><td>yes</td><td>yes (just don't link your account)</td></tr>
-</tbody></table>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="pre-requisites"><a class="header" href="#pre-requisites">Pre-requisites</a></h1>
-<p>Client libraries are focused on Typescript/Javascript web based applications (or Hybrid like Ionic)</p>
-<ul>
-<li><a href="https://www.npmjs.com/package/@marigold-dev/tezos-community">tezos-community</a> : base code containing TzCommunity Typescript classes for objects and entrypoints. It is generated by <a href="https://taqueria.io/docs/plugins/plugin-contract-types/">Taqueria plugin to generate types</a>. It includes also a caching service and the functions to authenticate on TZCommunity backend API</li>
-<li><a href="https://www.npmjs.com/package/@marigold-dev/tezos-community-reactcontext">tezos-community-reactcontext</a> : based on top of the previous library, it adds a React context to help you propage UserProfiles among your dapp</li>
-<li><a href="https://www.npmjs.com/package/@marigold-dev/tezos-community-reactcontext-ionic">tezos-community-reactcontext-ionic</a> : based on top of the previous library, it add some specific custom components like an IonChip that resolves a Tezos address to a name, picture and social account logo</li>
-</ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="install-1"><a class="header" href="#install-1">Install</a></h1>
+                        <h1 id="install"><a class="header" href="#install">Install</a></h1>
 <p>Depending of your dapp technology, you can import 1,2 or the 3 libraries</p>
 <pre><code class="language-bash">npm i @marigold-dev/tezos-community
 npm i @marigold-dev/tezos-community-reactcontext
@@ -637,16 +443,18 @@ return  &lt;TzCommunityIonicUserProfileChip
 
 </code></pre>
 <p>Here is the end of the magic story</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="example"><a class="header" href="#example">Example</a></h1>
-<p>You can find a full mobile dapp integration of these libraries on <a href="https://github.com/marigold-dev/tzvote.git">TzVote code</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="contributors"><a class="header" href="#contributors">Contributors</a></h1>
-<p>Made with love by <a href="https://www.marigold.dev/team">Marigold team</a></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="PreRequisites.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
+                            <a rel="next" href="Example.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -654,7 +462,13 @@ return  &lt;TzCommunityIonicUserProfileChip
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="PreRequisites.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
+                    <a rel="next" href="Example.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
@@ -686,13 +500,6 @@ return  &lt;TzCommunityIonicUserProfileChip
         <!-- Custom JS scripts -->
         <script src="theme/marigold.js"></script>
 
-        <script>
-        window.addEventListener('load', function() {
-            MathJax.Hub.Register.StartupHook('End', function() {
-                window.setTimeout(window.print, 100);
-            });
-        });
-        </script>
 
     </div>
     </body>
