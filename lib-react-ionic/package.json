@@ -1,0 +1,37 @@
+{
+  "name": "@marigold-dev/tezos-community-reactcontext-ionic",
+  "version": "0.1.6",
+  "description": "Add Ionic components of TzCommunity feature to your Tezos dapp",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsc -v && tsc",
+    "postbuild": "rsync -avum --include='*.png.txt' --include='*/' --exclude='*' './src/' './dist'",
+    "publish": "npm publish --access public"
+  },
+  "dependencies": {
+    "@ionic/react": "^7.3.4",
+    "@marigold-dev/tezos-community-reactcontext": "^0.1.2",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "vite": "^4.4.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marigold-dev/tzvote.git"
+  },
+  "keywords": [
+    "vote",
+    "tezos"
+  ],
+  "author": "benjamin.fuentes@marigold.dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marigold-dev/tzvote/issues"
+  },
+  "homepage": "https://github.com/marigold-dev/tzvote#readme"
+}

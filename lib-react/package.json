@@ -1,0 +1,36 @@
+{
+  "name": "@marigold-dev/tezos-community-reactcontext",
+  "version": "0.1.2",
+  "description": "Add React context of TzCommunity feature to your Tezos dapp",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsc -v && tsc",
+    "publish": "npm publish --access public"
+  },
+  "dependencies": {
+    "@marigold-dev/tezos-community": "^0.1.1",
+    "react": "^18.2.0",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "vite": "^4.4.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marigold-dev/tzvote.git"
+  },
+  "keywords": [
+    "vote",
+    "tezos"
+  ],
+  "author": "benjamin.fuentes@marigold.dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marigold-dev/tzvote/issues"
+  },
+  "homepage": "https://github.com/marigold-dev/tzvote#readme"
+}
