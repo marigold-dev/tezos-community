@@ -9,6 +9,10 @@
   - [Join an organization](./JoinAnOrganization.md)
   - [Write to an organization](./WriteToAnOrganization.md)
 - [Developer Guide](./DEVELOPER.md)
+  - [Incentive](./Incentive.md)
+  - [PreRequisites](./PreRequisites.md)
+  - [Install](./Install.md)
+  - [Example](./Example.md)
 
 ---
 
