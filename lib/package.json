@@ -1,6 +1,6 @@
 {
   "name": "@marigold-dev/tezos-community",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Minimum files to integrate TzCommunity feature to your Tezos dapp",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marigold-dev/tzvote.git"
+    "url": "git+https://github.com/marigold-dev/tezos-community.git"
   },
   "keywords": [
     "vote",
@@ -35,7 +35,7 @@
   "author": "benjamin.fuentes@marigold.dev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/marigold-dev/tzvote/issues"
+    "url": "https://github.com/marigold-dev/tezos-community/issues"
   },
-  "homepage": "https://github.com/marigold-dev/tzvote#readme"
+  "homepage": "https://github.com/marigold-dev/tezos-community#readme"
 }
