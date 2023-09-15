@@ -36,7 +36,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useHistory } from "react-router";
 import {
   LocalStorageKeys,
   Organization,
@@ -72,8 +71,6 @@ export const OrganizationScreen = ({
   selectedTab,
   setSelectedTab,
 }: OrganizationProps): JSX.Element => {
-  const history = useHistory();
-
   const {
     Tezos,
     userAddress,
@@ -610,7 +607,7 @@ export const OrganizationScreen = ({
                   <IonButton
                     color="danger"
                     slot="end"
-                    onClick={(e) => removeMember(userAddress as address)}
+                    onClick={() => removeMember(userAddress as address)}
                   >
                     <IonIcon icon={trashOutline} />
                     Leave organization

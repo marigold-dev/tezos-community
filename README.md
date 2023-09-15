@@ -218,6 +218,19 @@ yarn install
 yarn run start:dev
 ```
 
+# Publish libraries
+
+Go to one of the libraries :
+
+- lib
+- lib-react
+- lib-react-ionic
+
+```bash
+npm run build
+npm run publish
+```
+
 # Docs
 
 import git submodule and run doc locally

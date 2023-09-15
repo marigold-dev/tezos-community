@@ -40,7 +40,7 @@ export const OrganizationMessages = ({
 
   const [presentAlert] = useIonAlert();
 
-  const { Tezos, userProfiles, mainWalletType, setLoading } = React.useContext(
+  const { userProfiles, mainWalletType, setLoading } = React.useContext(
     UserContext
   ) as UserContextType;
 

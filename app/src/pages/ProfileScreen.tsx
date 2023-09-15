@@ -53,7 +53,6 @@ export const ProfileScreen: React.FC = () => {
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const {
-    Tezos,
     userAddress,
     nftContratTokenMetadataMap,
     storage,
@@ -248,7 +247,7 @@ export const ProfileScreen: React.FC = () => {
                   <IonButton
                     color="warning"
                     slot="end"
-                    onClick={(e) => unlinkSocialAccount()}
+                    onClick={() => unlinkSocialAccount()}
                   >
                     <IonIcon icon={unlinkOutline} />
                     Unlink social account

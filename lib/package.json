@@ -1,0 +1,41 @@
+{
+  "name": "@marigold-dev/tezos-community",
+  "version": "0.1.2",
+  "description": "Minimum files to integrate TzCommunity feature to your Tezos dapp",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsc -v && tsc",
+    "publish": "npm publish --access public"
+  },
+  "dependencies": {
+    "@ionic/storage": "^4.0.0",
+    "@siwt/sdk": "^0.0.5",
+    "@taquito/beacon-wallet": "^17.3.0",
+    "@taquito/taquito": "^17.3.0",
+    "@tzkt/sdk-api": "^2.2.0",
+    "bignumber.js": "^9.1.2",
+    "jwt-decode": "^3.1.2",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "vite": "^4.4.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marigold-dev/tezos-community.git"
+  },
+  "keywords": [
+    "vote",
+    "tezos"
+  ],
+  "author": "benjamin.fuentes@marigold.dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marigold-dev/tezos-community/issues"
+  },
+  "homepage": "https://github.com/marigold-dev/tezos-community#readme"
+}

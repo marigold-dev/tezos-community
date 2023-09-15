@@ -64,7 +64,6 @@ export const OrganizationAdministration = ({
   members,
 }: OrganizationProps): JSX.Element => {
   const {
-    Tezos,
     userAddress,
     userProfiles,
     storage,
@@ -435,7 +434,7 @@ export const OrganizationAdministration = ({
 
             {organization.admins.length > 1 && !isTezosOrganization ? (
               <IonIcon
-                onClick={(e) => removeAdmin(admin)}
+                onClick={() => removeAdmin(admin)}
                 slot="end"
                 color="white"
                 icon={trashBinOutline}
@@ -444,7 +443,7 @@ export const OrganizationAdministration = ({
               <>
                 <IonButton id="passFlag" color="dark" slot="end">
                   <IonIcon
-                    onClick={(e) => removeAdmin(admin)}
+                    onClick={() => removeAdmin(admin)}
                     icon={flagOutline}
                   />
                   Pass the flag
@@ -453,7 +452,7 @@ export const OrganizationAdministration = ({
                 <IonButton
                   color="danger"
                   slot="end"
-                  onClick={(e) => removeOrganization(organization.name)}
+                  onClick={() => removeOrganization(organization.name)}
                 >
                   <IonIcon icon={trashOutline} />
                   Delete organization
@@ -545,7 +544,7 @@ export const OrganizationAdministration = ({
                   />
 
                   <IonIcon
-                    onClick={(e) => removeMember(member)}
+                    onClick={() => removeMember(member)}
                     slot="end"
                     color="white"
                     style={{
@@ -812,7 +811,7 @@ export const OrganizationAdministration = ({
 
                   {"active" in org.status || "pendingApproval" in org.status ? (
                     <IonIcon
-                      onClick={(e) => freezeOrganization(org.name)}
+                      onClick={() => freezeOrganization(org.name)}
                       slot="end"
                       color="white"
                       icon={stopCircleOutline}
@@ -822,7 +821,7 @@ export const OrganizationAdministration = ({
                   )}
 
                   <IonIcon
-                    onClick={(e) => removeOrganization(org.name)}
+                    onClick={() => removeOrganization(org.name)}
                     slot="end"
                     color="white"
                     icon={trashOutline}

@@ -59,13 +59,13 @@
     "workbox-streams": "^5.1.4"
   },
   "scripts": {
-    "dev": "if test -f .env; then sed -i \"s/\\(VITE_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"VITE_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && serve -l 3000 dist",
+    "dev": "if test -f .env; then sed -i \"s/\\(VITE_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"VITE_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && serve -s -l 3000 dist",
     "ionic:build": "tsc -v && tsc && vite build",
     "build": " tsc -v && tsc && vite build",
     "preview": "vite preview",
     "ionic:serve": "vite dev --host",
     "sync": "npm run build && ionic cap sync --no-build",
-    "start:prod": "if test -f .env; then sed -i \"s/\\(VITE_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env ; else jq -r '\"VITE_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env ; fi && serve -l 3000 dist"
+    "start:prod": "if test -f .env; then sed -i \"s/\\(VITE_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env ; else jq -r '\"VITE_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env ; fi && serve -s -l 3000 dist"
   },
   "eslintConfig": {
     "extends": [
@@ -82,7 +82,7 @@
     "iOS >=14"
   ],
   "devDependencies": {
-    "@airgap/beacon-types": "^4.0.6",
+    "@airgap/beacon-types": "^4.0.9",
     "@capacitor/cli": "4.7.3",
     "@types/node": "^20.4.9",
     "@types/react": "^18.2.20",

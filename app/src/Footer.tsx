@@ -5,7 +5,6 @@ import {
   SigningType,
 } from "@airgap/beacon-types";
 
-import { Clipboard } from "@capacitor/clipboard";
 import {
   IonButton,
   IonButtons,
@@ -46,21 +45,11 @@ export const Footer: React.FC = () => {
   const {
     Tezos,
     userAddress,
-    userProfiles,
-    setUserProfiles,
-    userProfile,
-    setUserProfile,
-    storage,
-    storageNFT,
-    mainWalletType,
-    nftWalletType,
-    setStorage,
+
     setUserAddress,
-    setLoading,
     refreshStorage,
     disconnectWallet,
     setTransportWebHID,
-    nftContratTokenMetadataMap,
     localStorage,
     setTezos,
   } = React.useContext(UserContext) as UserContextType;
@@ -213,17 +202,6 @@ export const Footer: React.FC = () => {
 
     //refresh the global storage, as we have an access token now, we can fetch other user profiles
     await refreshStorage();
-  };
-
-  const writeToClipboard = async (content: string) => {
-    console.log("writeToClipboard", content);
-
-    await Clipboard.write({
-      string: content,
-    });
-
-    const result = await Clipboard.read();
-    console.log("reading clipboard", result);
   };
 
   return (
