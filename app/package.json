@@ -62,14 +62,14 @@
   },
   "scripts": {
     "local": "if test -f .env; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && vite dev --host ",
-    "dev": "if test -f .env.ghostnet; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env.ghostnet ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env.ghostnet ; fi && vite preview --port 3000",
+    "dev": "if test -f .env.ghostnet; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env.ghostnet ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env.ghostnet ; fi && vite preview --port 3000 --host",
     "ionic:build": "tsc -v && tsc && vite build --mode mainnet",
     "build:dev": " tsc -v && tsc && vite build --mode ghostnet",
     "build:prod": " tsc -v && tsc && vite build --mode mainnet",
     "preview": "vite preview",
     "ionic:serve": "vite dev --host",
     "sync": "npm run build && ionic cap sync --no-build",
-    "start:prod": "if test -f .env.mainnet; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env.mainnet ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env.mainnet ; fi && vite preview --port 3000"
+    "start:prod": "if test -f .env.mainnet; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env.mainnet ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env.mainnet ; fi && vite preview --port 3000 --host"
   },
   "eslintConfig": {
     "extends": [
