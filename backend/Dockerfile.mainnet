@@ -10,6 +10,6 @@ WORKDIR /tezos-community
 
 COPY ./backend .
 
-RUN npm ci && npm run build
+RUN yarn install && yarn run build
 
 ENTRYPOINT ["npm", "run", "start:prod"]
