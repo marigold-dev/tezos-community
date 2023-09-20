@@ -12,4 +12,4 @@ COPY ./backend .
 
 RUN npm ci && npm run build
 
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["npm", "run", "start:dev"]
