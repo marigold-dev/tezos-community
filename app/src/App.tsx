@@ -25,12 +25,11 @@ import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
 import { LocalNotifications } from "@capacitor/local-notifications";
-import jwt_decode from "jwt-decode";
 import "./theme/variables.css";
 
-import { MichelsonPrimitives, NetworkType } from "@airgap/beacon-types";
-import { Storage as LocalStorage } from "@ionic/storage";
+import { MichelsonPrimitives } from "@airgap/beacon-types";
 import Transport from "@ledgerhq/hw-transport";
+
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { LedgerSigner } from "@taquito/ledger-signer";
 import { TezosToolkit } from "@taquito/taquito";
@@ -40,7 +39,6 @@ import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { CachingService } from "./caching.service";
 import { MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
@@ -50,6 +48,19 @@ import { ProfileScreen } from "./pages/ProfileScreen";
 import { socket } from "./socket";
 import { BigMap, address, nat, unit } from "./type-aliases";
 
+import { Storage as LocalStorage } from "@ionic/storage";
+import {
+  CachingService,
+  LocalStorageKeys,
+  TzCommunityError,
+  TzCommunityErrorType,
+  UserProfile,
+  connectToWeb2Backend,
+  getUserProfile,
+  loadUserProfiles,
+  refreshToken,
+} from "@marigold-dev/tezos-community";
+import { TzCommunityReactContext } from "@marigold-dev/tezos-community-reactcontext";
 //FIXME waiting fix for https://github.com/airgap-it/beacon-sdk/issues/576
 export declare type MichelineMichelsonV1Expression =
   | {
@@ -70,15 +81,6 @@ export declare type MichelineMichelsonV1Expression =
 
 setupIonicReact();
 
-const localStorage = new CachingService(new LocalStorage());
-
-export enum LocalStorageKeys {
-  access_token = "access_token",
-  refresh_token = "refresh_token",
-  id_token = "id_token",
-  bigMapsGetKeys = "bigMapsGetKeys",
-}
-
 export type TZIP21TokenMetadata = TokenMetadata & {
   artifactUri?: string; //A URI (as defined in the JSON Schema Specification) to the asset.
   displayUri?: string; //A URI (as defined in the JSON Schema Specification) to an image of the asset.
@@ -94,25 +96,6 @@ export enum PROVIDER {
   LEDGER,
   UNKNOWN,
 }
-
-export enum SOCIAL_ACCOUNT_TYPE {
-  google = "google",
-  twitter = "twitter",
-  // facebook = "facebook",
-  github = "github",
-  gitlab = "gitlab",
-  // microsoft = "microsoft",
-  slack = "slack",
-  //reddit = "reddit",
-  //telegram = "telegram",
-}
-
-export type UserProfile = {
-  displayName: string;
-  socialAccountType: SOCIAL_ACCOUNT_TYPE;
-  socialAccountAlias: string;
-  photo: string;
-};
 
 export type MemberRequest = {
   joinRequest: {
@@ -155,12 +138,9 @@ export type UserContextType = {
   userAddress: string;
   setUserAddress: Dispatch<SetStateAction<string>>;
 
-  userProfiles: Map<address, UserProfile>; //cache to avoid to run more queries on userProfiles
-  setUserProfiles: Dispatch<SetStateAction<Map<address, UserProfile>>>;
   transportWebHID: Transport | undefined;
   setTransportWebHID: Dispatch<SetStateAction<Transport | undefined>>;
-  userProfile: UserProfile | null;
-  setUserProfile: Dispatch<SetStateAction<UserProfile | null>>;
+
   Tezos: TezosToolkit & { beaconWallet?: BeaconWallet };
   setTezos: Dispatch<SetStateAction<TezosToolkit>>;
   mainWalletType: MainWalletType | null;
@@ -168,10 +148,8 @@ export type UserContextType = {
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
   disconnectWallet: () => Promise<void>;
-  getUserProfile: (whateverUserAddress: string) => Promise<UserProfile | null>;
   refreshStorage: (event?: CustomEvent<RefresherEventDetail>) => Promise<void>;
   nftContratTokenMetadataMap: Map<number, TZIP21TokenMetadata>;
-  localStorage: CachingService;
   socket: Socket;
 };
 export let UserContext = React.createContext<UserContextType | null>(null);
@@ -179,6 +157,10 @@ export let UserContext = React.createContext<UserContextType | null>(null);
 const App: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
+
+  const [localStorage, setLocalStorage] = useState<CachingService>(
+    new CachingService(new LocalStorage())
+  );
 
   const [Tezos, setTezos] = useState<
     TezosToolkit & { beaconWallet?: BeaconWallet }
@@ -196,7 +178,7 @@ const App: React.FC = () => {
   const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
     new Map()
   );
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | undefined>();
   const [storage, setStorage] = useState<Storage | null>(null);
   const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
     null
@@ -216,31 +198,31 @@ const App: React.FC = () => {
   const [subscriptionsDone, setSubscriptionsDone] = useState<boolean>(false); //do registration only once
   const organizationActivatedSubscription = Tezos.stream.subscribeEvent({
     tag: "organizationActivated",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
   const organizationFrozenSubscription = Tezos.stream.subscribeEvent({
     tag: "organizationFrozen",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
   const organizationAddedSubscription = Tezos.stream.subscribeEvent({
     tag: "organizationAdded",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
   const joinOrganizationRequestSubscription = Tezos.stream.subscribeEvent({
     tag: "joinOrganizationRequest",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
   const orgMemberRequestsUpdatedSubscription = Tezos.stream.subscribeEvent({
     tag: "orgMemberRequestsUpdated",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
   const orgMessagesSubscription = Tezos.stream.subscribeEvent({
     tag: "message",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
   const repliesSubscription = Tezos.stream.subscribeEvent({
     tag: "reply",
-    address: import.meta.env.VITE_CONTRACT_ADDRESS!,
+    address: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
   });
 
   const [notificationId, setNotificationId] = useState<number>(0);
@@ -251,59 +233,59 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    console.warn(
-      "**************************userAddress changed***************",
-      userAddress
-    );
-
-    if (userAddress) {
-      (async () => {
-        await refreshStorage();
-      })();
-    } else {
-      (async () => {
-        //console.log("Tezos", Tezos, "Tezos.beaconWallet", Tezos.beaconWallet);
-        if (!Tezos.beaconWallet) {
-          console.log(
-            "We lost userAddress cause of page refresh, reload it from web Beacon local cache"
+    //only try to load if userProfile, it means you are logged with TzCommunity
+    console.warn("***userProfile changed***", userProfile);
+    (async () => {
+      if (userProfile || userProfile === null) {
+        try {
+          setUserProfiles(
+            await loadUserProfiles(
+              Tezos as TezosToolkit,
+              userAddress!,
+              localStorage
+            )
           );
+        } catch (error) {
+          console.log(error);
 
-          //we need to recreate the wallet completely because of page reload
-          let wallet = new BeaconWallet({
-            name: "TzCommunity",
-            preferredNetwork: import.meta.env.VITE_NETWORK
-              ? NetworkType[
-                  import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-                ]
-              : NetworkType.GHOSTNET,
-          });
-          Tezos.setWalletProvider(wallet);
-          Tezos.beaconWallet = wallet;
-          setTezos(Tezos); //object changed and needs propagation
-
-          const activeAccount =
-            await Tezos.beaconWallet.client.getActiveAccount();
-          var userAddress: string;
-          if (activeAccount) {
-            userAddress = activeAccount.address;
-            setUserAddress(userAddress);
+          if (error instanceof TzCommunityError) {
+            switch (error.type) {
+              case TzCommunityErrorType.ACCESS_TOKEN_NULL: {
+                console.warn("Cannot refresh token, disconnect");
+                disconnectWallet();
+                break;
+              }
+              case TzCommunityErrorType.ACCESS_TOKEN_EXPIRED: {
+                console.warn(
+                  "Access token expired, try to fetch from refresh token.."
+                );
+                await refreshToken(userAddress!, localStorage);
+                const userProfile = await getUserProfile(
+                  userAddress!,
+                  localStorage
+                );
+                if (userProfile) setUserProfile(userProfile);
+                setUserProfiles(
+                  await loadUserProfiles(Tezos, userAddress!, localStorage)
+                );
+                break;
+              }
+            }
           } else {
-            console.warn("There is no more active user");
+            //nada
           }
-        } else {
-          console.warn("Cannot restore user from page refresh");
-          disconnectWallet();
         }
-      })();
-    }
-  }, [userAddress]);
+      } else {
+        //in case of page hard refresh
+        await reloadUser();
+        await refreshStorage();
+      }
+    })();
+  }, [userProfile]);
 
   //subscriptions
   useEffect(() => {
-    console.warn(
-      "**************************storage changed***************",
-      storage
-    );
+    console.warn("***storage changed***", storage);
 
     if (storage) {
       (async () => {
@@ -540,48 +522,55 @@ const App: React.FC = () => {
                 const membersBigMapId = (
                   orgItem.members as unknown as { id: BigNumber }
                 ).id.toNumber();
-                const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
-                let keys: BigMapKey[] = await localStorage.getWithTTL(url);
 
-                if (!keys) {
-                  //console.warn("cache is empty for key : ", url);
-                  try {
-                    keys = await api.bigMapsGetKeys(membersBigMapId, {
-                      micheline: "Json",
-                      active: true,
-                    });
-                    await localStorage.setWithTTL(url, keys);
-                  } catch (error) {
-                    console.error("TZKT call failed", error);
+                //bring until some random seconds wait to avoid beign rejected by TZKT quotas
+                setTimeout(async () => {
+                  const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+                  let keys: BigMapKey[] = await localStorage.getWithTTL(url);
+
+                  if (!keys) {
+                    //console.warn("cache is empty for key : ", url);
+                    try {
+                      keys = await api.bigMapsGetKeys(membersBigMapId, {
+                        micheline: "Json",
+                        active: true,
+                      });
+                      await localStorage.setWithTTL(url, keys);
+                    } catch (error) {
+                      console.error("TZKT call failed", error);
+                    }
                   }
-                }
 
-                if (keys) {
-                  //check if member is part of it OR super admin
-                  if (
-                    keys.findIndex((key) => key.key === userAddress) >= 0 ||
-                    storage.tezosOrganization.admins.indexOf(
-                      userAddress as address
-                    ) >= 0
-                  ) {
-                    myOrganizationsAsMember.push(orgItem);
+                  if (keys) {
+                    //check if member is part of it OR super admin
+                    if (
+                      keys.findIndex((key) => key.key === userAddress) >= 0 ||
+                      storage.tezosOrganization.admins.indexOf(
+                        userAddress as address
+                      ) >= 0
+                    ) {
+                      myOrganizationsAsMember.push(orgItem);
 
-                    //cache userprofiles
-                    for (const key of keys) {
-                      if (
-                        await localStorage.get(LocalStorageKeys.access_token)
-                      ) {
-                        const up = await getUserProfile(key.key);
-                        if (up) {
-                          userProfiles.set(key.key, up);
+                      //cache userprofiles
+                      for (const key of keys) {
+                        if (
+                          await localStorage.get(LocalStorageKeys.access_token)
+                        ) {
+                          const up = await getUserProfile(
+                            key.key,
+                            localStorage
+                          );
+                          if (up) {
+                            userProfiles.set(key.key, up);
 
-                          // console.log("APP CALLING setUserProfiles", userProfiles);
-                          setUserProfiles(userProfiles);
+                            // console.log("APP CALLING setUserProfiles", userProfiles);
+                            setUserProfiles(userProfiles);
+                          }
                         }
                       }
                     }
                   }
-                }
+                }, Math.floor(Math.random() * 3000));
               })
             );
 
@@ -720,80 +709,134 @@ const App: React.FC = () => {
           } else {
           }
         } catch (error) {
-          console.log(
-            "********************Error*************************",
-            error
-          );
+          console.log("Error", error);
         }
       })();
     } else {
+      console.warn("storage not ready because === null");
     }
   }, [storage]);
+
+  const reloadUser = async (): Promise<string | undefined> => {
+    console.warn("reloadUser");
+
+    //console.log("Tezos", Tezos, "Tezos.beaconWallet", Tezos.beaconWallet);
+    if (!Tezos.beaconWallet) {
+      console.log(
+        "We lost userAddress cause of page refresh, reload it from web Beacon local cache"
+      );
+
+      //we need to recreate the wallet completely because of page reload
+      let wallet = new BeaconWallet({
+        name: "TzCommunity",
+        preferredNetwork: import.meta.env.VITE_NETWORK,
+      });
+      Tezos.setWalletProvider(wallet);
+      Tezos.beaconWallet = wallet;
+      setTezos(Tezos); //object changed and needs propagation
+
+      const activeAccount = await Tezos.beaconWallet.client.getActiveAccount();
+
+      if (activeAccount) {
+        let userAddress = activeAccount!.address;
+        setUserAddress(userAddress);
+        //try to load your user profile
+        try {
+          const newUserProfile = await getUserProfile(
+            userAddress,
+            localStorage
+          );
+          setUserProfile(newUserProfile!);
+
+          setUserProfiles(
+            userProfiles.set(userAddress as address, newUserProfile!)
+          );
+        } catch (error) {
+          if (error instanceof TzCommunityError) {
+            switch (error.type) {
+              case TzCommunityErrorType.ACCESS_TOKEN_NULL: {
+                console.warn("Cannot refresh token, disconnect");
+                disconnectWallet();
+                break;
+              }
+              case TzCommunityErrorType.ACCESS_TOKEN_EXPIRED: {
+                console.warn(
+                  "Access token expired, try to fetch from refresh token.."
+                );
+                await refreshToken(userAddress!, localStorage);
+                const userProfile = await getUserProfile(
+                  userAddress!,
+                  localStorage
+                );
+                if (userProfile) setUserProfile(userProfile);
+                setUserProfiles(
+                  await loadUserProfiles(Tezos, userAddress!, localStorage)
+                );
+                break;
+              }
+            }
+          } else {
+            console.warn(
+              "User " +
+                userAddress +
+                " has no social account profile link on TzCommunity"
+            );
+          }
+        }
+
+        return userAddress;
+      } else {
+        return undefined;
+      }
+    } else {
+      console.warn(
+        "We have a Ledger, and we are forced to disconnect because there is no session"
+      );
+      disconnectWallet();
+    }
+  };
 
   const refreshStorage = async (
     event?: CustomEvent<RefresherEventDetail>
   ): Promise<void> => {
-    console.log("************  Calling refreshStorage");
+    //console.log("Calling refreshStorage");
 
-    if (userAddress) {
-      //only refresh userProfile if there is SIWT
-      if (await localStorage.get(LocalStorageKeys.access_token)) {
-        const newUserProfile = await getUserProfile(userAddress);
-        if (newUserProfile) {
-          userProfiles.set(userAddress as address, newUserProfile);
+    console.log(
+      "VITE_CONTRACT_ADDRESS:",
+      import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
+    );
+    console.log(
+      "VITE_TZCOMMUNITY_BACKEND_URL:",
+      import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL!
+    );
 
-          //   console.log("APP CALLING setUserProfiles", userProfiles);
-          setUserProfiles(userProfiles); //cache
-
-          setUserProfile(newUserProfile); //cache
-          /* console.log(
-              "userProfile refreshed for " + userAddress,
-              newUserProfile
-            );*/
-        }
-      } else {
-        console.error(
-          "************  cannot find access_token ...",
-          localStorage
-        );
-      }
-
-      console.log(
-        "VITE_CONTRACT_ADDRESS:",
-        import.meta.env.VITE_CONTRACT_ADDRESS!
+    const mainWalletType: MainWalletType =
+      await Tezos.wallet.at<MainWalletType>(
+        import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
       );
-      console.log("VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL!);
+    const storage: Storage = await mainWalletType.storage();
+    setMainWalletType(mainWalletType);
 
-      const mainWalletType: MainWalletType =
-        await Tezos.wallet.at<MainWalletType>(
-          import.meta.env.VITE_CONTRACT_ADDRESS!
-        );
-      const storage: Storage = await mainWalletType.storage();
-      setMainWalletType(mainWalletType);
+    const nftWalletType: NftWalletType = await Tezos.wallet.at<NftWalletType>(
+      storage.nftAddress
+    );
+    const storageNFT: StorageNFT = await nftWalletType.storage();
+    setNftWalletType(nftWalletType);
 
-      const nftWalletType: NftWalletType = await Tezos.wallet.at<NftWalletType>(
-        storage.nftAddress
-      );
-      const storageNFT: StorageNFT = await nftWalletType.storage();
-      setNftWalletType(nftWalletType);
+    let c = await Tezos.contract.at(storage.nftAddress, tzip12);
 
-      let c = await Tezos.contract.at(storage.nftAddress, tzip12);
+    let tokenMetadata: TZIP21TokenMetadata = (await c
+      .tzip12()
+      .getTokenMetadata(0)) as TZIP21TokenMetadata;
+    nftContratTokenMetadataMap.set(0, tokenMetadata);
 
-      let tokenMetadata: TZIP21TokenMetadata = (await c
-        .tzip12()
-        .getTokenMetadata(0)) as TZIP21TokenMetadata;
-      nftContratTokenMetadataMap.set(0, tokenMetadata);
+    setNftContratTokenMetadataMap(new Map(nftContratTokenMetadataMap)); //new Map to force refresh
+    console.log("User NFT refreshed");
 
-      setNftContratTokenMetadataMap(new Map(nftContratTokenMetadataMap)); //new Map to force refresh
-      console.log("User NFT refreshed");
-
-      //it has to be last one
-      setStorageNFT(storageNFT);
-      setStorage(storage);
-      console.log("Storage refreshed");
-    } else {
-      console.log("No useraddress no need to refresh storage yet");
-    }
+    //it has to be last one
+    setStorageNFT(storageNFT);
+    setStorage(storage);
+    console.log("Storage refreshed");
 
     event?.detail.complete();
   };
@@ -829,7 +872,7 @@ const App: React.FC = () => {
 
   const disconnectWallet = async (): Promise<void> => {
     setUserAddress("");
-    setUserProfile(null);
+    setUserProfile(undefined);
 
     console.log("Tezos.wallet", Tezos.wallet);
 
@@ -846,6 +889,7 @@ const App: React.FC = () => {
       }
     }
 
+    //TzCommunity
     if (localStorage.initialized) {
       console.log("localStorage is initialized, removing access tokens");
       await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
@@ -854,147 +898,60 @@ const App: React.FC = () => {
     } else {
       console.warn("localStorage not initialized, cannot remove access tokens");
     }
-  };
-
-  const getUserProfile = async (
-    whateverUserAddress: string
-  ): Promise<UserProfile | null> => {
-    try {
-      const accessToken = await localStorage.get(LocalStorageKeys.access_token);
-
-      if (!accessToken) {
-        console.error("you lost the SIWT accessToken, disconnecting...");
-        disconnectWallet();
-        return null;
-      }
-      const url =
-        import.meta.env.VITE_BACKEND_URL + "/user/" + whateverUserAddress;
-      const up = await localStorage.getWithTTL(url);
-
-      if (up && Object.keys(up).length > 0) {
-        //not empty
-        return new Promise((resolve, _) => resolve(up));
-      } else if (up && Object.keys(up).length === 0) {
-        //empty
-        return new Promise((resolve, _) => resolve(null));
-      } else {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        const json = await response.json();
-
-        if (response.ok) {
-          await localStorage.setWithTTL(url, json);
-          return new Promise((resolve, _) => resolve(json));
-        } else if (response.status === 401 || response.status === 403) {
-          console.warn("Silently refreshing token", response);
-          try {
-            await refreshToken(userAddress);
-            return await getUserProfile(whateverUserAddress);
-          } catch (error) {
-            console.error("Cannot refresh token, disconnect");
-            disconnectWallet();
-            return null;
-          }
-        } else {
-          //console.warn("User Profile not found", response);
-          await localStorage.setWithTTL(url, {});
-          return new Promise((resolve, _) => resolve(null));
-        }
-      }
-    } catch (error) {
-      console.error("error", error);
-      return new Promise((resolve, _) => resolve(null));
-    }
-  };
-
-  const refreshToken = async (userAddress: string) => {
-    try {
-      const response = await fetch(
-        import.meta.env.VITE_BACKEND_URL + "/siwt/refreshToken",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            refreshToken: await localStorage.get("refresh_token"),
-            pkh: userAddress,
-          }),
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        const { accessToken, idToken, refreshToken } = data;
-        console.log("SIWT reconnected to web2 backend", jwt_decode(idToken));
-
-        await localStorage.set(LocalStorageKeys.access_token, accessToken);
-        await localStorage.set(LocalStorageKeys.refresh_token, refreshToken);
-        await localStorage.set(LocalStorageKeys.id_token, idToken);
-
-        console.log(
-          "tokens stored",
-          await localStorage.get(LocalStorageKeys.id_token)
-        );
-      } else {
-        console.error("error trying to refresh token", response);
-        return new Promise((resolve, _) => resolve(null));
-      }
-    } catch (error) {
-      console.error("error", error); //cannot do more because session is dead
-      disconnectWallet();
-    }
+    //End TzCommunity
   };
 
   return (
     <IonApp>
-      <UserContext.Provider
+      <TzCommunityReactContext.Provider
         value={{
-          transportWebHID,
-          setTransportWebHID,
-          userAddress,
           userProfiles,
           setUserProfiles,
           userProfile,
           setUserProfile,
-          Tezos,
-          storage,
-          storageNFT,
-          mainWalletType,
-          nftWalletType,
-          setUserAddress,
-          setStorage,
-          loading,
-          setLoading,
-          refreshStorage,
-          getUserProfile,
-          nftContratTokenMetadataMap,
           localStorage,
-          disconnectWallet,
-          socket,
-          setTezos,
+          connectToWeb2Backend: connectToWeb2Backend,
         }}
       >
-        <IonReactRouter>
-          <IonRouterOutlet>
-            <Route
-              path={"/" + PAGES.ORGANIZATIONS}
-              component={OrganizationsScreen}
-            />
-            <Route
-              path={"/" + PAGES.ORGANIZATION}
-              component={OrganizationScreen}
-            />
-            <Route path={"/" + PAGES.FAQ} component={FAQScreen} />
-            <Route path={"/" + PAGES.PROFILE} component={ProfileScreen} />
-            <Redirect exact from="/" to={PAGES.ORGANIZATIONS} />
-          </IonRouterOutlet>
-        </IonReactRouter>
-      </UserContext.Provider>
+        <UserContext.Provider
+          value={{
+            transportWebHID,
+            setTransportWebHID,
+            userAddress,
+
+            Tezos,
+            storage,
+            storageNFT,
+            mainWalletType,
+            nftWalletType,
+            setUserAddress,
+            setStorage,
+            loading,
+            setLoading,
+            refreshStorage,
+            nftContratTokenMetadataMap,
+            disconnectWallet,
+            socket,
+            setTezos,
+          }}
+        >
+          <IonReactRouter>
+            <IonRouterOutlet>
+              <Route
+                path={"/" + PAGES.ORGANIZATIONS}
+                component={OrganizationsScreen}
+              />
+              <Route
+                path={"/" + PAGES.ORGANIZATION}
+                component={OrganizationScreen}
+              />
+              <Route path={"/" + PAGES.FAQ} component={FAQScreen} />
+              <Route path={"/" + PAGES.PROFILE} component={ProfileScreen} />
+              <Redirect exact from="/" to={PAGES.ORGANIZATIONS} />
+            </IonRouterOutlet>
+          </IonReactRouter>
+        </UserContext.Provider>
+      </TzCommunityReactContext.Provider>
     </IonApp>
   );
 };

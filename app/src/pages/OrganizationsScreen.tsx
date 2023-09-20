@@ -48,22 +48,26 @@ import {
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
-import {
-  LocalStorageKeys,
-  Organization,
-  PAGES,
-  UserContext,
-  UserContextType,
-} from "../App";
+import { Organization, PAGES, UserContext, UserContextType } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
-import { address } from "../type-aliases";
 import { OrganizationScreen, TABS } from "./OrganizationScreen";
+
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { address } from "../type-aliases";
 export const OrganizationsScreen: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
+
+  const { localStorage, setUserProfiles, userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -73,21 +77,17 @@ export const OrganizationsScreen: React.FC = () => {
   const {
     Tezos,
     userAddress,
-    userProfiles,
-    setUserProfiles,
+
     storage,
     mainWalletType,
     setStorage,
     setLoading,
     loading,
     refreshStorage,
-    getUserProfile,
-    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   const [myOrganizations, setMyOrganizations] = useState<Organization[]>([]);
 
-  //page cache for big_map
   const [orgMembers, setOrgMembers] = useState<Map<string, address[]>>(
     new Map()
   );
@@ -143,8 +143,10 @@ export const OrganizationsScreen: React.FC = () => {
     useState<boolean>(false);
 
   const refreshMyOrganizations = async () => {
+    console.log("refreshMyOrganizations");
     if (storage) {
-      let orgMembers: Map<string, address[]> = new Map();
+      //filter my orgs
+      let myOrgs = myOrganizations;
 
       await Promise.all(
         storage.organizations.map(async (organization: Organization) => {
@@ -152,81 +154,56 @@ export const OrganizationsScreen: React.FC = () => {
             organization.members as unknown as { id: BigNumber }
           ).id.toNumber();
 
-          const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
-          let keys: BigMapKey[] = await localStorage.getWithTTL(url);
+          //bring until some random seconds wait to avoid beign rejected by TZKT quotas
+          setTimeout(async () => {
+            const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+            let keys: BigMapKey[] = await localStorage.getWithTTL(url);
 
-          if (!keys) {
-            try {
-              keys = await api.bigMapsGetKeys(membersBigMapId, {
-                micheline: "Json",
-                active: true,
-              });
-              await localStorage.setWithTTL(url, keys);
-            } catch (error) {
-              console.warn("TZKT call failed", error);
-            }
-          }
-
-          if (keys) {
-            orgMembers.set(
-              organization.name,
-              Array.from(keys.map((key) => key.key))
-            ); //push to React state also
-
-            //if I am member of it OR super admin
-            if (
-              keys.findIndex((key) => key.key === userAddress) >= 0 ||
-              storage.tezosOrganization.admins.indexOf(
-                userAddress as address
-              ) >= 0
-            ) {
-              //cache userprofiles
-              for (const key of keys) {
-                if (await localStorage.get(LocalStorageKeys.access_token)) {
-                  const up = await getUserProfile(key.key);
-                  if (up) {
-                    userProfiles.set(key.key, up);
-                    setUserProfiles(userProfiles);
-                  }
-                }
+            if (!keys) {
+              try {
+                keys = await api.bigMapsGetKeys(membersBigMapId, {
+                  micheline: "Json",
+                  active: true,
+                });
+                await localStorage.setWithTTL(url, keys);
+              } catch (error) {
+                console.warn("TZKT call failed", error);
               }
             }
-          }
+
+            const members = Array.from(keys.map((key) => key.key));
+
+            orgMembers.set(organization.name, members); //push to React state also
+            setOrgMembers(orgMembers);
+
+            if (
+              (members!.indexOf(userAddress as address) >= 0 ||
+                organization.admins.indexOf(userAddress as address) >= 0 ||
+                storage.tezosOrganization.admins.indexOf(
+                  userAddress as address
+                ) >= 0) &&
+              myOrganizations.indexOf(organization) < 0
+            ) {
+              myOrgs.push(organization);
+              setMyOrganizations([...myOrgs]); //avoid dup & force refresh
+            }
+          }, Math.floor(Math.random() * 3000));
         })
       );
-
-      //set on a page cache
-      setOrgMembers(orgMembers);
-
-      setMyOrganizations(
-        storage.organizations.filter((org: Organization) => {
-          //console.log("org", org);
-
-          const members = orgMembers.get(org.name);
-
-          if (
-            members!.indexOf(userAddress as address) >= 0 ||
-            org.admins.indexOf(userAddress as address) >= 0 ||
-            storage.tezosOrganization.admins.indexOf(userAddress as address) >=
-              0
-          ) {
-            return org;
-          } else {
-          }
-        })
-      );
-
-      if (myOrganizations.length > 0 && !selectedOrganizationName) {
-        setSelectedOrganizationName(myOrganizations[0].name); //init
-        setIsTezosOrganization(false);
-      } else if (myOrganizations.length == 0) {
-        setSelectedOrganizationName(undefined);
-      }
-      //console.log("myOrganizations", myOrganizations);
     } else {
       //storage not ready yet
+      console.warn("storage not ready yet");
     }
   };
+
+  useEffect(() => {
+    if (myOrganizations.length > 0 && !selectedOrganizationName) {
+      setSelectedOrganizationName(myOrganizations[0].name); //init
+      setIsTezosOrganization(false);
+    } else if (myOrganizations.length == 0) {
+      setSelectedOrganizationName(undefined);
+    }
+  }, [myOrganizations.length]);
 
   useEffect(() => {
     (async () => {
@@ -239,14 +216,13 @@ export const OrganizationsScreen: React.FC = () => {
   }, [storage, userAddress]);
 
   useEffect(() => {
-    if (
-      myOrganizations &&
-      myOrganizations.length > 0 &&
-      !selectedOrganizationName
-    ) {
-      setSelectedOrganizationName(myOrganizations[0].name); //init
-      setIsTezosOrganization(false);
-    }
+    (async () => {
+      if (storage && storage.organizations) {
+        await refreshMyOrganizations();
+      } else {
+        console.log("storage is not ready yet");
+      }
+    })();
   }, []);
 
   useEffect(
@@ -601,7 +577,7 @@ export const OrganizationsScreen: React.FC = () => {
                               setJoiningOrganization(organization);
                             }}
                             lines="none"
-                            key={organization.name}
+                            key={"modal-list-" + organization.name}
                           >
                             <IonGrid>
                               <IonRow style={{ height: "4em" }}>
@@ -868,7 +844,7 @@ export const OrganizationsScreen: React.FC = () => {
                     />
 
                     <IonText>Select an organization *</IonText>
-                    <IonList id="modal-list" inset={true}>
+                    <IonList id="modal-list2" inset={true}>
                       {messagingOrganizations &&
                         messagingOrganizations.map((organization) => (
                           <IonItem
@@ -881,7 +857,7 @@ export const OrganizationsScreen: React.FC = () => {
                               setMessagingOrganization(organization);
                             }}
                             lines="none"
-                            key={organization.name}
+                            key={"modal-list2-" + organization.name}
                           >
                             <IonGrid>
                               <IonRow style={{ height: "4em" }}>

@@ -36,14 +36,16 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Organization, UserContext, UserContextType } from "../App";
+
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
 import {
-  LocalStorageKeys,
-  Organization,
-  UserContext,
-  UserContextType,
-} from "../App";
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
 import { OrganizationAdministration } from "./OrganizationAdministration";
 import { OrganizationMessages } from "./OrganizationMessages";
@@ -77,10 +79,12 @@ export const OrganizationScreen = ({
     storage,
     mainWalletType,
     setLoading,
-    userProfiles,
     refreshStorage,
-    localStorage,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { localStorage, userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
@@ -225,7 +229,7 @@ export const OrganizationScreen = ({
       }
     } else {
       setOrganization(undefined);
-      console.log("organization fetch his not ready yet");
+      console.log("organization fetch is not ready yet");
     }
   };
 
@@ -581,7 +585,7 @@ export const OrganizationScreen = ({
                           ? members.map((member) => (
                               <IonItem key={member}>
                                 {" "}
-                                <UserProfileChip
+                                <TzCommunityIonicUserProfileChip
                                   address={member}
                                   userProfiles={userProfiles}
                                 />

@@ -22,8 +22,6 @@ export class SiwtGuard implements CanActivate {
       const pkh = this.siwtService.siwtClient.verifyAccessToken(token);
 
       if (pkh) {
-        //TODO, can do more check here already looking at smartcontract stuff ...
-
         return true;
       } else {
         Logger.debug(

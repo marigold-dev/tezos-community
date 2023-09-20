@@ -1,11 +1,4 @@
 import {
-  BeaconMessageType,
-  NetworkType,
-  SignPayloadResponse,
-  SigningType,
-} from "@airgap/beacon-types";
-
-import {
   IonButton,
   IonButtons,
   IonCol,
@@ -40,19 +33,36 @@ import {
 } from "ionicons/icons";
 import jwt_decode from "jwt-decode";
 import React, { useRef, useState } from "react";
-import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "./App";
+import { PAGES, UserContext, UserContextType } from "./App";
+
+import {
+  BeaconMessageType,
+  SignPayloadResponse,
+  SigningType,
+} from "@airgap/beacon-types";
+import {
+  LocalStorageKeys,
+  getUserProfile,
+} from "@marigold-dev/tezos-community";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { address } from "./type-aliases";
+
 export const Footer: React.FC = () => {
   const {
-    Tezos,
     userAddress,
-
+    Tezos,
     setUserAddress,
-    refreshStorage,
     disconnectWallet,
     setTransportWebHID,
-    localStorage,
+
     setTezos,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { setUserProfile, localStorage, setUserProfiles, userProfiles } =
+    React.useContext(TzCommunityReactContext) as TzCommunityReactContextType;
 
   const connectWallet = async (): Promise<void> => {
     try {
@@ -60,20 +70,12 @@ export const Footer: React.FC = () => {
 
       const wallet = new BeaconWallet({
         name: "TzCommunity",
-        preferredNetwork: import.meta.env.VITE_NETWORK
-          ? NetworkType[
-              import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-            ]
-          : NetworkType.GHOSTNET,
+        preferredNetwork: import.meta.env.VITE_NETWORK,
       });
 
       await wallet.requestPermissions({
         network: {
-          type: import.meta.env.VITE_NETWORK
-            ? NetworkType[
-                import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-              ]
-            : NetworkType.GHOSTNET,
+          type: import.meta.env.VITE_NETWORK,
           rpcUrl:
             "https://" + import.meta.env.VITE_NETWORK + ".tezos.marigold.dev",
         },
@@ -89,11 +91,29 @@ export const Footer: React.FC = () => {
 
       setUserAddress(userAddress);
 
+      //connect to TzCommunity
       await connectToWeb2Backend(
         (
           await wallet.client.getActiveAccount()
-        )?.publicKey!
+        )?.publicKey!,
+        userAddress
       );
+
+      //try to load your user profile
+      try {
+        const newUserProfile = await getUserProfile(userAddress, localStorage);
+        setUserProfile(newUserProfile!);
+
+        setUserProfiles(
+          userProfiles.set(userAddress as address, newUserProfile!)
+        );
+      } catch (error) {
+        console.warn(
+          "User " +
+            userAddress +
+            " has no social account profile link on TzCommunity"
+        );
+      }
     } catch (error) {
       console.error("error connectWallet", error);
     }
@@ -130,7 +150,23 @@ export const Footer: React.FC = () => {
       const userAddress = await Tezos.signer.publicKeyHash();
       setUserAddress(userAddress);
 
-      await connectToWeb2Backend(await Tezos.signer.publicKey());
+      await connectToWeb2Backend(await Tezos.signer.publicKey(), userAddress);
+
+      //try to load your user profile
+      try {
+        const newUserProfile = await getUserProfile(userAddress, localStorage);
+        setUserProfile(newUserProfile!);
+
+        setUserProfiles(
+          userProfiles.set(userAddress as address, newUserProfile!)
+        );
+      } catch (error) {
+        console.warn(
+          "User " +
+            userAddress +
+            " has no social account profile link on TzCommunity"
+        );
+      }
     } catch (error) {
       console.error("error connectLedger", error);
       await disconnectWallet();
@@ -138,7 +174,10 @@ export const Footer: React.FC = () => {
     }
   };
 
-  const connectToWeb2Backend = async (publicKey: string) => {
+  const connectToWeb2Backend = async (
+    publicKey: string,
+    userAddress: string
+  ) => {
     // create the message to be signed
     const messagePayload = createMessagePayload({
       dappUrl: "tezos-community.com",
@@ -173,7 +212,9 @@ export const Footer: React.FC = () => {
     }
 
     // sign in the user to our app
-    const res = (await signIn(import.meta.env.VITE_BACKEND_URL! + "/siwt")({
+    const res = (await signIn(
+      import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL! + "/siwt"
+    )({
       pk: publicKey,
       pkh: userAddress,
       message: messagePayload.payload,
@@ -199,9 +240,6 @@ export const Footer: React.FC = () => {
       "tokens stored",
       await localStorage.get(LocalStorageKeys.id_token)
     );
-
-    //refresh the global storage, as we have an access token now, we can fetch other user profiles
-    await refreshStorage();
   };
 
   return (

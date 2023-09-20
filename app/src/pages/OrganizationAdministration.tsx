@@ -24,6 +24,11 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { BigNumber } from "bignumber.js";
 import {
   addCircleOutline,
@@ -49,7 +54,6 @@ import {
 } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
-import { UserProfileChip } from "../components/UserProfileChip";
 import { address, nat } from "../type-aliases";
 
 type OrganizationProps = {
@@ -65,13 +69,16 @@ export const OrganizationAdministration = ({
 }: OrganizationProps): JSX.Element => {
   const {
     userAddress,
-    userProfiles,
     storage,
     mainWalletType,
     setStorage,
     setLoading,
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [presentAlert] = useIonAlert();
 
@@ -430,7 +437,10 @@ export const OrganizationAdministration = ({
 
         {organization?.admins.map((admin) => (
           <IonItem key={admin}>
-            <UserProfileChip address={admin} userProfiles={userProfiles} />
+            <TzCommunityIonicUserProfileChip
+              address={admin}
+              userProfiles={userProfiles}
+            />
 
             {organization.admins.length > 1 && !isTezosOrganization ? (
               <IonIcon
@@ -510,7 +520,7 @@ export const OrganizationAdministration = ({
                         .filter((member) => member != userAddress)
                         .map((member) => (
                           <IonSelectOption key={member} value={member}>
-                            <UserProfileChip
+                            <TzCommunityIonicUserProfileChip
                               address={member}
                               userProfiles={userProfiles}
                             />
@@ -538,7 +548,7 @@ export const OrganizationAdministration = ({
 
               {members.map((member) => (
                 <IonItem key={member}>
-                  <UserProfileChip
+                  <TzCommunityIonicUserProfileChip
                     address={member}
                     userProfiles={userProfiles}
                   />
@@ -633,11 +643,11 @@ export const OrganizationAdministration = ({
                     <IonCard key={memberRequest.user}>
                       <IonCardHeader>
                         <IonCardTitle>
-                          <UserProfileChip
+                          <TzCommunityIonicUserProfileChip
                             key={memberRequest.user}
                             userProfiles={userProfiles}
                             address={memberRequest.user}
-                          ></UserProfileChip>
+                          />
                         </IonCardTitle>
 
                         <IonToggle

@@ -1,9 +1,15 @@
 import { Browser } from "@capacitor/browser";
 import { IonAvatar, IonChip, IonLabel } from "@ionic/react";
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
 import React, { useEffect } from "react";
 import { useHistory } from "react-router";
-import { LocalStorageKeys, PAGES, UserContext, UserContextType } from "./App";
+import { PAGES, UserContext, UserContextType } from "./App";
 import { address } from "./type-aliases";
+
 type OAuthProps = {
   provider: string;
 };
@@ -11,13 +17,14 @@ type OAuthProps = {
 export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
   const {
     userAddress,
-    setUserProfiles,
-    userProfiles,
-    setUserProfile,
-    localStorage,
+
     socket,
     disconnectWallet,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { setUserProfile, localStorage, setUserProfiles, userProfiles } =
+    React.useContext(TzCommunityReactContext) as TzCommunityReactContextType;
+
   const history = useHistory();
 
   useEffect(() => {
@@ -44,7 +51,10 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
         }
 
         const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "/" + provider + "/claim",
+          import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL +
+            "/" +
+            provider +
+            "/claim",
           {
             method: "POST",
             headers: {
@@ -72,9 +82,9 @@ export const OAuth = ({ provider }: OAuthProps): JSX.Element => {
   }, [socket]);
 
   const openPopup = async () => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/${provider}?socketId=${
-      socket!.id
-    }`;
+    const url = `${
+      import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL
+    }/${provider}?socketId=${socket!.id}`;
     await Browser.open({
       url,
       windowName: provider,

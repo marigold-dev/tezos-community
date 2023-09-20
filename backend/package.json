@@ -30,7 +30,7 @@
     "@nestjs/platform-socket.io": "^10.0.5",
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^10.0.5",
-    "@siwt/core": "^0.0.4",
+    "@siwt/core": "^0.0.5",
     "@taquito/taquito": "^17.1.0",
     "@taquito/utils": "^17.1.0",
     "@tzkt/sdk-api": "^2.2.0",
