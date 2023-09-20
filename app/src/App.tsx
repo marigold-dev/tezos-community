@@ -158,7 +158,7 @@ const App: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
-  const [localStorage, setLocalStorage] = useState<CachingService>(
+  const [localStorage] = useState<CachingService>(
     new CachingService(new LocalStorage())
   );
 

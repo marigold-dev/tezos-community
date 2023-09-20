@@ -65,7 +65,7 @@ export const OrganizationsScreen: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
-  const { localStorage, setUserProfiles, userProfiles } = React.useContext(
+  const { localStorage } = React.useContext(
     TzCommunityReactContext
   ) as TzCommunityReactContextType;
 

@@ -9,8 +9,9 @@ COPY --from=docker:dind /usr/local/bin/docker /bin/docker
 ADD https://github.com/ecadlabs/taqueria/releases/download/v0.28.4/taq-linux /bin/taq
 RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
 COPY . .
-RUN rm app/.env
-COPY app/.env.ghostnet app/.env
+RUN rm -f dist
+RUN rm -f app/.env
+RUN rm -f app/.env.ghostnet
 
 
 RUN npm ci && taq init
@@ -18,8 +19,7 @@ RUN npm ci && taq init
 #RUN taq generate types ./src
 RUN cd app && npm ci 
 
-# Install serve globally
-RUN npm install -g serve
+RUN cd app && npm run build:dev
 
 WORKDIR /tezos-community/app
 
