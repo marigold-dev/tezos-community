@@ -24,6 +24,7 @@ export const FAQScreen: React.FC = () => {
 
   const history = useHistory();
   const location = useLocation();
+
   const match = useRouteMatch();
 
   useEffect(() => {
