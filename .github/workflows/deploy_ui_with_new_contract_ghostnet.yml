@@ -3,7 +3,7 @@ name: Build and deploy ui with new contract Ghostnet
 on:
   push:
     branches:
-      - ghostnet
+      - desactivateThisByDefault
     paths:
       - "app/**"
   workflow_dispatch: # adding the workflow_dispatch so it can be triggered manually
