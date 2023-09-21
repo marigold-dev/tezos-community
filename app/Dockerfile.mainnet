@@ -11,7 +11,7 @@ RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
 COPY . .
 RUN rm -f dist
 RUN rm -f app/.env
-RUN rm -f app/.env.mainnet
+RUN rm -f app/.env.ghostnet
 
 RUN npm ci && taq init
 #RUN taq install @taqueria/plugin-contract-types@next
