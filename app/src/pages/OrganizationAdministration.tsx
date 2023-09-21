@@ -50,6 +50,7 @@ import {
   Limits,
   MemberRequest,
   Organization,
+  PROVIDER,
   UserContext,
   UserContextType,
 } from "../App";
@@ -72,9 +73,12 @@ export const OrganizationAdministration = ({
     userAddress,
     storage,
     mainContractType,
+    mainWalletType,
     setStorage,
     setLoading,
     refreshStorage,
+    provider,
+    Tezos,
   } = React.useContext(UserContext) as UserContextType;
 
   const { userProfiles, localStorage } = React.useContext(
@@ -114,7 +118,10 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .responseToJoinOrganization(
           membersToApprove,
           membersToDecline,
@@ -154,7 +161,10 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .freezeOrganization(organizationName)
         .send();
       await op?.confirmation();
@@ -182,7 +192,10 @@ export const OrganizationAdministration = ({
     e.preventDefault();
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .activateOrganization(organizationName)
         .send();
       await op?.confirmation();
@@ -207,11 +220,17 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .removeOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainContractType!.storage();
+      const newStorage = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).storage();
       setStorage(newStorage);
       setLoading(false);
     } catch (error) {
@@ -233,7 +252,10 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();
@@ -267,9 +289,21 @@ export const OrganizationAdministration = ({
   const removeAdmin = async (adminToRemove: address) => {
     console.log("removeAdmin", adminToRemove, organization!.name);
 
+    console.log(
+      "**********************",
+      provider,
+      mainContractType,
+      mainWalletType,
+      Tezos,
+      Tezos.signer
+    );
+
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .removeAdmin(
           adminToRemove,
           selectedAdmin ? { Some: selectedAdmin } : null,
@@ -317,10 +351,18 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = !isTezosOrganization
-        ? await mainContractType!.methods
+        ? await (provider === PROVIDER.LEDGER
+            ? mainContractType!
+            : mainWalletType!
+          ).methods
             .addAdmin(selectedAdmin!, organization!.name)
             .send()
-        : await mainContractType!.methods.addTezosAdmin(selectedAdmin!).send();
+        : await (provider === PROVIDER.LEDGER
+            ? mainContractType!
+            : mainWalletType!
+          ).methods
+            .addTezosAdmin(selectedAdmin!)
+            .send();
       await op?.confirmation();
 
       //invalidate cache !!!
@@ -356,7 +398,10 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .changeLimits(
           limits.adminsMax,
           limits.memberRequestMax,

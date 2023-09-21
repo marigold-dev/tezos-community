@@ -48,7 +48,13 @@ import {
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
-import { Organization, PAGES, UserContext, UserContextType } from "../App";
+import {
+  Organization,
+  PAGES,
+  PROVIDER,
+  UserContext,
+  UserContextType,
+} from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
@@ -80,10 +86,12 @@ export const OrganizationsScreen: React.FC = () => {
 
     storage,
     mainContractType,
+    mainWalletType,
     setStorage,
     setLoading,
     loading,
     refreshStorage,
+    provider,
   } = React.useContext(UserContext) as UserContextType;
 
   const [myOrganizations, setMyOrganizations] = useState<Organization[]>([]);
@@ -259,11 +267,17 @@ export const OrganizationsScreen: React.FC = () => {
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .requestToJoinOrganization(joiningOrganization!.name, reason)
         .send();
       await op?.confirmation();
-      const newStorage = await mainContractType!.storage();
+      const newStorage = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).storage();
       setStorage(newStorage);
       setLoading(false);
       history.push(PAGES.ORGANIZATIONS); //it was the id created
@@ -291,7 +305,10 @@ export const OrganizationsScreen: React.FC = () => {
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .addOrganization(
           autoRegistration,
           business,
@@ -303,7 +320,10 @@ export const OrganizationsScreen: React.FC = () => {
         )
         .send();
       await op?.confirmation();
-      const newStorage = await mainContractType!.storage();
+      const newStorage = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).storage();
       setStorage(newStorage);
       await modalAdd.current?.dismiss();
       history.replace(PAGES.ORGANIZATIONS);
@@ -327,7 +347,10 @@ export const OrganizationsScreen: React.FC = () => {
     try {
       setLoading(true);
 
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .sendMessage(messagingOrganization!.name, message)
         .send();
 
