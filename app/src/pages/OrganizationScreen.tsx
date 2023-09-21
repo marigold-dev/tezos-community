@@ -147,6 +147,14 @@ export const OrganizationScreen = ({
         .send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage(); //need to refresh it
       await refreshMyOrganizations(); //need to refresh it too
       setSelectedOrganizationName(undefined);

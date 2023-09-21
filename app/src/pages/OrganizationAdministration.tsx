@@ -24,6 +24,7 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
 import {
   TzCommunityReactContext,
   TzCommunityReactContextType,
@@ -76,7 +77,7 @@ export const OrganizationAdministration = ({
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
 
-  const { userProfiles } = React.useContext(
+  const { userProfiles, localStorage } = React.useContext(
     TzCommunityReactContext
   ) as TzCommunityReactContextType;
 
@@ -121,7 +122,18 @@ export const OrganizationAdministration = ({
         )
         .send();
       await op?.confirmation();
+
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization();
+
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -226,7 +238,16 @@ export const OrganizationAdministration = ({
         .send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization(); //to force to refresh the org members
 
       setLoading(false);
     } catch (error) {
@@ -257,7 +278,17 @@ export const OrganizationAdministration = ({
         .send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization(); //to force to refresh the org members
+
       setSelectedAdmin(null); //reset
 
       setLoading(false);
@@ -292,7 +323,17 @@ export const OrganizationAdministration = ({
         : await mainWalletType!.methods.addTezosAdmin(selectedAdmin!).send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization(); //to force to refresh the org members
+
       setSelectedAdmin(null); //reset
 
       setLoading(false);

@@ -182,7 +182,9 @@ export const OrganizationsScreen: React.FC = () => {
                 storage.tezosOrganization.admins.indexOf(
                   userAddress as address
                 ) >= 0) &&
-              myOrganizations.indexOf(organization) < 0
+              myOrganizations.findIndex(
+                (org) => org.name === organization.name
+              ) < 0
             ) {
               myOrgs.push(organization);
               setMyOrganizations([...myOrgs]); //avoid dup & force refresh
