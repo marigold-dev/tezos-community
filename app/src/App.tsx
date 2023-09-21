@@ -802,7 +802,7 @@ const App: React.FC = () => {
     //console.log("Calling refreshStorage");
 
     console.log(
-      "VITE_CONTRACT_ADDRESS:",
+      "VITE_TZCOMMUNITY_CONTRACT_ADDRESS:",
       import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
     );
     console.log(
