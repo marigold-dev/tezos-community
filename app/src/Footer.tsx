@@ -33,7 +33,7 @@ import {
 } from "ionicons/icons";
 import jwt_decode from "jwt-decode";
 import React, { useRef, useState } from "react";
-import { PAGES, UserContext, UserContextType } from "./App";
+import { PAGES, PROVIDER, UserContext, UserContextType } from "./App";
 
 import {
   BeaconMessageType,
@@ -57,7 +57,7 @@ export const Footer: React.FC = () => {
     setUserAddress,
     disconnectWallet,
     setTransportWebHID,
-
+    setProvider,
     setTezos,
   } = React.useContext(UserContext) as UserContextType;
 
@@ -67,9 +67,6 @@ export const Footer: React.FC = () => {
   const connectWallet = async (): Promise<void> => {
     try {
       console.log("connectWallet before requestPermissions");
-
-      //clean local storage
-      if (window) window.localStorage.clear();
 
       const wallet = new BeaconWallet({
         name: "TzCommunity",
@@ -93,6 +90,8 @@ export const Footer: React.FC = () => {
       const userAddress = await wallet.getPKH();
 
       setUserAddress(userAddress);
+
+      setProvider(PROVIDER.BEACON);
 
       //connect to TzCommunity
       await connectToWeb2Backend(
@@ -153,6 +152,8 @@ export const Footer: React.FC = () => {
 
       const userAddress = await Tezos.signer.publicKeyHash();
       setUserAddress(userAddress);
+
+      setProvider(PROVIDER.LEDGER);
 
       await connectToWeb2Backend(await Tezos.signer.publicKey(), userAddress);
 

@@ -28,7 +28,7 @@ import {
   timeOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
-import { UserContext, UserContextType } from "../App";
+import { PROVIDER, UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { address, nat } from "../type-aliases";
 
@@ -44,9 +44,8 @@ export const OrganizationMessages = ({
 
   const [presentAlert] = useIonAlert();
 
-  const { mainContractType, setLoading } = React.useContext(
-    UserContext
-  ) as UserContextType;
+  const { mainContractType, mainWalletType, setLoading, provider } =
+    React.useContext(UserContext) as UserContextType;
 
   const { userProfiles } = React.useContext(
     TzCommunityReactContext
@@ -119,7 +118,10 @@ export const OrganizationMessages = ({
     try {
       setLoading(true);
 
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .sendMessage(organizationName!, message)
         .send();
 
@@ -144,7 +146,10 @@ export const OrganizationMessages = ({
     try {
       setLoading(true);
 
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .replyToMessage(
           new BigNumber(replyId!) as nat,
           replyUser! as string,

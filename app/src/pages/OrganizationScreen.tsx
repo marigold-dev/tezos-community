@@ -36,7 +36,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Organization, UserContext, UserContextType } from "../App";
+import { Organization, PROVIDER, UserContext, UserContextType } from "../App";
 
 import { LocalStorageKeys } from "@marigold-dev/tezos-community";
 import {
@@ -78,8 +78,10 @@ export const OrganizationScreen = ({
     userAddress,
     storage,
     mainContractType,
+    mainWalletType,
     setLoading,
     refreshStorage,
+    provider,
   } = React.useContext(UserContext) as UserContextType;
 
   const { localStorage, userProfiles } = React.useContext(
@@ -110,7 +112,10 @@ export const OrganizationScreen = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .updateOrganization(
           organization!.autoRegistration,
           organization!.business,
@@ -142,7 +147,10 @@ export const OrganizationScreen = ({
 
     try {
       setLoading(true);
-      const op = await mainContractType!.methods
+      const op = await (provider === PROVIDER.LEDGER
+        ? mainContractType!
+        : mainWalletType!
+      ).methods
         .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();

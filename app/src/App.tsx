@@ -39,7 +39,7 @@ import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { MainContractType, Storage } from "./main.types";
+import { MainContractType, MainWalletType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
@@ -143,7 +143,12 @@ export type UserContextType = {
 
   Tezos: TezosToolkit & { beaconWallet?: BeaconWallet };
   setTezos: Dispatch<SetStateAction<TezosToolkit>>;
-  mainContractType: MainContractType | null;
+
+  mainWalletType: MainWalletType | null; //BEACON
+  mainContractType: MainContractType | null; // LEDGER
+  provider: PROVIDER;
+  setProvider: Dispatch<SetStateAction<PROVIDER>>;
+
   nftWalletType: NftWalletType | null;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
@@ -174,6 +179,8 @@ const App: React.FC = () => {
     Transport | undefined
   >();
 
+  const [provider, setProvider] = useState<PROVIDER>(PROVIDER.UNKNOWN);
+
   const [userAddress, setUserAddress] = useState<string>("");
   const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
     new Map()
@@ -183,6 +190,9 @@ const App: React.FC = () => {
 
   const [mainContractType, setMainContractType] =
     useState<MainContractType | null>(null);
+  const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
+    null
+  );
 
   const [storageNFT, setStorageNFT] = useState<StorageNFT | null>(null);
   const [nftWalletType, setNftWalletType] = useState<NftWalletType | null>(
@@ -232,6 +242,11 @@ const App: React.FC = () => {
     setNotificationId(newNextNotificationId);
     return newNextNotificationId;
   };
+
+  useEffect(() => {
+    console.warn("provider changed", provider);
+    (async () => await refreshStorage())();
+  }, [provider]);
 
   useEffect(() => {
     //only try to load if userProfile, it means you are logged with TzCommunity
@@ -811,19 +826,40 @@ const App: React.FC = () => {
       import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL!
     );
 
-    const mainContractType: MainContractType =
-      await Tezos.contract.at<MainContractType>(
-        import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
-      );
-    setMainContractType(mainContractType);
+    let storage: Storage;
+    let storageNFT: StorageNFT;
+    if (provider === PROVIDER.LEDGER) {
+      console.log("LEDGER");
+      const mainContractType: MainContractType =
+        await Tezos.contract.at<MainContractType>(
+          import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
+        );
+      setMainContractType(mainContractType);
+      setMainWalletType(null);
 
-    const storage: Storage = await mainContractType.storage();
+      storage = await mainContractType.storage();
+    } else if (provider === PROVIDER.BEACON) {
+      console.log("BEACON");
 
+      const mainWalletType: MainWalletType =
+        await Tezos.wallet.at<MainWalletType>(
+          import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
+        );
+      setMainWalletType(mainWalletType);
+      setMainContractType(null);
+
+      storage = await mainWalletType.storage();
+    } else {
+      //do nothing
+      return;
+    }
+
+    //just a fetch with no signature action is fine for now...
     const nftWalletType: NftWalletType = await Tezos.wallet.at<NftWalletType>(
       storage.nftAddress
     );
-    const storageNFT: StorageNFT = await nftWalletType.storage();
     setNftWalletType(nftWalletType);
+    storageNFT = await nftWalletType.storage();
 
     let c = await Tezos.contract.at(storage.nftAddress, tzip12);
 
@@ -884,8 +920,10 @@ const App: React.FC = () => {
     } else if (Tezos.beaconWallet) {
       try {
         console.log("disconnecting wallet");
-
         await Tezos.beaconWallet.clearActiveAccount();
+        Tezos.beaconWallet = undefined; //clear completely
+        setTezos(Tezos);
+        setProvider(PROVIDER.UNKNOWN);
       } catch (error) {
         console.log("wallet dead anyway ...");
       }
@@ -924,7 +962,12 @@ const App: React.FC = () => {
             Tezos,
             storage,
             storageNFT,
+
             mainContractType,
+            mainWalletType,
+            provider,
+            setProvider,
+
             nftWalletType,
             setUserAddress,
             setStorage,
