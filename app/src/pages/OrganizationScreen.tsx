@@ -77,7 +77,7 @@ export const OrganizationScreen = ({
     Tezos,
     userAddress,
     storage,
-    mainWalletType,
+    mainContractType,
     setLoading,
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
@@ -110,7 +110,7 @@ export const OrganizationScreen = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .updateOrganization(
           organization!.autoRegistration,
           organization!.business,
@@ -142,7 +142,7 @@ export const OrganizationScreen = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();

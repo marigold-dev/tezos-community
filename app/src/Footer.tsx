@@ -68,6 +68,9 @@ export const Footer: React.FC = () => {
     try {
       console.log("connectWallet before requestPermissions");
 
+      //clean local storage
+      if (window) window.localStorage.clear();
+
       const wallet = new BeaconWallet({
         name: "TzCommunity",
         preferredNetwork: import.meta.env.VITE_NETWORK,
@@ -116,6 +119,7 @@ export const Footer: React.FC = () => {
       }
     } catch (error) {
       console.error("error connectWallet", error);
+      await disconnectWallet();
     }
   };
 
@@ -130,7 +134,7 @@ export const Footer: React.FC = () => {
   );
 
   const connectLedger = async (): Promise<void> => {
-    console.log("connectLedger before requestPermissions");
+    console.log("connectLedger");
 
     try {
       //Ledger init

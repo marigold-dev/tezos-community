@@ -39,7 +39,7 @@ import { BigMapKey } from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { MainWalletType, Storage } from "./main.types";
+import { MainContractType, Storage } from "./main.types";
 import { NftWalletType, Storage as StorageNFT } from "./nft.types";
 import { FAQScreen } from "./pages/FAQScreen";
 import { OrganizationScreen } from "./pages/OrganizationScreen";
@@ -143,7 +143,7 @@ export type UserContextType = {
 
   Tezos: TezosToolkit & { beaconWallet?: BeaconWallet };
   setTezos: Dispatch<SetStateAction<TezosToolkit>>;
-  mainWalletType: MainWalletType | null;
+  mainContractType: MainContractType | null;
   nftWalletType: NftWalletType | null;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
@@ -180,9 +180,10 @@ const App: React.FC = () => {
   );
   const [userProfile, setUserProfile] = useState<UserProfile | undefined>();
   const [storage, setStorage] = useState<Storage | null>(null);
-  const [mainWalletType, setMainWalletType] = useState<MainWalletType | null>(
-    null
-  );
+
+  const [mainContractType, setMainContractType] =
+    useState<MainContractType | null>(null);
+
   const [storageNFT, setStorageNFT] = useState<StorageNFT | null>(null);
   const [nftWalletType, setNftWalletType] = useState<NftWalletType | null>(
     null
@@ -810,12 +811,13 @@ const App: React.FC = () => {
       import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL!
     );
 
-    const mainWalletType: MainWalletType =
-      await Tezos.wallet.at<MainWalletType>(
+    const mainContractType: MainContractType =
+      await Tezos.contract.at<MainContractType>(
         import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!
       );
-    const storage: Storage = await mainWalletType.storage();
-    setMainWalletType(mainWalletType);
+    setMainContractType(mainContractType);
+
+    const storage: Storage = await mainContractType.storage();
 
     const nftWalletType: NftWalletType = await Tezos.wallet.at<NftWalletType>(
       storage.nftAddress
@@ -922,7 +924,7 @@ const App: React.FC = () => {
             Tezos,
             storage,
             storageNFT,
-            mainWalletType,
+            mainContractType,
             nftWalletType,
             setUserAddress,
             setStorage,

@@ -44,7 +44,7 @@ export const OrganizationMessages = ({
 
   const [presentAlert] = useIonAlert();
 
-  const { mainWalletType, setLoading } = React.useContext(
+  const { mainContractType, setLoading } = React.useContext(
     UserContext
   ) as UserContextType;
 
@@ -119,7 +119,7 @@ export const OrganizationMessages = ({
     try {
       setLoading(true);
 
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .sendMessage(organizationName!, message)
         .send();
 
@@ -144,7 +144,7 @@ export const OrganizationMessages = ({
     try {
       setLoading(true);
 
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .replyToMessage(
           new BigNumber(replyId!) as nat,
           replyUser! as string,

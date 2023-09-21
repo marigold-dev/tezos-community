@@ -79,7 +79,7 @@ export const OrganizationsScreen: React.FC = () => {
     userAddress,
 
     storage,
-    mainWalletType,
+    mainContractType,
     setStorage,
     setLoading,
     loading,
@@ -259,11 +259,11 @@ export const OrganizationsScreen: React.FC = () => {
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .requestToJoinOrganization(joiningOrganization!.name, reason)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
+      const newStorage = await mainContractType!.storage();
       setStorage(newStorage);
       setLoading(false);
       history.push(PAGES.ORGANIZATIONS); //it was the id created
@@ -291,7 +291,7 @@ export const OrganizationsScreen: React.FC = () => {
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .addOrganization(
           autoRegistration,
           business,
@@ -303,7 +303,7 @@ export const OrganizationsScreen: React.FC = () => {
         )
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
+      const newStorage = await mainContractType!.storage();
       setStorage(newStorage);
       await modalAdd.current?.dismiss();
       history.replace(PAGES.ORGANIZATIONS);
@@ -327,7 +327,7 @@ export const OrganizationsScreen: React.FC = () => {
     try {
       setLoading(true);
 
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .sendMessage(messagingOrganization!.name, message)
         .send();
 

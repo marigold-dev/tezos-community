@@ -71,7 +71,7 @@ export const OrganizationAdministration = ({
   const {
     userAddress,
     storage,
-    mainWalletType,
+    mainContractType,
     setStorage,
     setLoading,
     refreshStorage,
@@ -114,7 +114,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .responseToJoinOrganization(
           membersToApprove,
           membersToDecline,
@@ -154,7 +154,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .freezeOrganization(organizationName)
         .send();
       await op?.confirmation();
@@ -182,7 +182,7 @@ export const OrganizationAdministration = ({
     e.preventDefault();
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .activateOrganization(organizationName)
         .send();
       await op?.confirmation();
@@ -207,11 +207,11 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
+      const newStorage = await mainContractType!.storage();
       setStorage(newStorage);
       setLoading(false);
     } catch (error) {
@@ -233,7 +233,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();
@@ -269,7 +269,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeAdmin(
           adminToRemove,
           selectedAdmin ? { Some: selectedAdmin } : null,
@@ -317,10 +317,10 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = !isTezosOrganization
-        ? await mainWalletType!.methods
+        ? await mainContractType!.methods
             .addAdmin(selectedAdmin!, organization!.name)
             .send()
-        : await mainWalletType!.methods.addTezosAdmin(selectedAdmin!).send();
+        : await mainContractType!.methods.addTezosAdmin(selectedAdmin!).send();
       await op?.confirmation();
 
       //invalidate cache !!!
@@ -356,7 +356,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .changeLimits(
           limits.adminsMax,
           limits.memberRequestMax,
