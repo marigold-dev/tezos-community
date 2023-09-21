@@ -18,6 +18,7 @@ import {
   RefresherEventDetail,
   useIonAlert,
 } from "@ionic/react";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import * as api from "@tzkt/sdk-api";
 import {
   arrowDownCircleOutline,
@@ -33,24 +34,34 @@ import {
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation, useRouteMatch } from "react-router";
 
-import {
-  LocalStorageKeys,
-  PAGES,
-  SOCIAL_ACCOUNT_TYPE,
-  UserContext,
-  UserContextType,
-} from "../App";
+import { PAGES, UserContext, UserContextType } from "../App";
 import { Footer } from "../Footer";
 import { Header } from "../Header";
 import { OAuth } from "../OAuth";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
+
+import {
+  LocalStorageKeys,
+  SOCIAL_ACCOUNT_TYPE,
+} from "@marigold-dev/tezos-community";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
 
 export const ProfileScreen: React.FC = () => {
   const [presentAlert] = useIonAlert();
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
+
+  const {
+    setUserProfile,
+    userProfile,
+    localStorage,
+    setUserProfiles,
+    userProfiles,
+  } = React.useContext(TzCommunityReactContext) as TzCommunityReactContextType;
 
   const {
     userAddress,
@@ -60,14 +71,9 @@ export const ProfileScreen: React.FC = () => {
     setLoading,
     nftWalletType,
     refreshStorage,
-    userProfile,
     disconnectWallet,
-    userProfiles,
-    setUserProfile,
-    setUserProfiles,
 
     storageNFT,
-    localStorage,
   } = React.useContext(UserContext) as UserContextType;
 
   const history = useHistory();
@@ -88,7 +94,7 @@ export const ProfileScreen: React.FC = () => {
     }
 
     const response = await fetch(
-      import.meta.env.VITE_BACKEND_URL + "/user" + "/unlink",
+      import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL + "/user" + "/unlink",
       {
         method: "POST",
         headers: {
@@ -99,7 +105,7 @@ export const ProfileScreen: React.FC = () => {
     );
     if (response.ok) {
       console.log("UserProfile unlinked on backend");
-      setUserProfile(null);
+      setUserProfile(undefined);
       userProfiles.delete(userAddress as address);
 
       // console.log("ProfileScreen CALLING setUserProfiles", userProfiles);
@@ -151,7 +157,7 @@ export const ProfileScreen: React.FC = () => {
     })[] = [];
 
     const replies: api.ContractEvent[] = await api.eventsGetContractEvents({
-      contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
+      contract: { eq: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS! },
       tag: { eq: "reply" },
       payload: { eq: { jsonValue: userAddress, jsonPath: "string_0" } },
       sort: { desc: "id" },
@@ -163,7 +169,9 @@ export const ProfileScreen: React.FC = () => {
       replies.map(async (r) => {
         const originalMessages: api.ContractEvent[] =
           await api.eventsGetContractEvents({
-            contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
+            contract: {
+              eq: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS!,
+            },
             tag: { eq: "message" },
             id: { eq: r.payload.nat },
           });
@@ -240,7 +248,7 @@ export const ProfileScreen: React.FC = () => {
             <>
               {userProfile ? (
                 <IonItem lines="none">
-                  <UserProfileChip
+                  <TzCommunityIonicUserProfileChip
                     address={userAddress as address}
                     userProfiles={userProfiles}
                   />
@@ -255,7 +263,7 @@ export const ProfileScreen: React.FC = () => {
                 </IonItem>
               ) : (
                 <>
-                  <UserProfileChip
+                  <TzCommunityIonicUserProfileChip
                     address={userAddress as address}
                     userProfiles={userProfiles}
                   />
@@ -316,10 +324,10 @@ export const ProfileScreen: React.FC = () => {
                         ></IonIcon>
                         {new Date(ev.timestamp!).toLocaleString()}
                       </IonChip>
-                      <UserProfileChip
+                      <TzCommunityIonicUserProfileChip
                         userProfiles={userProfiles}
                         address={ev.payload.address}
-                      ></UserProfileChip>
+                      />
                     </IonRow>
                     <IonRow style={{ marginLeft: "5vw" }}>
                       <IonTextarea readonly>{ev.payload.string_1}</IonTextarea>

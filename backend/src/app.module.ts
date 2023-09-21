@@ -14,8 +14,8 @@ import { UserProfilesModule } from './userprofiles/userprofiles.module';
 @Module({
   imports: [
     CacheModule.register({
-      ttl: 15000,
-      max: 1000,
+      ttl: 15 * 1000,
+      max: 5000,
     }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({

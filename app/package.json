@@ -2,9 +2,10 @@
   "name": "app",
   "version": "0.1.1",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@airgap/beacon-dapp": "^4.0.6",
-    "@airgap/beacon-sdk": "^4.0.6",
+    "@airgap/beacon-dapp": "^4.0.10",
+    "@airgap/beacon-sdk": "^4.0.10",
     "@capacitor/app": "4.1.1",
     "@capacitor/browser": "^4.1.1",
     "@capacitor/clipboard": "^4.1.0",
@@ -17,15 +18,16 @@
     "@ionic/react-router": "^7.0.0",
     "@ionic/storage": "^4.0.0",
     "@ledgerhq/hw-transport-webhid": "^6.27.17",
+    "@marigold-dev/tezos-community-reactcontext-ionic": "^0.1.7",
     "@siwt/sdk": "^0.0.4",
-    "@taquito/beacon-wallet": "~17.1.0",
+    "@taquito/beacon-wallet": "^17.3.1",
     "@taquito/core": "^17.1.0",
     "@taquito/http-utils": "~17.1.0",
     "@taquito/ledger-signer": "^17.1.0",
     "@taquito/local-forging": "~17.1.0",
     "@taquito/michel-codec": "~17.1.0",
     "@taquito/michelson-encoder": "~17.1.0",
-    "@taquito/taquito": "~17.1.0",
+    "@taquito/taquito": "^17.3.1",
     "@taquito/tzip12": "~17.1.0",
     "@taquito/tzip16": "~17.1.0",
     "@taquito/utils": "~17.1.0",
@@ -59,13 +61,15 @@
     "workbox-streams": "^5.1.4"
   },
   "scripts": {
-    "dev": "if test -f .env; then sed -i \"s/\\(VITE_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"VITE_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && serve -s -l 3000 dist",
-    "ionic:build": "tsc -v && tsc && vite build",
-    "build": " tsc -v && tsc && vite build",
+    "local": "if test -f .env; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && vite dev --host ",
+    "dev": "if test -f .env.ghostnet; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env.ghostnet ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env.ghostnet ; fi && vite preview --port 3000 --host",
+    "ionic:build": "tsc -v && tsc && vite build --mode mainnet",
+    "build:dev": " tsc -v && tsc && vite build --mode ghostnet",
+    "build:prod": " tsc -v && tsc && vite build --mode mainnet",
     "preview": "vite preview",
     "ionic:serve": "vite dev --host",
     "sync": "npm run build && ionic cap sync --no-build",
-    "start:prod": "if test -f .env; then sed -i \"s/\\(VITE_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env ; else jq -r '\"VITE_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env ; fi && serve -s -l 3000 dist"
+    "start:prod": "if test -f .env.mainnet; then sed -i \"s/\\(VITE_TZCOMMUNITY_CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env.mainnet ; else jq -r '\"VITE_TZCOMMUNITY_CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env.mainnet ; fi && vite preview --port 3000 --host"
   },
   "eslintConfig": {
     "extends": [
@@ -86,6 +90,8 @@
     "@capacitor/cli": "4.7.3",
     "@types/node": "^20.4.9",
     "@types/react": "^18.2.20",
+    "@vitejs/plugin-legacy": "^4.1.1",
+    "@vitejs/plugin-react": "^4.0.4",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
@@ -97,7 +103,8 @@
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.1",
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.4"
   },
   "description": "An Ionic project"
 }

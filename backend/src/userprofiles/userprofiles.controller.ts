@@ -204,7 +204,7 @@ export class UserProfilesController {
           )) as unknown as api.BigMapKey[] | undefined;
 
         if (!keys) {
-          /*  Logger.debug('FAILURE CACHE ****** Fecthing members for ', org.name);*/
+          /*  Logger.debug('FAILURE CACHE *** Fecthing members for ', org.name);*/
 
           await this.fetchOrgMembersForOrg(org);
 
@@ -213,7 +213,7 @@ export class UserProfilesController {
           )) as unknown as api.BigMapKey[] | undefined;
           /*
           Logger.debug(
-            'FAILURE CACHE ****** Fecthing members for ',
+            'FAILURE CACHE *** Fecthing members for ',
             org.name,
             'key is now ',
             keys,

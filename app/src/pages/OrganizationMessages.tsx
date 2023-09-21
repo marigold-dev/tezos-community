@@ -13,6 +13,11 @@ import {
   RefresherEventDetail,
   useIonAlert,
 } from "@ionic/react";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import * as api from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import {
@@ -25,7 +30,6 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { UserContext, UserContextType } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { UserProfileChip } from "../components/UserProfileChip";
 import { address, nat } from "../type-aliases";
 
 type OrganizationProps = {
@@ -40,9 +44,13 @@ export const OrganizationMessages = ({
 
   const [presentAlert] = useIonAlert();
 
-  const { userProfiles, mainWalletType, setLoading } = React.useContext(
+  const { mainContractType, setLoading } = React.useContext(
     UserContext
   ) as UserContextType;
+
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [contractEvents, setcontractEvents] = useState<
     (api.ContractEvent & { replies: api.ContractEvent[] | undefined })[]
@@ -64,7 +72,7 @@ export const OrganizationMessages = ({
     })[] = [];
     const contractEvents: api.ContractEvent[] =
       await api.eventsGetContractEvents({
-        contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
+        contract: { eq: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS! },
         tag: { eq: "message" },
         payload: { eq: { jsonValue: organizationName!, jsonPath: "string_0" } },
       });
@@ -72,7 +80,7 @@ export const OrganizationMessages = ({
     await Promise.all(
       contractEvents.map(async (ce) => {
         const replies = await api.eventsGetContractEvents({
-          contract: { eq: import.meta.env.VITE_CONTRACT_ADDRESS! },
+          contract: { eq: import.meta.env.VITE_TZCOMMUNITY_CONTRACT_ADDRESS! },
           tag: { eq: "reply" },
           payload: { eq: { jsonValue: ce.id + "", jsonPath: "nat" } },
           sort: { asc: "id" },
@@ -111,7 +119,7 @@ export const OrganizationMessages = ({
     try {
       setLoading(true);
 
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .sendMessage(organizationName!, message)
         .send();
 
@@ -136,7 +144,7 @@ export const OrganizationMessages = ({
     try {
       setLoading(true);
 
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .replyToMessage(
           new BigNumber(replyId!) as nat,
           replyUser! as string,
@@ -175,10 +183,10 @@ export const OrganizationMessages = ({
                     <IonIcon icon={timeOutline} style={{ margin: 0 }}></IonIcon>
                     {new Date(ev.timestamp!).toLocaleString()}
                   </IonChip>
-                  <UserProfileChip
+                  <TzCommunityIonicUserProfileChip
                     userProfiles={userProfiles}
                     address={ev.payload.address}
-                  ></UserProfileChip>
+                  />
                 </IonRow>
                 <IonRow>
                   <IonTextarea readonly>{ev.payload.string_1}</IonTextarea>
@@ -209,10 +217,10 @@ export const OrganizationMessages = ({
                             ></IonIcon>
                             {new Date(reply.timestamp!).toLocaleString()}
                           </IonChip>
-                          <UserProfileChip
+                          <TzCommunityIonicUserProfileChip
                             userProfiles={userProfiles}
                             address={reply.payload.address}
-                          ></UserProfileChip>
+                          />
                         </IonRow>
                         <IonRow style={{ opacity: "0.5", marginLeft: "5vw" }}>
                           <IonTextarea readonly>

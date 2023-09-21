@@ -36,14 +36,16 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Organization, UserContext, UserContextType } from "../App";
+
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
 import {
-  LocalStorageKeys,
-  Organization,
-  UserContext,
-  UserContextType,
-} from "../App";
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
-import { UserProfileChip } from "../components/UserProfileChip";
 import { address } from "../type-aliases";
 import { OrganizationAdministration } from "./OrganizationAdministration";
 import { OrganizationMessages } from "./OrganizationMessages";
@@ -75,12 +77,14 @@ export const OrganizationScreen = ({
     Tezos,
     userAddress,
     storage,
-    mainWalletType,
+    mainContractType,
     setLoading,
-    userProfiles,
     refreshStorage,
-    localStorage,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { localStorage, userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
@@ -106,7 +110,7 @@ export const OrganizationScreen = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .updateOrganization(
           organization!.autoRegistration,
           organization!.business,
@@ -138,10 +142,18 @@ export const OrganizationScreen = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();
+
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
 
       await refreshStorage(); //need to refresh it
       await refreshMyOrganizations(); //need to refresh it too
@@ -225,7 +237,7 @@ export const OrganizationScreen = ({
       }
     } else {
       setOrganization(undefined);
-      console.log("organization fetch his not ready yet");
+      console.log("organization fetch is not ready yet");
     }
   };
 
@@ -581,7 +593,7 @@ export const OrganizationScreen = ({
                           ? members.map((member) => (
                               <IonItem key={member}>
                                 {" "}
-                                <UserProfileChip
+                                <TzCommunityIonicUserProfileChip
                                   address={member}
                                   userProfiles={userProfiles}
                                 />

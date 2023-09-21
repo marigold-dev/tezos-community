@@ -24,6 +24,12 @@ import {
   IonToolbar,
   useIonAlert,
 } from "@ionic/react";
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { BigNumber } from "bignumber.js";
 import {
   addCircleOutline,
@@ -49,7 +55,6 @@ import {
 } from "../App";
 import { TransactionInvalidBeaconError } from "../TransactionInvalidBeaconError";
 import { getStatusColor } from "../Utils";
-import { UserProfileChip } from "../components/UserProfileChip";
 import { address, nat } from "../type-aliases";
 
 type OrganizationProps = {
@@ -65,13 +70,16 @@ export const OrganizationAdministration = ({
 }: OrganizationProps): JSX.Element => {
   const {
     userAddress,
-    userProfiles,
     storage,
-    mainWalletType,
+    mainContractType,
     setStorage,
     setLoading,
     refreshStorage,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { userProfiles, localStorage } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [presentAlert] = useIonAlert();
 
@@ -106,7 +114,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .responseToJoinOrganization(
           membersToApprove,
           membersToDecline,
@@ -114,7 +122,18 @@ export const OrganizationAdministration = ({
         )
         .send();
       await op?.confirmation();
+
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization();
+
       setLoading(false);
     } catch (error) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -135,7 +154,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .freezeOrganization(organizationName)
         .send();
       await op?.confirmation();
@@ -163,7 +182,7 @@ export const OrganizationAdministration = ({
     e.preventDefault();
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .activateOrganization(organizationName)
         .send();
       await op?.confirmation();
@@ -188,11 +207,11 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeOrganization(organizationName)
         .send();
       await op?.confirmation();
-      const newStorage = await mainWalletType!.storage();
+      const newStorage = await mainContractType!.storage();
       setStorage(newStorage);
       setLoading(false);
     } catch (error) {
@@ -214,12 +233,21 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeMember(member, organization!.name)
         .send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization(); //to force to refresh the org members
 
       setLoading(false);
     } catch (error) {
@@ -241,7 +269,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .removeAdmin(
           adminToRemove,
           selectedAdmin ? { Some: selectedAdmin } : null,
@@ -250,7 +278,17 @@ export const OrganizationAdministration = ({
         .send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization(); //to force to refresh the org members
+
       setSelectedAdmin(null); //reset
 
       setLoading(false);
@@ -279,13 +317,23 @@ export const OrganizationAdministration = ({
     try {
       setLoading(true);
       const op = !isTezosOrganization
-        ? await mainWalletType!.methods
+        ? await mainContractType!.methods
             .addAdmin(selectedAdmin!, organization!.name)
             .send()
-        : await mainWalletType!.methods.addTezosAdmin(selectedAdmin!).send();
+        : await mainContractType!.methods.addTezosAdmin(selectedAdmin!).send();
       await op?.confirmation();
 
+      //invalidate cache !!!
+      const membersBigMapId = (
+        organization?.members as unknown as { id: BigNumber }
+      ).id.toNumber();
+      const url = LocalStorageKeys.bigMapsGetKeys + membersBigMapId;
+      await localStorage.invalidateCacheEntry(url);
+      //////
+
       await refreshStorage();
+      await refreshOrganization(); //to force to refresh the org members
+
       setSelectedAdmin(null); //reset
 
       setLoading(false);
@@ -308,7 +356,7 @@ export const OrganizationAdministration = ({
 
     try {
       setLoading(true);
-      const op = await mainWalletType!.methods
+      const op = await mainContractType!.methods
         .changeLimits(
           limits.adminsMax,
           limits.memberRequestMax,
@@ -430,7 +478,10 @@ export const OrganizationAdministration = ({
 
         {organization?.admins.map((admin) => (
           <IonItem key={admin}>
-            <UserProfileChip address={admin} userProfiles={userProfiles} />
+            <TzCommunityIonicUserProfileChip
+              address={admin}
+              userProfiles={userProfiles}
+            />
 
             {organization.admins.length > 1 && !isTezosOrganization ? (
               <IonIcon
@@ -510,7 +561,7 @@ export const OrganizationAdministration = ({
                         .filter((member) => member != userAddress)
                         .map((member) => (
                           <IonSelectOption key={member} value={member}>
-                            <UserProfileChip
+                            <TzCommunityIonicUserProfileChip
                               address={member}
                               userProfiles={userProfiles}
                             />
@@ -538,7 +589,7 @@ export const OrganizationAdministration = ({
 
               {members.map((member) => (
                 <IonItem key={member}>
-                  <UserProfileChip
+                  <TzCommunityIonicUserProfileChip
                     address={member}
                     userProfiles={userProfiles}
                   />
@@ -633,11 +684,11 @@ export const OrganizationAdministration = ({
                     <IonCard key={memberRequest.user}>
                       <IonCardHeader>
                         <IonCardTitle>
-                          <UserProfileChip
+                          <TzCommunityIonicUserProfileChip
                             key={memberRequest.user}
                             userProfiles={userProfiles}
                             address={memberRequest.user}
-                          ></UserProfileChip>
+                          />
                         </IonCardTitle>
 
                         <IonToggle

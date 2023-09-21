@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "if test -f .env; then sed -i \"s/\\(CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && nest start",
+    "local": "if test -f .env; then sed -i \"s/\\(CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && node dist/main",
     "start:dev": "if test -f .env; then sed -i \"s/\\(CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && NODE_ENV=dev nest start --watch",
     "start:debug": "if test -f .env; then sed -i \"s/\\(CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/testing-state.json)/\" .env ; else jq -r '\"CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/testing-state.json > .env ; fi && nest start --debug --watch",
     "start:prod": "if test -f .env; then sed -i \"s/\\(CONTRACT_ADDRESS *= *\\).*/\\1$(jq -r 'last(.tasks[]).output[0].address' ../.taq/production-state.json)/\" .env ; else jq -r '\"CONTRACT_ADDRESS=\" + last(.tasks[]).output[0].address' ../.taq/production-state.json > .env ; fi && node dist/main",
@@ -30,7 +30,7 @@
     "@nestjs/platform-socket.io": "^10.0.5",
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^10.0.5",
-    "@siwt/core": "^0.0.4",
+    "@siwt/core": "^0.0.5",
     "@taquito/taquito": "^17.1.0",
     "@taquito/utils": "^17.1.0",
     "@tzkt/sdk-api": "^2.2.0",

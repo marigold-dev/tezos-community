@@ -151,10 +151,10 @@ export const loadUserProfiles = async (
           keys.findIndex((key) => key.key === userAddress) >= 0 ||
           storage.tezosOrganization.admins.indexOf(userAddress as address) >= 0
         ) {
-          console.log(
+          /*console.log(
             "cache userprofiles as member is part of it OR super admin",
             keys
-          );
+          );*/
           for (const key of keys) {
             const up = await getUserProfile(key.key, localStorage);
             if (up) {
@@ -200,7 +200,7 @@ export const getUserProfile = async (
       //empty
       return new Promise((resolve, _) => resolve(null));
     } else {
-      console.log("getUserProfile - fetch", url);
+      //console.log("getUserProfile - fetch", url);
 
       const response = await fetch(url, {
         method: "GET",
@@ -211,7 +211,7 @@ export const getUserProfile = async (
 
       const json = await response.json();
 
-      console.log("getUserProfile - fetch", url, json);
+      //console.log("getUserProfile - fetch", url, json);
 
       if (response.ok) {
         await localStorage.setWithTTL(url, json);
@@ -244,7 +244,7 @@ export const refreshToken = async (
   localStorage: CachingService
 ) => {
   try {
-    console.log("**************refreshToken", userAddress, localStorage);
+    //    console.log("refreshToken", userAddress, localStorage);
 
     const response = await fetch(
       import.meta.env.VITE_TZCOMMUNITY_BACKEND_URL + "/siwt/refreshToken",
