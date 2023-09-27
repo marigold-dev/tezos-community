@@ -11,7 +11,7 @@ const default_storage: Contract.storage = {
     admins: Set.literal(
       list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address])
     ) as set<address>,
-    status: Contract.Active(),
+    status: Active(),
     memberRequests: Set.empty as set<Contract.joinOrganizationRequest>,
     fundingAddress: None() as option<address>,
     autoRegistration: false
@@ -23,7 +23,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://avatars.githubusercontent.com/u/104824659?s=200&v=4",
         members: Big_map.literal(
           list([["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address, unit]])
@@ -46,7 +46,7 @@ const default_storage: Contract.storage = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://ipfs.io/ipfs/QmdNYgc5crenyLGViykvcnW3sAfC8XE59fWyv7Q7mTTBGH",
         members: Big_map.literal(
           list(
@@ -69,7 +69,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://www.functori.com/assets/img/brand/functori_logotype_square.svg",
         members: Big_map.literal(
           list([["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address, unit]])
@@ -91,7 +91,7 @@ const default_storage: Contract.storage = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://bit.ly/MarigolddevLogo",
         members: Big_map.literal(
           list(
@@ -117,7 +117,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://pbs.twimg.com/profile_images/1567279396590870529/tS9DP6ax_400x400.jpg",
         members: Big_map.literal(
           list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
@@ -134,7 +134,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://uploads-ssl.webflow.com/63808b3b41be273d52703f26/63808b3b41be27dd8e703f60_logo-piratz-lab.svg",
         members: Big_map.literal(
           list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
@@ -151,7 +151,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://images.yourstory.com/cs/images/companies/zN5FSNQj400x4001-1646805134262.jpg",
         members: Big_map.literal(
           list([["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address, unit]])
@@ -168,7 +168,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://www.oxheadalpha.com/images/oxheadalpha.svg",
         members: Big_map.literal(
           list([["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address, unit]])
@@ -185,7 +185,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://pbs.twimg.com/profile_images/1438787875169054725/nQW0PNQp.jpg",
         members: Big_map.literal(
           list([["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address, unit]])
@@ -202,7 +202,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://gateway.pinata.cloud/ipfs/QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
         members: Big_map.literal(
           list([["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address, unit]])
@@ -219,7 +219,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://media.licdn.com/dms/image/C4E0BAQGwd4e4j4OPyg/company-logo_200_200/0/1651337929335?e=1694044800&v=beta&t=Dfa5FBWnf9S39gQARtyMKnXdXh0HvxhGHtIgExcxyyU",
         members: Big_map.literal(
           list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
@@ -236,7 +236,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://pbs.twimg.com/profile_images/1487132747214864385/E1plRzJm_400x400.jpg",
         members: Big_map.literal(
           list([["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address, unit]])
@@ -253,7 +253,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://d1fdloi71mui9q.cloudfront.net/WPsoyXgtRe8mkCe2FLcQ_objkt-com-logo-xl.png",
         members: Big_map.literal(
           list([["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address, unit]])
@@ -270,7 +270,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://serokell.io/static/images/serokell-logo-new-black.png",
         members: Big_map.literal(
           list([["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address, unit]])
@@ -287,7 +287,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://localhr.co/storage/user_files/employers/2730/logo.png",
         members: Big_map.literal(
           list([["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address, unit]])
@@ -304,7 +304,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://www.dailambda.jp/img/triangle.png",
         members: Big_map.literal(
           list([["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address, unit]])
@@ -321,7 +321,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://cdn.discordapp.com/attachments/973238864342839357/1116093223119618220/ron_west_TTC_logo_01.jpg",
         members: Big_map.literal(
           list([["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address, unit]])
@@ -339,7 +339,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "",
         members: Big_map.literal(
           list([["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address, unit]])
@@ -356,7 +356,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez.png",
         members: Big_map.literal(
           list(
@@ -379,7 +379,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez_evolution.png",
         members: Big_map.literal(
           list(
@@ -402,7 +402,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1ZW6AvZCjSvz5xARo2L9QVKq3ofHU6Z6Hc" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://app.tezos.domains/assets/img/logo_notext.svg",
         members: Big_map.literal(
           list(
@@ -430,7 +430,7 @@ const default_storage: Contract.storage = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://images.squarespace-cdn.com/content/v1/621e19e02a75bc5e24ce9a20/377b2c63-db90-4369-8b0a-3e47a5f2f6f4/Frame.png?format=1500w",
         members: Big_map.literal(
           list(
@@ -452,7 +452,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "",
         members: Big_map.literal(
           list([["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address, unit]])
@@ -470,7 +470,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808523041488896/Profilbild.jpg",
         members: Big_map.literal(
           list(
@@ -493,7 +493,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808941091950642/IMG_20230503_124736.jpg",
         members: Big_map.literal(
           list(
@@ -521,7 +521,7 @@ const default_storage: Contract.storage = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://chainborn.xyz/static/media/logo-big-color.8c8a0cec.webp",
         members: Big_map.literal(
           list(
@@ -544,7 +544,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://twitter.com/batbitsofficial/photo",
         members: Big_map.literal(
           list([["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]])
@@ -562,7 +562,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://uploads-ssl.webflow.com/6307b856943c0f1358714dab/6307be3a634c24b505d20cb3_plentyIcon.svg",
         members: Big_map.literal(
           list([["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address, unit]])
@@ -579,7 +579,7 @@ const default_storage: Contract.storage = {
         admins: Set.literal(
           list(["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "",
         members: Big_map.literal(
           list([["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address, unit]])
@@ -601,7 +601,7 @@ const default_storage: Contract.storage = {
   nftAddress: "KT1D9hiv2vmqBDsdoa3tyervd5vAFZRBdNsr" as address
 };
 
-const mainnet = {
+const mainnet: Contract.storage = {
   tezosOrganization: {
     name: "TEZOS",
     business: "Save the planet",
@@ -612,7 +612,7 @@ const mainnet = {
     admins: Set.literal(
       list(["tz1h5GajcQWq4ybaWuwSiYrR5PvmUxndm8T8" as address])
     ) as set<address>,
-    status: Contract.Active(),
+    status: Active(),
     memberRequests: Set.empty as set<Contract.joinOrganizationRequest>,
     fundingAddress: None() as option<address>,
     autoRegistration: false
@@ -624,7 +624,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://avatars.githubusercontent.com/u/104824659?s=200&v=4",
         members: Big_map.literal(
           list([["tz1LRHZKL44bCSV1pKmwTyh9ghiSCc3LyJoA" as address, unit]])
@@ -647,7 +647,7 @@ const mainnet = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://ipfs.io/ipfs/QmdNYgc5crenyLGViykvcnW3sAfC8XE59fWyv7Q7mTTBGH",
         members: Big_map.literal(
           list(
@@ -670,7 +670,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://www.functori.com/assets/img/brand/functori_logotype_square.svg",
         members: Big_map.literal(
           list([["tz1QoiKkkjzNrqGEi7URiWr9nH26xbyJqvf3" as address, unit]])
@@ -692,7 +692,7 @@ const mainnet = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://bit.ly/MarigolddevLogo",
         members: Big_map.literal(
           list(
@@ -718,7 +718,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://pbs.twimg.com/profile_images/1567279396590870529/tS9DP6ax_400x400.jpg",
         members: Big_map.literal(
           list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
@@ -735,7 +735,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://uploads-ssl.webflow.com/63808b3b41be273d52703f26/63808b3b41be27dd8e703f60_logo-piratz-lab.svg",
         members: Big_map.literal(
           list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
@@ -752,7 +752,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://images.yourstory.com/cs/images/companies/zN5FSNQj400x4001-1646805134262.jpg",
         members: Big_map.literal(
           list([["tz1KmELgMMvCGamLRyMNr9qDoNaPBvDDBQux" as address, unit]])
@@ -769,7 +769,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://www.oxheadalpha.com/images/oxheadalpha.svg",
         members: Big_map.literal(
           list([["tz1QVzFA321GhZEBpvR7tEV2Tzd95wCQ74UD" as address, unit]])
@@ -786,7 +786,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://pbs.twimg.com/profile_images/1438787875169054725/nQW0PNQp.jpg",
         members: Big_map.literal(
           list([["tz1b1sH2FmuVazszFdkUn8GvfvZpNxSa7C8J" as address, unit]])
@@ -803,7 +803,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://gateway.pinata.cloud/ipfs/QmZKSrCZwp9XmZQ2GiSdZ73RWpEGcrocAAiYU7CzZi3gBj",
         members: Big_map.literal(
           list([["tz1SRqikWtR2KNpugCApreA9QeZuqh8swQMa" as address, unit]])
@@ -820,7 +820,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://media.licdn.com/dms/image/C4E0BAQGwd4e4j4OPyg/company-logo_200_200/0/1651337929335?e=1694044800&v=beta&t=Dfa5FBWnf9S39gQARtyMKnXdXh0HvxhGHtIgExcxyyU",
         members: Big_map.literal(
           list([["tz1iAuFqKbnrK6p18di4CEdVCZgB7X5tS4hX" as address, unit]])
@@ -837,7 +837,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://pbs.twimg.com/profile_images/1487132747214864385/E1plRzJm_400x400.jpg",
         members: Big_map.literal(
           list([["tz1TPXFXctCyJ6ZLBo2kbb9EPkEQdcVUN1rB" as address, unit]])
@@ -854,7 +854,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://d1fdloi71mui9q.cloudfront.net/WPsoyXgtRe8mkCe2FLcQ_objkt-com-logo-xl.png",
         members: Big_map.literal(
           list([["tz1TWrPXuG3T3rR9NR5EqsBegJMwiMcobjkt" as address, unit]])
@@ -871,7 +871,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://serokell.io/static/images/serokell-logo-new-black.png",
         members: Big_map.literal(
           list([["tz1R86LUZDMnRCCGRnug3QmBaQ8nxqSjzwsg" as address, unit]])
@@ -888,7 +888,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://localhr.co/storage/user_files/employers/2730/logo.png",
         members: Big_map.literal(
           list([["tz2JtjLNSYTw276j5yfMkn9YksdMEymwQmT7" as address, unit]])
@@ -905,7 +905,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://www.dailambda.jp/img/triangle.png",
         members: Big_map.literal(
           list([["tz1ZMeJMXynXg5v8DaciSZjz3hmsxqZjaEnu" as address, unit]])
@@ -922,7 +922,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://cdn.discordapp.com/attachments/973238864342839357/1116093223119618220/ron_west_TTC_logo_01.jpg",
         members: Big_map.literal(
           list([["tz1RZN17j7FuPtDpGpXKgMXbx57WEhpZGF6B" as address, unit]])
@@ -940,7 +940,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "",
         members: Big_map.literal(
           list([["tz2HZsWyZvQfq8whWk3N2oKozaeFBNoPxP9D" as address, unit]])
@@ -957,7 +957,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez.png",
         members: Big_map.literal(
           list(
@@ -980,7 +980,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz29DrxbfkcfpUveVGsmhgvWqjgkVtGXbQyP" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://assets.objkt.media/file/assets-002/collection-logos/ottez_evolution.png",
         members: Big_map.literal(
           list(
@@ -1003,7 +1003,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1ZW6AvZCjSvz5xARo2L9QVKq3ofHU6Z6Hc" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://app.tezos.domains/assets/img/logo_notext.svg",
         members: Big_map.literal(
           list(
@@ -1031,7 +1031,7 @@ const mainnet = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://images.squarespace-cdn.com/content/v1/621e19e02a75bc5e24ce9a20/377b2c63-db90-4369-8b0a-3e47a5f2f6f4/Frame.png?format=1500w",
         members: Big_map.literal(
           list(
@@ -1053,7 +1053,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "",
         members: Big_map.literal(
           list([["tz1MY1BKQd2QFDDsjCpkKi6vVDxPKycGiJA3" as address, unit]])
@@ -1071,7 +1071,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808523041488896/Profilbild.jpg",
         members: Big_map.literal(
           list(
@@ -1094,7 +1094,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://cdn.discordapp.com/attachments/952344765939208244/1116808941091950642/IMG_20230503_124736.jpg",
         members: Big_map.literal(
           list(
@@ -1122,7 +1122,7 @@ const mainnet = {
             ]
           )
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://chainborn.xyz/static/media/logo-big-color.8c8a0cec.webp",
         members: Big_map.literal(
           list(
@@ -1145,7 +1145,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://twitter.com/batbitsofficial/photo",
         members: Big_map.literal(
           list([["tz1a95jRX4Z9WG7iHbPXZoQMLB9qN6wJvp4W" as address, unit]])
@@ -1163,7 +1163,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "https://uploads-ssl.webflow.com/6307b856943c0f1358714dab/6307be3a634c24b505d20cb3_plentyIcon.svg",
         members: Big_map.literal(
           list([["tz1QssZXqqGznmaj5mEK53mtbjsnaasfo1Nf" as address, unit]])
@@ -1180,7 +1180,7 @@ const mainnet = {
         admins: Set.literal(
           list(["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address])
         ),
-        status: Contract.Active(),
+        status: Active(),
         logoUrl: "",
         members: Big_map.literal(
           list([["tz1d473kD8ctsHnJVtmoLAGW1wBZzYzMuU7n" as address, unit]])

@@ -1,50 +1,50 @@
 #import "./main.jsligo" "CONTRACT"
+
 #import "./nft.jsligo" "NFT"
-#import "@ligo/fa/lib/fa2/asset/multi_asset.jsligo" "MULTIASSET"
+
 const _ = Test.reset_state(4 as nat, list([]) as list<tez>);
 
 const baker = Test.nth_bootstrap_account(0);
 
-const _ = Test.set_baker(baker);
+const _14 = Test.set_baker(baker);
 
 const tezosAdmin: address = Test.nth_bootstrap_account(1);
 
-const _ = Test.log("tezosAdmin has balance : ");
+const _13 = Test.log("tezosAdmin has balance : ");
 
-const _ = Test.log(Test.get_balance(tezosAdmin));
+const _12 = Test.log(Test.get_balance(tezosAdmin));
 
-const _ = Test.log(tezosAdmin);
+const _11 = Test.log(tezosAdmin);
 
 const user: address = Test.nth_bootstrap_account(2);
 
-const _ = Test.log("user has balance : ");
+const _10 = Test.log("user has balance : ");
 
-const _ = Test.log(Test.get_balance(user));
+const _9 = Test.log(Test.get_balance(user));
 
-const _ = Test.log(user);
+const _8 = Test.log(user);
 
 const user2: address = Test.nth_bootstrap_account(3);
 
-const _ = Test.log("user2 has balance : ");
+const _7 = Test.log("user2 has balance : ");
 
-const _ = Test.log(Test.get_balance(user2));
+const _6 = Test.log(Test.get_balance(user2));
 
-const _ = Test.log(user2);
+const _5 = Test.log(user2);
 
-const tezosOrganization: CONTRACT.organization =
-  {
-    name: "TEZOS",
-    business: "Save the planet",
-    siteUrl: "https://tezos.com",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
-    ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
-    members: Big_map.empty as big_map<address, unit>,
-    admins: Set.literal(list([tezosAdmin])) as set<address>,
-    status: Active(),
-    memberRequests: Set.empty as set<CONTRACT.joinOrganizationRequest>,
-    fundingAddress: None() as option<address>,
-    autoRegistration: false
-  };
+const tezosOrganization: CONTRACT.organization = {
+  name: "TEZOS",
+  business: "Save the planet",
+  siteUrl: "https://tezos.com",
+  logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tezos_logo.svg/langfr-220px-Tezos_logo.svg.png",
+  ipfsNftUrl: "ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej",
+  members: Big_map.empty as big_map<address, unit>,
+  admins: Set.literal(list([tezosAdmin])) as set<address>,
+  status: Active(),
+  memberRequests: Set.empty as set<CONTRACT.joinOrganizationRequest>,
+  fundingAddress: None() as option<address>,
+  autoRegistration: false
+};
 
 const token_info: map<string, bytes> =
   Map.literal(
@@ -80,45 +80,43 @@ const metadata: bytes =
       "views": []
       }`;
 
-const initial_storageNFT: NFT.storage =
-  {
-    ledger: Big_map.literal(list([[[tezosAdmin, 0 as nat], 1 as nat]])) as
-      MULTIASSET.Ledger.t,
-    metadata: Big_map.literal(
-      list([["", bytes `tezos-storage:data`], ["data", metadata]])
-    ),
-    token_metadata: Big_map.add(
-      0 as nat,
-      { token_id: 0 as nat, token_info: token_info },
-      Big_map.empty as MULTIASSET.TokenMetadata.t
-    ),
-    operators: Big_map.empty as MULTIASSET.Operators.t,
-    owner_token_ids: Set.add(
-      [tezosAdmin, 0 as nat],
-      Set.empty as set<[MULTIASSET.owner, MULTIASSET.token_id]>
-    ),
-    token_ids: Set.add(0 as nat, Set.empty as set<MULTIASSET.token_id>)
-  };
+const initial_storageNFT: NFT.storage = {
+  ledger: Big_map.literal(list([[[tezosAdmin, 0 as nat], 1 as nat]])) as
+    NFT.MULTIASSET.Ledger.t,
+  metadata: Big_map.literal(
+    list([["", bytes `tezos-storage:data`], ["data", metadata]])
+  ),
+  token_metadata: Big_map.add(
+    0 as nat,
+    { token_id: 0 as nat, token_info: token_info },
+    Big_map.empty as NFT.MULTIASSET.TokenMetadata.t
+  ),
+  operators: Big_map.empty as NFT.MULTIASSET.Operators.t,
+  owner_token_ids: Set.add(
+    [tezosAdmin, 0 as nat],
+    Set.empty as set<[NFT.MULTIASSET.owner, NFT.MULTIASSET.token_id]>
+  ),
+  token_ids: Set.add(0 as nat, Set.empty as set<NFT.MULTIASSET.token_id>)
+};
 
-const [taddrNFT, _, _] =
-  Test.originate_module(contract_of (NFT), initial_storageNFT, 0 as tez);
+const [taddrNFT, _3, _4] =
+  Test.originate_module(contract_of(NFT), initial_storageNFT, 0 as tez);
 
 const contrNFT = Test.to_contract(taddrNFT);
 
-const initial_storage: CONTRACT.storage =
-  {
-    tezosOrganization: tezosOrganization,
-    organizations: list([]) as list<CONTRACT.organization>,
-    limits: {
-      organizationMax: 1000 as nat,
-      adminsMax: 50 as nat,
-      memberRequestMax: 50 as nat
-    },
-    nftAddress: Tezos.address(contrNFT)
-  };
+const initial_storage: CONTRACT.storage = {
+  tezosOrganization: tezosOrganization,
+  organizations: list([]) as list<CONTRACT.organization>,
+  limits: {
+    organizationMax: 1000 as nat,
+    adminsMax: 50 as nat,
+    memberRequestMax: 50 as nat
+  },
+  nftAddress: Tezos.address(contrNFT)
+};
 
-const [taddr, _, _] =
-  Test.originate_module(contract_of (CONTRACT), initial_storage, 0 as tez);
+const [taddr, _1, _2] =
+  Test.originate_module(contract_of(CONTRACT), initial_storage, 0 as tez);
 
 const contr = Test.to_contract(taddr);
 
@@ -133,9 +131,9 @@ const _testClaimNFT = (sender: address, ledgerSize: nat): bool => {
     Set.cardinal(store.owner_token_ids) == ledgerSize,
     "Wrong size on ledger"
   );
-  const ownerTokenIds: set<[MULTIASSET.owner, MULTIASSET.token_id]> =
+  const ownerTokenIds: set<[NFT.MULTIASSET.owner, NFT.MULTIASSET.token_id]> =
     Set.filter_map(
-      (tupleItem: [MULTIASSET.owner, MULTIASSET.token_id]) =>
+      (tupleItem: [NFT.MULTIASSET.owner, NFT.MULTIASSET.token_id]) =>
         tupleItem[0] == sender ? Some(tupleItem) : None(),
       store.owner_token_ids
     );
@@ -245,10 +243,12 @@ const _testUpdateTezosOrganizationToFail = (
   const _ = Test.log(["transferStatus", transferStatus]);
   let store: CONTRACT.storage = Test.get_storage(taddr);
   Test.log(store);
-  return match(
-    transferStatus,
-    { Fail: (_: test_exec_error) => true, Success: (_: nat) => false }
-  )
+  return match(transferStatus) {
+    when (Fail(_)):
+      true
+    when (Success(_)):
+      false
+  }
 };
 
 const _testActivateOrganization = (
@@ -454,16 +454,15 @@ const testClaimNFT = _testClaimNFT(user, 2 as nat);
 
 //testAddOrganizationNotAdmin
 
-const newOrganization: CONTRACT.addOrganizationRequest =
-  {
-    name: "Marigold",
-    business: "Save Tezos",
-    siteUrl: "https://",
-    logoUrl: "https://",
-    ipfsNftUrl: "https://",
-    fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
-    autoRegistration: false
-  };
+const newOrganization: CONTRACT.addOrganizationRequest = {
+  name: "Marigold",
+  business: "Save Tezos",
+  siteUrl: "https://",
+  logoUrl: "https://",
+  ipfsNftUrl: "https://",
+  fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+  autoRegistration: false
+};
 
 const testAddOrganizationNotAdmin =
   _testAddOrganizationNotAdmin(
@@ -510,12 +509,11 @@ const testRequestToJoinOrganization =
 
 //responseToJoinOrganization
 
-const userJoinOrganizationResponse =
-  {
-    membersToApprove: Set.literal(list([user2])) as set<address>,
-    membersToDecline: Set.empty as set<address>,
-    orgName: newOrganization.name
-  };
+const userJoinOrganizationResponse = {
+  membersToApprove: Set.literal(list([user2])) as set<address>,
+  membersToDecline: Set.empty as set<address>,
+  orgName: newOrganization.name
+};
 
 const testResponseToJoinOrganization =
   _testResponseToJoinOrganization(
@@ -534,16 +532,15 @@ const testRemoveMember = _testRemoveMember(user, userRemoveMemberRequest, false)
 
 //testAddOrganizationNotAdmin
 
-const newOrganization2: CONTRACT.addOrganizationRequest =
-  {
-    name: "NomadicLabs",
-    business: "Save nomades",
-    siteUrl: "https://",
-    logoUrl: "https://",
-    ipfsNftUrl: "https://",
-    fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
-    autoRegistration: true
-  };
+const newOrganization2: CONTRACT.addOrganizationRequest = {
+  name: "NomadicLabs",
+  business: "Save nomades",
+  siteUrl: "https://",
+  logoUrl: "https://",
+  ipfsNftUrl: "https://",
+  fundingAddress: Some("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+  autoRegistration: true
+};
 
 const testAddOrganizationNotAdmin2 =
   _testAddOrganizationNotAdmin(
