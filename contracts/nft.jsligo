@@ -1,4 +1,5 @@
 #import "@ligo/fa/lib/fa2/asset/multi_asset.jsligo" "MULTIASSET"
+
 export type storage = {
     ledger: MULTIASSET.Ledger.t,
     metadata: MULTIASSET.Metadata.t,
@@ -43,17 +44,15 @@ const transfer = (_p: MULTIASSET.transfer, s: storage): _return => {
 const balance_of = (p: MULTIASSET.balance_of, s: storage): _return => {
     const ret2 =
         MULTIASSET.balance_of(
-            [
-                p,
-                {
-                    ledger: s.ledger,
-                    metadata: s.metadata,
-                    token_metadata: s.token_metadata,
-                    operators: s.operators,
-                    owner_token_ids: s.owner_token_ids,
-                    token_ids: s.token_ids
-                }
-            ]
+            p,
+            {
+                ledger: s.ledger,
+                metadata: s.metadata,
+                token_metadata: s.token_metadata,
+                operators: s.operators,
+                owner_token_ids: s.owner_token_ids,
+                token_ids: s.token_ids
+            }
         );
     return [
         ret2[0],
@@ -72,18 +71,16 @@ const balance_of = (p: MULTIASSET.balance_of, s: storage): _return => {
 @entry
 const update_operators = (p: MULTIASSET.update_operators, s: storage): _return => {
     const ret2 =
-        MULTIASSET.update_ops(
-            [
-                p,
-                {
-                    ledger: s.ledger,
-                    metadata: s.metadata,
-                    token_metadata: s.token_metadata,
-                    operators: s.operators,
-                    owner_token_ids: s.owner_token_ids,
-                    token_ids: s.token_ids
-                }
-            ]
+        MULTIASSET.update_operators(
+            p,
+            {
+                ledger: s.ledger,
+                metadata: s.metadata,
+                token_metadata: s.token_metadata,
+                operators: s.operators,
+                owner_token_ids: s.owner_token_ids,
+                token_ids: s.token_ids
+            }
         );
     return [
         ret2[0],

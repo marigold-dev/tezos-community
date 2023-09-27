@@ -76,7 +76,7 @@ type limits = {
   memberRequestMax: nat
 };
 
-type storage = {
+export type storage = {
   tezosOrganization: organization,
   organizations: list<organization>,
   nftAddress: address,
@@ -121,13 +121,13 @@ const updateOrganization = (
       List.find_opt(
         (org: organization) => org.name == orgToUpdate.name,
         store.organizations
-      ),
+      ))
       {
-        None: () =>
+        when(None()): 
           failwith(
             "Cannot find an organization with the one passed as parameter"
-          ),
-        Some: (org) =>
+          )
+        when(Some(org)) :
           Set.mem(Tezos.get_sender(), org.admins) ? [
               list([Tezos.emit("%organizationUpdated", org.name)]),
               {
@@ -150,7 +150,7 @@ const updateOrganization = (
               "You need to be part of organization admins to update an organization"
             )
       }
-    )
+    
   }
 };
 
@@ -160,13 +160,13 @@ const activateOrganization = (orgName: string, store: storage): _return => {
     List.find_opt(
       (org: organization) => orgName == org.name,
       store.organizations
-    ),
+    ))
     {
-      None: () =>
+      when(None()) :
         failwith(
           "Cannot find an organization with the name passed as parameter"
-        ),
-      Some: (org) =>
+        )
+      when(Some (org)) :
         Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
             list([Tezos.emit("%organizationActivated", org.name)]),
             {
@@ -181,7 +181,7 @@ const activateOrganization = (orgName: string, store: storage): _return => {
             "You need to be part of Tezos organization to activate an organization"
           )
     }
-  )
+  
 };
 
 @entry
@@ -190,11 +190,11 @@ const freezeOrganization = (name: string, store: storage): _return => {
     List.find_opt(
       (org: organization) => (org.name == name),
       store.organizations
-    ),
+    ))
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) =>
+      when(None()) :
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some(org)) :
         Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ? [
             list([Tezos.emit("%organizationFrozen", org.name)]),
             {
@@ -209,7 +209,7 @@ const freezeOrganization = (name: string, store: storage): _return => {
             "You need to be part of Tezos organization to remove an organization"
           )
     }
-  )
+  
 };
 
 @entry
@@ -253,11 +253,11 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
       List.find_opt(
         (orgItem: organization) => (org.name == orgItem.name),
         store.organizations
-      ),
+      ))
       {
-        Some: (_org) =>
-          failwith("Organization name already exists and should be unique"),
-        None: () =>
+        when(Some(_org)):
+          failwith("Organization name already exists and should be unique")
+        when(None()) :
           [
             list([Tezos.emit("%organizationAdded", org.name)]),
             {
@@ -276,7 +276,7 @@ const addOrganization = (org: addOrganizationRequest, store: storage): _return =
             }
           ]
       }
-    )
+    
   }
 };
 
@@ -286,11 +286,11 @@ const removeOrganization = (name: string, store: storage): _return => {
     List.find_opt(
       (org: organization) => (org.name == name),
       store.organizations
-    ),
+    ))
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) =>
+      when(None()) :
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some (org)) :
         Set.mem(Tezos.get_sender(), store.tezosOrganization.admins) ||
           Set.mem(Tezos.get_sender(), org.admins) ? [
             list([]),
@@ -306,7 +306,7 @@ const removeOrganization = (name: string, store: storage): _return => {
             "You need to be part of organization administrators or Tezos organization to remove an organization"
           )
     }
-  )
+  
 };
 
 const leaveOrganizationAsAdmin = (
@@ -318,9 +318,9 @@ const leaveOrganizationAsAdmin = (
     "You need to be an admin to use this function"
   ) else {
     return match(
-      lastAdminOpt,
+      lastAdminOpt)
       {
-        None: () => {
+        when(None()) :do {
           if (Set.cardinal(org.admins) == (1 as nat)) failwith(
             "You cannot leave an organization empty without naming another admin from members"
           ) else return {
@@ -336,8 +336,8 @@ const leaveOrganizationAsAdmin = (
               store.organizations
             )
           }
-        },
-        Some: (lastAdmin) => {
+        }
+        when(Some (lastAdmin)) : do {
           if (Set.cardinal(org.admins) != (1 as nat)) return failwith(
             "Don't name another admin to replace you if there are enough admins on the organization"
           ) else if (
@@ -370,7 +370,7 @@ const leaveOrganizationAsAdmin = (
           }
         }
       }
-    )
+    
   }
 };
 
@@ -382,11 +382,11 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
       store.organizations
     );
   return match(
-    orgOpt,
+    orgOpt)
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) => {
+      when(None ()) :
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some (org)) : do {
         if (Set.mem(rmp.member, org.admins)) failwith(
           "Cannot remove a member who is administrator, use removeAdmin endpoint instead"
         ) else if (
@@ -411,7 +411,7 @@ const removeMember = (rmp: removeMemberParameters, store: storage): _return => {
         }
       }
     }
-  )
+  
 };
 
 @entry
@@ -422,11 +422,11 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
       store.organizations
     );
   return match(
-    orgOpt,
+    orgOpt)
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) => {
+      when(None()) :
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some (org) ) : do {
         if (Tezos.get_sender() == rap.admin && Set.mem(rap.admin, org.admins)) {
           return [list([]), leaveOrganizationAsAdmin(org, rap.lastAdmin, store)]
         } else if (
@@ -451,7 +451,7 @@ const removeAdmin = (rap: removeAdminParameters, store: storage): _return => {
         }
       }
     }
-  )
+  
 };
 
 @entry
@@ -462,11 +462,11 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
       store.organizations
     );
   return match(
-    orgOpt,
+    orgOpt)
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) => {
+      when(None()) :
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some (org)) : do {
         if (Set.cardinal(org.admins) == store.limits.adminsMax) failwith(
           "We have reached admin size limit"
         );
@@ -493,7 +493,7 @@ const addAdmin = (aap: addAdminParameters, store: storage): _return => {
         }
       }
     }
-  )
+  
 };
 
 @entry
@@ -527,11 +527,11 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
       store.organizations
     );
   return match(
-    orgOpt,
+    orgOpt)
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) => {
+      when(None()) : 
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some(org)) : do {
         if (org.status != Active()) return failwith(
           "You cannot receive requests until your organization is activated"
         ) else if (
@@ -589,7 +589,7 @@ const requestToJoinOrganization = (jr: joinRequest, store: storage): _return => 
         }
       }
     }
-  )
+  
 };
 
 @entry
@@ -603,11 +603,11 @@ const responseToJoinOrganization = (
       store.organizations
     );
   return match(
-    orgOpt,
+    orgOpt)
     {
-      None: () =>
-        failwith("Cannot find organization with name passed on parameter"),
-      Some: (org) => {
+      when(None ()) :
+        failwith("Cannot find organization with name passed on parameter")
+      when(Some (org)) : do {
         if (!Set.mem(Tezos.get_sender(), org.admins)) return failwith(
           "You don't have the rights to approve/decline users from this organization"
         ) else {
@@ -650,7 +650,7 @@ const responseToJoinOrganization = (
         }
       }
     }
-  )
+  
 };
 
 @entry
