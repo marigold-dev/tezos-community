@@ -1,24 +1,24 @@
 #include "./nft.jsligo"
-const default_storage =
-  {
-    ledger: Big_map.literal(
-      list(
+
+const default_storage = {
+  ledger: Big_map.literal(
+    list(
+      [
         [
-          [
-            [("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address), 0 as nat],
-            1 as nat
-          ]
+          [("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address), 0 as nat],
+          1 as nat
         ]
-      )
-    ) as MULTIASSET.Ledger.t,
-    metadata: Big_map.literal(
-      list(
+      ]
+    )
+  ) as MULTIASSET.Ledger.t,
+  metadata: Big_map.literal(
+    list(
+      [
+        ["", bytes `tezos-storage:data`],
         [
-          ["", bytes `tezos-storage:data`],
-          [
-            "data",
-            bytes
-            `{
+          "data",
+          bytes
+          `{
       "name":"Tezos Community NFT",
       "description":"Membership card for Tezos community member",
       "version":"0.0.1",
@@ -32,39 +32,47 @@ const default_storage =
       "errors": [],
       "views": []
       }`
-          ]
         ]
-      )
-    ),
-    token_metadata: Big_map.add(
-      0 as nat,
-      {
-        token_id: 0 as nat,
-        token_info: Map.literal(
-          list(
+      ]
+    )
+  ),
+  token_metadata: Big_map.add(
+    0 as nat,
+    {
+      token_id: 0 as nat,
+      token_info: Map.literal(
+        list(
+          [
+            ["name", (bytes `Tezos Community`)],
             [
-              ["name", (bytes `Tezos Community`)],
-              [
-                "description",
-                (bytes `Membership card for Tezos community member`)
-              ],
-              ["interfaces", (bytes `["TZIP-12"]`)],
-              [
-                "thumbnailUri",
-                (bytes `ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej`)
-              ],
-              ["symbol", (bytes `NFTTZ`)],
-              ["decimals", (bytes `0`)]
-            ]
-          )
-        ) as map<string, bytes>
-      },
-      Big_map.empty as MULTIASSET.TokenMetadata.t
-    ),
-    operators: Big_map.empty as MULTIASSET.Operators.t,
-    owner_token_ids: Set.add(
-      ["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address, 0 as nat],
-      Set.empty as set<[MULTIASSET.owner, MULTIASSET.token_id]>
-    ),
-    token_ids: Set.add(0 as nat, Set.empty as set<MULTIASSET.token_id>)
-  };
+              "description",
+              (bytes `Membership card for Tezos community member`)
+            ],
+            ["interfaces", (bytes `["TZIP-12"]`)],
+            [
+              "artifactUri",
+              (bytes `ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej`)
+            ],
+            [
+              "displayUri",
+              (bytes `ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej`)
+            ],
+            [
+              "thumbnailUri",
+              (bytes `ipfs://QmdHrYEHaaDQBXVF7vZJXudLgeMaeoiPE4UuGapMNe25ej`)
+            ],
+            ["symbol", (bytes `NFTTZ`)],
+            ["decimals", (bytes `0`)]
+          ]
+        )
+      ) as map<string, bytes>
+    },
+    Big_map.empty as MULTIASSET.TokenMetadata.t
+  ),
+  operators: Big_map.empty as MULTIASSET.Operators.t,
+  owner_token_ids: Set.add(
+    ["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address, 0 as nat],
+    Set.empty as set<[MULTIASSET.owner, MULTIASSET.token_id]>
+  ),
+  token_ids: Set.add(0 as nat, Set.empty as set<MULTIASSET.token_id>)
+};
