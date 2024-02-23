@@ -1,5 +1,7 @@
 # tezos-community
 
+* [Documentation](https://marigold-dev.github.io/tzvote/)
+
 ## Build / compile
 
 Project to build a dapp for Tezos community that includes a DAO, organization rules, multisig, message broadcast, etc ...
@@ -232,6 +234,8 @@ npm run publish
 ```
 
 # Docs
+
+* [Documentation](https://marigold-dev.github.io/tzvote/)
 
 import git submodule and run doc locally
 
