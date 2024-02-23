@@ -1,6 +1,6 @@
 # tezos-community
 
-* [Documentation](https://marigold-dev.github.io/tzvote/)
+* [Documentation](https://marigold-dev.github.io/tezos-community/)
 
 ## Build / compile
 
@@ -235,7 +235,7 @@ npm run publish
 
 # Docs
 
-* [Documentation](https://marigold-dev.github.io/tzvote/)
+* [Documentation](https://marigold-dev.github.io/tezos-community/)
 
 import git submodule and run doc locally
 
